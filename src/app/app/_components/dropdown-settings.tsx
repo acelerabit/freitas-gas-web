@@ -16,7 +16,7 @@ export function DropdownSettings() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          className="rounded-full border border-gray-200 w-8 h-8 dark:border-gray-800"
+          className="rounded-full w-8 h-8"
           size="icon"
           variant="ghost"
         >

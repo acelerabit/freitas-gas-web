@@ -1,26 +1,17 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser } from "@/contexts/user-context";
-import { faker } from "@faker-js/faker";
 
 export function DropdownUserImage() {
   const { user } = useUser();
 
   return (
     <>
-      <img
-        alt="Avatar"
-        className="rounded-full"
-        height="32"
-        src={user?.avatarUrl ? user.avatarUrl : faker.image.avatarGitHub()}
-        style={{
-          aspectRatio: "32/32",
-          objectFit: "cover",
-        }}
-        width="32"
-      />
-      <span className="sr-only">Toggle user menu</span>
+      <Avatar>
+        <AvatarImage className="cursor-pointer" src={user?.avatarUrl} />
+        <AvatarFallback className="cursor-pointer uppercase hover:bg-slate-200">{user?.name.substring(0, 2)}</AvatarFallback>
+      </Avatar>
     </>
   );
 }
