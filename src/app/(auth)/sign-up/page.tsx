@@ -41,58 +41,36 @@ export default function SignUp() {
   const [planSelected, setPlanSelected] = useState(null);
   const router = useRouter();
 
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  async function queryDefault() {
-    const response = await fetchApi(`/plans/default`);
-
-    if (!response.ok) {
-      toast.error("Erro ao buscar planos",{
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
-      });
-      return;
-    }
-
-    const data = await response.json();
-
-    setPlanSelected(data.id);
-  }
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const requestData = {
-      user: {
-        name: values.name,
-        email: values.email,
-        password: values.password,
-      },
-      acceptNotifications: true
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      role: "USER",
     };
 
-    const response = await fetchApi(
-      `/subscription/create-subscription/${planSelected}`,
-      {
-        method: "POST",
-        body: JSON.stringify(requestData),
-      }
-    );
+    const response = await fetchApi(`/users`, {
+      method: "POST",
+      body: JSON.stringify(requestData),
+    });
 
     if (!response.ok) {
-      toast.error("Erro ao criar conta",{
+      toast.error("Erro ao criar conta", {
         action: {
           label: "Undo",
           onClick: () => console.log("Undo"),
         },
       });
+
+      console.log(response)
       return;
     }
 
-    toast.success("Conta criada com sucesso",{
+    toast.success("Conta criada com sucesso", {
       action: {
         label: "Undo",
         onClick: () => console.log("Undo"),
@@ -100,10 +78,6 @@ export default function SignUp() {
     });
     router.replace("/");
   }
-
-  useEffect(() => {
-    queryDefault();
-  }, []);
 
   return (
     <main className="w-screen h-screen flex flex-col items-center justify-center">

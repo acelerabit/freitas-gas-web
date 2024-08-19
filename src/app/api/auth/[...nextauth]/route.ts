@@ -25,7 +25,6 @@ const nextAuthOptions: NextAuthOptions = {
         }
       },
       async authorize(credentials, req) {
-        const cookiesStore = getCookies();
 
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
@@ -42,10 +41,6 @@ const nextAuthOptions: NextAuthOptions = {
 
 
         const result = await response.json()
-
-        if (result.subscriptionValue != null && result.subscriptionValue <= 0) {
-          cookiesStore.set('sub-free', 'sub-free')
-        }
 
         if (result && response.ok) {
           return {
@@ -117,7 +112,6 @@ const nextAuthOptions: NextAuthOptions = {
         const profileTyped: any = { ...profile }
 
         if (profileTyped?.email_verified) {
-          const cookiesStore = getCookies();
 
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login-with-google`, {
             method: 'POST',
@@ -137,10 +131,6 @@ const nextAuthOptions: NextAuthOptions = {
 
           const result = await response.json()
 
-          if (result.subscriptionValue != null && result.subscriptionValue <= 0) {
-            cookiesStore.set('sub-free', 'sub-free')
-          }
-
           return result
         }
 
@@ -148,7 +138,6 @@ const nextAuthOptions: NextAuthOptions = {
       }
 
       if (account?.provider === 'credentials') {
-        const cookiesStore = getCookies();
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
           method: 'POST',
@@ -162,16 +151,13 @@ const nextAuthOptions: NextAuthOptions = {
             })
         })
 
-        if(!response.ok) {
+        if (!response.ok) {
           return null
         }
 
 
         const result = await response.json()
 
-        if (result.subscriptionValue != null && result.subscriptionValue <= 0) {
-          cookiesStore.set('sub-free', 'sub-free')
-        }
 
         if (result && response.ok) {
           return {
