@@ -11,7 +11,7 @@ import { TableUsers } from "./_components/table-users";
 export default function Users() {
   return (
     <main className="p-8 flex flex-col">
-      <h1 className="text-4xl font-semibold">Users</h1>
+      <h1 className="text-4xl font-semibold">Usuários</h1>
 
       <Breadcrumb className="my-4">
         <BreadcrumbList>

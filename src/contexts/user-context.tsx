@@ -20,7 +20,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: "ADMIN" | "USER";
+  role: "ADMIN" | "DELIVERYMAN";
   loggedWithGoogle: boolean;
   avatarUrl: string;
   acceptNotifications: boolean;

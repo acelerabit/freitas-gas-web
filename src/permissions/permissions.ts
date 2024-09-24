@@ -10,7 +10,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
   ADMIN(user, { can, cannot }) {
     can('manage', 'all')
   },
-  USER(user, { can }) {
+  DELIVERYMAN(user, { can }) {
     can('get', 'User')
     can(['update', 'delete'], 'User', {
       id: {

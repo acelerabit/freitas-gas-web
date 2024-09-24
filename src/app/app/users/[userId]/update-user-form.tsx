@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -33,7 +34,8 @@ const formSchema = z.object({
     message: "Username must be at least 2 characters.",
   }),
   email: z.string().email("Email must be valid"),
-  role: z.enum(["ADMIN", "USER"]),
+  role: z.enum(["ADMIN", "DELIVERYMAN"]),
+  status: z.boolean(),
 });
 
 interface User {
@@ -41,13 +43,14 @@ interface User {
   email: string;
   name: string;
   role: string;
+  status: boolean;
 }
 
 interface UpdateUserFormProps {
   user: User;
 }
 
-type roles = 'ADMIN' | 'USER'
+type roles = 'ADMIN' | 'DELIVERYMAN'
 
 export function UpdateUserForm({ user }: UpdateUserFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,6 +59,7 @@ export function UpdateUserForm({ user }: UpdateUserFormProps) {
       username: user?.name,
       email: user?.email,
       role: user.role as roles,
+      status: user.status ?? false
     },
   });
 
@@ -65,6 +69,7 @@ export function UpdateUserForm({ user }: UpdateUserFormProps) {
       email: values.email,
       role: values.role,
       id: user?.id,
+      status: values.status
     };
 
     const response = await fetchApi(`/users/update`, {
@@ -102,12 +107,12 @@ export function UpdateUserForm({ user }: UpdateUserFormProps) {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Nome</FormLabel>
               <FormControl>
                 <Input placeholder="username" {...field} />
               </FormControl>
               <FormDescription>
-                This is your public display name.
+                Insira seu nome
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -124,7 +129,7 @@ export function UpdateUserForm({ user }: UpdateUserFormProps) {
                 <Input placeholder="email" {...field} />
               </FormControl>
               <FormDescription>
-                This is your public display email.
+                Insira seu e-mail
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -136,7 +141,7 @@ export function UpdateUserForm({ user }: UpdateUserFormProps) {
           name="role"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Role</FormLabel>
+              <FormLabel>Permissão</FormLabel>
               <Select
                 onValueChange={field.onChange}
                 defaultValue={field.value}
@@ -147,7 +152,7 @@ export function UpdateUserForm({ user }: UpdateUserFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="USER">USER</SelectItem>
+                  <SelectItem value="DELIVERYMAN">DELIVERYMAN</SelectItem>
                   <SelectItem value="ADMIN">ADMIN</SelectItem>
                 </SelectContent>
               </Select>
@@ -159,7 +164,26 @@ export function UpdateUserForm({ user }: UpdateUserFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <FormControl>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    style={{ marginLeft: "5px" }}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Salvar</Button>
       </form>
     </Form>
   );
