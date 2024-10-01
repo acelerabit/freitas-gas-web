@@ -59,8 +59,8 @@ const mockSales: Sale[] = [
   {
     id: '1',
     products: [
-      { id: 'P1', type: 'P1', quantity: 2, price: 5.0, status: 'COMODATO' },
-      { id: 'P2', type: 'P2', quantity: 1, price: 10.0, status: 'FULL' },
+      { id: 'P3', type: 'COMODATO', quantity: 2, price: 5.0, status: 'COMODATO' },
+      { id: 'P45', type: 'FULL', quantity: 1, price: 10.0, status: 'FULL' },
     ],
     deliveryman: 'João',
     paymentMethod: 'Cartão',
@@ -72,7 +72,7 @@ const mockSales: Sale[] = [
   {
     id: '2',
     products: [
-      { id: 'P20', type: 'P20', quantity: 5, price: 3.0, status: 'COMODATO' },
+      { id: 'P20', type: 'COMODATO', quantity: 5, price: 3.0, status: 'COMODATO' },
     ],
     deliveryman: 'Maria',
     paymentMethod: 'Dinheiro',
@@ -84,125 +84,14 @@ const mockSales: Sale[] = [
   {
     id: '3',
     products: [
-      { id: 'P20', type: 'P20', quantity: 3, price: 4.0, status: 'FULL' },
-    ],
-    deliveryman: 'Pedro',
-    paymentMethod: 'Pix',
-    customer: 'Cliente C',
-    saleType: 'Comodato',
-    total: 12.0,
-    date: new Date('2024-09-22'),
-  },
-  {
-    id: '4',
-    products: [
-      { id: 'P10', type: 'P10', quantity: 1, price: 5.0, status: 'FULL' },
+      { id: 'P13', type: 'FULL', quantity: 3, price: 8.0, status: 'FULL' },
     ],
     deliveryman: 'Carlos',
-    paymentMethod: 'Cartão',
-    customer: 'Cliente D',
-    saleType: 'Conteúdo',
-    total: 5.0,
-    date: new Date('2024-09-23'),
-  },
-  {
-    id: '5',
-    products: [
-      { id: 'P28', type: 'P28', quantity: 10, price: 2.5, status: 'FULL' },
-    ],
-    deliveryman: 'José',
-    paymentMethod: 'Dinheiro',
-    customer: 'Cliente E',
-    saleType: 'Vasilhame Cheio',
-    total: 25.0,
-    date: new Date('2024-09-24'),
-  },
-  {
-    id: '6',
-    products: [
-      { id: 'P1', type: 'P1', quantity: 6, price: 3.0, status: 'FULL' },
-    ],
-    deliveryman: 'Ana',
     paymentMethod: 'Pix',
-    customer: 'Cliente F',
-    saleType: 'Comodato',
-    total: 18.0,
-    date: new Date('2024-09-25'),
-  },
-  // Novas vendas adicionadas
-  {
-    id: '7',
-    products: [
-      { id: 'P3', type: 'P3', quantity: 2, price: 7.0, status: 'FULL' },
-    ],
-    deliveryman: 'Luiz',
-    paymentMethod: 'Cartão',
-    customer: 'Cliente G',
-    saleType: 'Conteúdo',
-    total: 14.0,
-    date: new Date('2024-09-26'),
-  },
-  {
-    id: '8',
-    products: [
-      { id: 'P4', type: 'P4', quantity: 1, price: 15.0, status: 'FULL' },
-      { id: 'P5', type: 'P5', quantity: 3, price: 4.0, status: 'COMODATO' },
-    ],
-    deliveryman: 'Fernanda',
-    paymentMethod: 'Dinheiro',
-    customer: 'Cliente H',
-    saleType: 'Vasilhame Cheio',
-    total: 27.0,
-    date: new Date('2024-09-27'),
-  },
-  {
-    id: '9',
-    products: [
-      { id: 'P6', type: 'P6', quantity: 4, price: 6.0, status: 'FULL' },
-    ],
-    deliveryman: 'Ricardo',
-    paymentMethod: 'Pix',
-    customer: 'Cliente I',
-    saleType: 'Comodato',
+    customer: 'Cliente C',
+    saleType: 'Vasilhame Vazio',
     total: 24.0,
-    date: new Date('2024-09-28'),
-  },
-  {
-    id: '10',
-    products: [
-      { id: 'P7', type: 'P7', quantity: 5, price: 3.5, status: 'COMODATO' },
-    ],
-    deliveryman: 'Mariana',
-    paymentMethod: 'Cartão',
-    customer: 'Cliente J',
-    saleType: 'Conteúdo',
-    total: 17.5,
-    date: new Date('2024-09-29'),
-  },
-  {
-    id: '11',
-    products: [
-      { id: 'P8', type: 'P8', quantity: 7, price: 2.0, status: 'FULL' },
-    ],
-    deliveryman: 'Sofia',
-    paymentMethod: 'Dinheiro',
-    customer: 'Cliente K',
-    saleType: 'Vasilhame Cheio',
-    total: 14.0,
-    date: new Date('2024-09-30'),
-  },
-  {
-    id: '12',
-    products: [
-      { id: 'P9', type: 'P9', quantity: 1, price: 20.0, status: 'COMODATO' },
-      { id: 'P10', type: 'P10', quantity: 2, price: 10.0, status: 'FULL' },
-    ],
-    deliveryman: 'Lucas',
-    paymentMethod: 'Pix',
-    customer: 'Cliente L',
-    saleType: 'Comodato',
-    total: 40.0,
-    date: new Date('2024-10-01'),
+    date: new Date('2024-09-22'),
   },
 ];
 
