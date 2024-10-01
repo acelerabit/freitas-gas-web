@@ -12,11 +12,6 @@ export default function SalesPage() {
           <CardTitle>Listagem de Vendas</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between items-center mb-4">
-            <Button asChild>
-              <Link href="/sales/new">Nova Venda</Link>
-            </Button>
-          </div>
           <TableSales />
         </CardContent>
       </Card>

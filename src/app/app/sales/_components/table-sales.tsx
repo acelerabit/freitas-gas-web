@@ -1,8 +1,12 @@
 "use client";
 
+import { useForm, Controller } from 'react-hook-form';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -15,13 +19,22 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { EllipsisVertical } from "lucide-react";
+import { fetchApi } from "@/services/fetchApi";
+import { useUser } from "../../../../contexts/user-context";
 
+type ProductType = 'FULL' | 'EMPTY' | 'COMODATO';
 interface Product {
   id: string;
-  name: string;
+  type: ProductType;
   quantity: number;
-  unitPrice: number;
+  price: number;
+  status: string;
 }
+const productTypes: Record<ProductType, string> = {
+  FULL: "COMPLETO",
+  EMPTY: "VAZIO",
+  COMODATO: "COMODATO"
+};
 
 interface Sale {
   id: string;
@@ -33,14 +46,21 @@ interface Sale {
   total: number;
   date: Date;
 }
-
+interface Customer {
+  name: string;
+  id: string;
+  props: {
+    id: string;
+    name: string;
+  };
+}
 
 const mockSales: Sale[] = [
   {
     id: '1',
     products: [
-      { id: 'P1', name: 'P1', quantity: 2, unitPrice: 5.0 },
-      { id: 'P2', name: 'P2', quantity: 1, unitPrice: 10.0 },
+      { id: 'P1', type: 'P1', quantity: 2, price: 5.0, status: 'COMODATO' },
+      { id: 'P2', type: 'P2', quantity: 1, price: 10.0, status: 'FULL' },
     ],
     deliveryman: 'João',
     paymentMethod: 'Cartão',
@@ -52,7 +72,7 @@ const mockSales: Sale[] = [
   {
     id: '2',
     products: [
-      { id: 'P20', name: 'P20', quantity: 5, unitPrice: 3.0 },
+      { id: 'P20', type: 'P20', quantity: 5, price: 3.0, status: 'COMODATO' },
     ],
     deliveryman: 'Maria',
     paymentMethod: 'Dinheiro',
@@ -64,7 +84,7 @@ const mockSales: Sale[] = [
   {
     id: '3',
     products: [
-      { id: 'P20', name: 'P20', quantity: 3, unitPrice: 4.0 },
+      { id: 'P20', type: 'P20', quantity: 3, price: 4.0, status: 'FULL' },
     ],
     deliveryman: 'Pedro',
     paymentMethod: 'Pix',
@@ -76,7 +96,7 @@ const mockSales: Sale[] = [
   {
     id: '4',
     products: [
-      { id: 'P10', name: 'P10', quantity: 1, unitPrice: 5.0 },
+      { id: 'P10', type: 'P10', quantity: 1, price: 5.0, status: 'FULL' },
     ],
     deliveryman: 'Carlos',
     paymentMethod: 'Cartão',
@@ -88,7 +108,7 @@ const mockSales: Sale[] = [
   {
     id: '5',
     products: [
-      { id: 'P28', name: 'P28', quantity: 10, unitPrice: 2.5 },
+      { id: 'P28', type: 'P28', quantity: 10, price: 2.5, status: 'FULL' },
     ],
     deliveryman: 'José',
     paymentMethod: 'Dinheiro',
@@ -100,7 +120,7 @@ const mockSales: Sale[] = [
   {
     id: '6',
     products: [
-      { id: 'P1', name: 'P1', quantity: 6, unitPrice: 3.0 },
+      { id: 'P1', type: 'P1', quantity: 6, price: 3.0, status: 'FULL' },
     ],
     deliveryman: 'Ana',
     paymentMethod: 'Pix',
@@ -113,7 +133,7 @@ const mockSales: Sale[] = [
   {
     id: '7',
     products: [
-      { id: 'P3', name: 'P3', quantity: 2, unitPrice: 7.0 },
+      { id: 'P3', type: 'P3', quantity: 2, price: 7.0, status: 'FULL' },
     ],
     deliveryman: 'Luiz',
     paymentMethod: 'Cartão',
@@ -125,8 +145,8 @@ const mockSales: Sale[] = [
   {
     id: '8',
     products: [
-      { id: 'P4', name: 'P4', quantity: 1, unitPrice: 15.0 },
-      { id: 'P5', name: 'P5', quantity: 3, unitPrice: 4.0 },
+      { id: 'P4', type: 'P4', quantity: 1, price: 15.0, status: 'FULL' },
+      { id: 'P5', type: 'P5', quantity: 3, price: 4.0, status: 'COMODATO' },
     ],
     deliveryman: 'Fernanda',
     paymentMethod: 'Dinheiro',
@@ -138,7 +158,7 @@ const mockSales: Sale[] = [
   {
     id: '9',
     products: [
-      { id: 'P6', name: 'P6', quantity: 4, unitPrice: 6.0 },
+      { id: 'P6', type: 'P6', quantity: 4, price: 6.0, status: 'FULL' },
     ],
     deliveryman: 'Ricardo',
     paymentMethod: 'Pix',
@@ -150,7 +170,7 @@ const mockSales: Sale[] = [
   {
     id: '10',
     products: [
-      { id: 'P7', name: 'P7', quantity: 5, unitPrice: 3.5 },
+      { id: 'P7', type: 'P7', quantity: 5, price: 3.5, status: 'COMODATO' },
     ],
     deliveryman: 'Mariana',
     paymentMethod: 'Cartão',
@@ -162,7 +182,7 @@ const mockSales: Sale[] = [
   {
     id: '11',
     products: [
-      { id: 'P8', name: 'P8', quantity: 7, unitPrice: 2.0 },
+      { id: 'P8', type: 'P8', quantity: 7, price: 2.0, status: 'FULL' },
     ],
     deliveryman: 'Sofia',
     paymentMethod: 'Dinheiro',
@@ -174,8 +194,8 @@ const mockSales: Sale[] = [
   {
     id: '12',
     products: [
-      { id: 'P9', name: 'P9', quantity: 1, unitPrice: 20.0 },
-      { id: 'P10', name: 'P10', quantity: 2, unitPrice: 10.0 },
+      { id: 'P9', type: 'P9', quantity: 1, price: 20.0, status: 'COMODATO' },
+      { id: 'P10', type: 'P10', quantity: 2, price: 10.0, status: 'FULL' },
     ],
     deliveryman: 'Lucas',
     paymentMethod: 'Pix',
@@ -186,91 +206,293 @@ const mockSales: Sale[] = [
   },
 ];
 
-
 export function TableSales() {
+  const { user } = useUser();
   const [sales, setSales] = useState<Sale[]>([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 5;
   const [loadingSales, setLoadingSales] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const { control, handleSubmit, setValue, watch } = useForm();
+
+  const [formData, setFormData] = useState({
+    customerId: "",
+    deliverymanId: user?.id || "",
+    products: [{ productId: "", type: "", status: "", price: 0, quantity: 1 }],
+    paymentMethod: "",
+  });
 
   useEffect(() => {
     setLoadingSales(true);
-
     const paginatedSales = mockSales.slice((page - 1) * itemsPerPage, page * itemsPerPage);
     setSales(paginatedSales);
-    
     setLoadingSales(false);
   }, [page]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const customersResponse = await fetchApi('/customers/all');
+        const customersData = await customersResponse.json();
+        const formattedCustomers = customersData.map((customer: { id: any; props: { id: any; name: any; }; }) => ({
+          id: customer.props.id,
+          name: customer.props.name,
+        }));
+        setCustomers(formattedCustomers);
+  
+        const productsResponse = await fetchApi('/products');
+        const productsData = await productsResponse.json();
+        const formattedProducts = productsData.map((product: { _id: any; _type: any; _status: any; _price: any; }) => ({
+          id: product._id,
+          type: product._type,
+          status: product._status,
+          price: product._price,
+        }));
+        setProducts(formattedProducts);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchData();
+  }, []);
+
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  const handleProductSelect = (productId: string, index: number) => {
+    const selectedProduct = products.find(product => product.id === productId);
+    if (selectedProduct) {
+      const updatedProducts = [...formData.products];
+      updatedProducts[index] = {
+        ...updatedProducts[index],
+        productId,
+        type: selectedProduct.type,
+        status: selectedProduct.status,
+        price: selectedProduct.price,
+        quantity: updatedProducts[index].quantity,
+      };
+
+      setFormData(prev => ({ ...prev, products: updatedProducts }));
+
+      setValue(`products[${index}].type`, selectedProduct.type);
+      setValue(`products[${index}].status`, selectedProduct.status);
+      setValue(`products[${index}].price`, selectedProduct.price);
+    }
+  };
+
+  const addProductField = () => {
+    setFormData(prevData => ({
+      ...prevData,
+      products: [...prevData.products, { productId: "", type: "", status: "", price: 0, quantity: 1 }],
+    }));
+  };  
+
+  const onSubmit = async () => {
+    await fetchApi("/sales", {
+      method: "POST",
+      body: JSON.stringify(formData),
+    });
+    handleCloseDialog();
+  };
+
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Vendas</CardTitle>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger>
+            <Button onClick={handleOpenDialog}>Cadastrar Venda</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cadastrar Nova Venda</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <Controller
+              name="customerId"
+              control={control}
+              render={({ field }) => (
+                <Select 
+                  {...field}
+                  onValueChange={(value) => {
+                    setFormData(prev => ({ ...prev, customerId: value }));
+                    field.onChange(value);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um cliente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customers.map((customer) => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {customer.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {formData.products.map((product, index) => (
+              <div key={index}>
+                <Controller
+                  name={`products[${index}].productId`}
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      onValueChange={(value) => handleProductSelect(value, index)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um produto" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {products.map(product => (
+                          <SelectItem key={product.id} value={product.id}>
+                            {product.type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <Controller
+                  name={`products[${index}].status`}
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      placeholder="Status"
+                      {...field}
+                      value={productTypes[product.status as keyof typeof productTypes] || product.status}
+                      readOnly
+                    />
+                  )}
+                />
+                <Controller
+                  name={`products[${index}].price`}
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      placeholder="Preço"
+                      type="number"
+                      {...field}
+                      value={product.price} // Use o estado do produto
+                      onChange={(e) => {
+                        const updatedProducts = [...formData.products];
+                        updatedProducts[index].price = parseFloat(e.target.value);
+                        setFormData(prev => ({ ...prev, products: updatedProducts })); // Atualiza o estado do formulário
+                        field.onChange(parseFloat(e.target.value)); // Atualiza o controle
+                      }}
+                    />
+                  )}
+                />
+                <Controller
+                  name={`products[${index}].quantity`}
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      placeholder="Quantidade"
+                      type="number"
+                      {...field}
+                      value={product.quantity}
+                      onChange={(e) => {
+                        const updatedProducts = [...formData.products];
+                        updatedProducts[index].quantity = parseInt(e.target.value, 10) || 1;
+                        setFormData(prev => ({ ...prev, products: updatedProducts }));
+                        field.onChange(parseInt(e.target.value, 10) || 1);
+                      }}
+                    />
+                  )}
+                />
+              </div>
+            ))}
+
+              <Button type="button" onClick={addProductField}>Adicionar Produto</Button>
+
+              <Controller
+                name="paymentMethod"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setFormData(prev => ({ ...prev, paymentMethod: value }));
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um método de pagamento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
+                      <SelectItem value="CARTAO">Cartão</SelectItem>
+                      <SelectItem value="PIX">Pix</SelectItem>
+                      <SelectItem value="FIADO">Fiado</SelectItem>
+                      <SelectItem value="TRANSFERENCIA">Transferência</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <DialogFooter>
+                <Button type="submit">Salvar</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Produto</TableHead>
-              <TableHead>Quantidade</TableHead>
-              <TableHead>Entregador</TableHead>
-              <TableHead>Valor Unitário</TableHead>
-              <TableHead>Forma de Pagamento</TableHead>
+              <TableHead>ID</TableHead>
               <TableHead>Cliente</TableHead>
-              <TableHead>Tipo de Venda</TableHead>
-              <TableHead>Total</TableHead>
+              <TableHead>Entregador</TableHead>
               <TableHead>Data</TableHead>
+              <TableHead>Total</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sales.map((sale) => (
-              <TableRow key={sale.id}>
-                <TableCell>
-                  {sale.products.map((product) => (
-                    <div key={product.id}>
-                      {product.name} (x{product.quantity})
-                    </div>
-                  ))}
-                </TableCell>
-                <TableCell>
-                  {sale.products.reduce((total, product) => total + product.quantity, 0)}
-                </TableCell>
-                <TableCell>{sale.deliveryman}</TableCell>
-                <TableCell>
-                  {sale.products.reduce((total, product) => total + product.unitPrice, 0).toFixed(2)}
-                </TableCell>
-                <TableCell>{sale.paymentMethod}</TableCell>
-                <TableCell>{sale.customer}</TableCell>
-                <TableCell>{sale.saleType}</TableCell>
-                <TableCell>{sale.total.toFixed(2)}</TableCell>
-                <TableCell>{new Date(sale.date).toLocaleDateString()}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <EllipsisVertical className="h-5 w-5" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/sales/${sale.id}`}>Editar</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>Excluir</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+            {loadingSales ? (
+              <TableRow>
+                <TableCell colSpan={6}>Carregando...</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              sales.map((sale) => (
+                <TableRow key={sale.id}>
+                  <TableCell>{sale.id}</TableCell>
+                  <TableCell>{sale.customer}</TableCell>
+                  <TableCell>{sale.deliveryman}</TableCell>
+                  <TableCell>{sale.date.toLocaleDateString()}</TableCell>
+                  <TableCell>{sale.total.toFixed(2)}</TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Button variant="outline">
+                          <EllipsisVertical />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/sales/${sale.id}`}>Ver Detalhes</Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
-
         </Table>
-        <div className="flex justify-end space-x-2">
-          <Button disabled={page === 1} onClick={() => setPage(page - 1)}>
-            Anterior
-          </Button>
-          <Button disabled={sales.length < itemsPerPage} onClick={() => setPage(page + 1)}>
-            Próximo
-          </Button>
-        </div>
       </CardContent>
     </Card>
   );
