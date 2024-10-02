@@ -21,6 +21,7 @@ import Link from "next/link";
 import { EllipsisVertical } from "lucide-react";
 import { fetchApi } from "@/services/fetchApi";
 import { useUser } from "../../../../contexts/user-context";
+import { Toaster, toast } from 'react-hot-toast';
 
 type ProductType = 'FULL' | 'EMPTY' | 'COMODATO';
 interface Product {
@@ -134,12 +135,13 @@ export function TableSales() {
   
         const productsResponse = await fetchApi('/products');
         const productsData = await productsResponse.json();
-        const formattedProducts = productsData.map((product: { _id: any; _type: any; _status: any; _price: any; }) => ({
+        const formattedProducts = productsData.map((product: { _id: any; _props: { type: any; status: any; price: any; quantity: any; }; }) => ({
           id: product._id,
-          type: product._type,
-          status: product._status,
-          price: product._price,
-        }));
+          type: product._props.type,
+          status: product._props.status,
+          price: product._props.price,
+          quantity: product._props.quantity
+        }));               
         setProducts(formattedProducts);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -186,203 +188,220 @@ export function TableSales() {
   };  
 
   const onSubmit = async () => {
-    await fetchApi("/sales", {
-      method: "POST",
-      body: JSON.stringify(formData),
-    });
-    handleCloseDialog();
+    try {
+      const response = await fetchApi("/sales", {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Erro ao cadastrar a venda. Cliente genérico não pode pegar em comodato!');
+      }
+  
+      toast.success("Venda cadastrada com sucesso.");
+      handleCloseDialog();
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao cadastrar a venda.");
+    }
   };
 
-
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Vendas</CardTitle>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger>
-            <Button onClick={handleOpenDialog}>Cadastrar Venda</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Cadastrar Nova Venda</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <Controller
-              name="customerId"
-              control={control}
-              render={({ field }) => (
-                <Select 
-                  {...field}
-                  onValueChange={(value) => {
-                    setFormData(prev => ({ ...prev, customerId: value }));
-                    field.onChange(value);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um cliente" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {formData.products.map((product, index) => (
-              <div key={index}>
-                <Controller
-                  name={`products[${index}].productId`}
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      onValueChange={(value) => handleProductSelect(value, index)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um produto" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {products.map(product => (
-                          <SelectItem key={product.id} value={product.id}>
-                            {product.type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                <Controller
-                  name={`products[${index}].status`}
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      placeholder="Status"
-                      {...field}
-                      value={productTypes[product.status as keyof typeof productTypes] || product.status}
-                      readOnly
-                    />
-                  )}
-                />
-                <Controller
-                  name={`products[${index}].price`}
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      placeholder="Preço"
-                      type="number"
-                      {...field}
-                      value={product.price} // Use o estado do produto
-                      onChange={(e) => {
-                        const updatedProducts = [...formData.products];
-                        updatedProducts[index].price = parseFloat(e.target.value);
-                        setFormData(prev => ({ ...prev, products: updatedProducts })); // Atualiza o estado do formulário
-                        field.onChange(parseFloat(e.target.value)); // Atualiza o controle
-                      }}
-                    />
-                  )}
-                />
-                <Controller
-                  name={`products[${index}].quantity`}
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      placeholder="Quantidade"
-                      type="number"
-                      {...field}
-                      value={product.quantity}
-                      onChange={(e) => {
-                        const updatedProducts = [...formData.products];
-                        updatedProducts[index].quantity = parseInt(e.target.value, 10) || 1;
-                        setFormData(prev => ({ ...prev, products: updatedProducts }));
-                        field.onChange(parseInt(e.target.value, 10) || 1);
-                      }}
-                    />
-                  )}
-                />
-              </div>
-            ))}
-
-              <Button type="button" onClick={addProductField}>Adicionar Produto</Button>
-
-              <Controller
-                name="paymentMethod"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      setFormData(prev => ({ ...prev, paymentMethod: value }));
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um método de pagamento" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
-                      <SelectItem value="CARTAO">Cartão</SelectItem>
-                      <SelectItem value="PIX">Pix</SelectItem>
-                      <SelectItem value="FIADO">Fiado</SelectItem>
-                      <SelectItem value="TRANSFERENCIA">Transferência</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              <DialogFooter>
-                <Button type="submit">Salvar</Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Cliente</TableHead>
-              <TableHead>Entregador</TableHead>
-              <TableHead>Data</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loadingSales ? (
+    <>
+      <Toaster />
+      <Card>
+        <CardHeader>
+          <CardTitle>Vendas</CardTitle>
+          <div className="flex justify-end mb-4">
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger>
+                <Button onClick={handleOpenDialog} className="w-full sm:w-auto">Cadastrar Venda</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Cadastrar Nova Venda</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full"> {/* Formulário responsivo */}
+                  <Controller
+                    name="customerId"
+                    control={control}
+                    render={({ field }) => (
+                      <Select 
+                        {...field}
+                        onValueChange={(value) => {
+                          setFormData(prev => ({ ...prev, customerId: value }));
+                          field.onChange(value);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um cliente" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {customers.map((customer) => (
+                            <SelectItem key={customer.id} value={customer.id}>
+                              {customer.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {formData.products.map((product, index) => (
+                    <div key={index}>
+                      <Controller
+                        name={`products[${index}].productId`}
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            onValueChange={(value) => handleProductSelect(value, index)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione um produto" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {products.map(product => (
+                                <SelectItem key={product.id} value={product.id}>
+                                  {product.type}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      <Controller
+                        name={`products[${index}].status`}
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            placeholder="Status"
+                            {...field}
+                            value={productTypes[product.status as keyof typeof productTypes] || product.status}
+                            readOnly
+                          />
+                        )}
+                      />
+                      <Controller
+                        name={`products[${index}].price`}
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            placeholder="Preço"
+                            type="number"
+                            {...field}
+                            value={product.price}
+                            onChange={(e) => {
+                              const updatedProducts = [...formData.products];
+                              updatedProducts[index].price = parseFloat(e.target.value);
+                              setFormData(prev => ({ ...prev, products: updatedProducts }));
+                              field.onChange(parseFloat(e.target.value));
+                            }}
+                          />
+                        )}
+                      />
+                      <Controller
+                        name={`products[${index}].quantity`}
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            placeholder="Quantidade"
+                            type="number"
+                            {...field}
+                            value={product.quantity}
+                            onChange={(e) => {
+                              const updatedProducts = [...formData.products];
+                              updatedProducts[index].quantity = parseInt(e.target.value, 10) || 1;
+                              setFormData(prev => ({ ...prev, products: updatedProducts }));
+                              field.onChange(parseInt(e.target.value, 10) || 1);
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+                  ))}
+  
+                  <Button type="button" onClick={addProductField}>Adicionar Produto</Button>
+  
+                  <Controller
+                    name="paymentMethod"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          setFormData(prev => ({ ...prev, paymentMethod: value }));
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um método de pagamento" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
+                          <SelectItem value="CARTAO">Cartão</SelectItem>
+                          <SelectItem value="PIX">Pix</SelectItem>
+                          <SelectItem value="FIADO">Fiado</SelectItem>
+                          <SelectItem value="TRANSFERENCIA">Transferência</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <DialogFooter>
+                    <Button type="submit" className="w-full sm:w-auto">Salvar</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6}>Carregando...</TableCell>
+                <TableHead>ID</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Entregador</TableHead>
+                <TableHead>Data</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead>Ações</TableHead>
               </TableRow>
-            ) : (
-              sales.map((sale) => (
-                <TableRow key={sale.id}>
-                  <TableCell>{sale.id}</TableCell>
-                  <TableCell>{sale.customer}</TableCell>
-                  <TableCell>{sale.deliveryman}</TableCell>
-                  <TableCell>{sale.date.toLocaleDateString()}</TableCell>
-                  <TableCell>{sale.total.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button variant="outline">
-                          <EllipsisVertical />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem asChild>
-                          <Link href={`/sales/${sale.id}`}>Ver Detalhes</Link>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+            </TableHeader>
+            <TableBody>
+              {loadingSales ? (
+                <TableRow>
+                  <TableCell colSpan={6}>Carregando...</TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  );
+              ) : (
+                sales.map((sale) => (
+                  <TableRow key={sale.id}>
+                    <TableCell>{sale.id}</TableCell>
+                    <TableCell>{sale.customer}</TableCell>
+                    <TableCell>{sale.deliveryman}</TableCell>
+                    <TableCell>{sale.date.toLocaleDateString()}</TableCell>
+                    <TableCell>{sale.total.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Button variant="outline">
+                            <EllipsisVertical />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/sales/${sale.id}`}>Ver Detalhes</Link>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </>
+  );  
 }
