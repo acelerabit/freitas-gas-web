@@ -1,19 +1,11 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, Plus } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
+import LoadingAnimation from "@/app/app/_components/loading-page";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,14 +15,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { fetchApi } from "@/services/fetchApi";
-import { toast } from "sonner";
-import { SearchSales } from "./search-sales";
-import { DataTable } from "./data-table-sales";
-import LoadingAnimation from "@/app/app/_components/loading-page";
 import { useUser } from "@/contexts/user-context";
-import { Badge } from "@/components/ui/badge";
+import { fetchApi } from "@/services/fetchApi";
+import Link from "next/link";
+import { toast } from "sonner";
+import { DataTable } from "./data-table-sales";
+import { SearchSales } from "./search-sales";
+import useModal from "@/hooks/use-modal";
+import { UpdateSaleDialog } from "./edit-sale-dialog";
 
 interface Product {
   id: string;
@@ -97,6 +89,7 @@ export default function TableSale() {
   const [sales, setSales] = useState<Sale[] | []>([]);
   const [page, setPage] = useState(1);
   const [saleSelectType, setSaleSelectType] = useState("");
+  const [saleId, setSaleId] = useState("");
   const [dateFilter, setDateFilter] = useState<DateFilter>({
     startDate: null,
     endDate: null,
@@ -108,6 +101,9 @@ export default function TableSale() {
   const itemsPerPage = 10;
   const [filter, setFilter] = useState("");
   const { user, loadingUser } = useUser();
+
+  const { isOpen: openUpdateSale, onOpenChange: updateSaleOnOpenChange } =
+    useModal();
 
   const handleSort = (sortField: SortType, direction: "desc" | "asc") => {
     setOrderByField(sortField);
@@ -322,6 +318,16 @@ export default function TableSale() {
               <DropdownMenuItem asChild>
                 <Link href={`/app/sales/${row.original.id}`}>Ver detalhes</Link>
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Button
+                  onClick={() => {
+                    setSaleId(row.original.id);
+                    updateSaleOnOpenChange();
+                  }}
+                >
+                  Editar
+                </Button>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -379,8 +385,6 @@ export default function TableSale() {
 
     const data: Sale[] = await response.json();
 
-    console.log(data, "SALES ----------------------");
-
     setSales(data);
   };
 
@@ -411,27 +415,6 @@ export default function TableSale() {
               onChange={handleValueChange}
             />
           </div>
-          {/* <Select
-            value={saleSelectType}
-            onValueChange={(value) => setSaleSelectType(value)}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Selecione um tipo de venda" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Tipo de venda</SelectLabel>
-                <SelectItem value="none">---- Nenhum ----</SelectItem>
-                {saleTypes.map((saleType) => {
-                  return (
-                    <SelectItem key={saleType.value} value={saleType.value}>
-                      {saleType.name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectGroup>
-            </SelectContent>
-          </Select> */}
         </div>
       </div>
 
@@ -445,6 +428,12 @@ export default function TableSale() {
           previousPage={previousPage}
         />
       </div>
+
+      <UpdateSaleDialog
+        saleId={saleId}
+        open={openUpdateSale}
+        onOpenChange={updateSaleOnOpenChange}
+      />
     </div>
   );
 }
