@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { TableSales } from "./_components/table-sales";
+import TableSale from "./_components/table-sale";
 
 export default function SalesPage() {
   return (

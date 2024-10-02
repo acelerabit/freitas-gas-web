@@ -22,6 +22,7 @@ import { EllipsisVertical } from "lucide-react";
 import { fetchApi } from "@/services/fetchApi";
 import { useUser } from "../../../../contexts/user-context";
 import { Toaster, toast } from 'react-hot-toast';
+import TableSale from './table-sale';
 
 type ProductType = 'FULL' | 'EMPTY' | 'COMODATO';
 interface Product {
@@ -115,12 +116,7 @@ export function TableSales() {
     paymentMethod: "",
   });
 
-  useEffect(() => {
-    setLoadingSales(true);
-    const paginatedSales = mockSales.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-    setSales(paginatedSales);
-    setLoadingSales(false);
-  }, [page]);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -207,6 +203,13 @@ export function TableSales() {
       toast.error(error.message || "Erro ao cadastrar a venda.");
     }
   };
+
+  useEffect(() => {
+    setLoadingSales(true);
+    const paginatedSales = mockSales.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+    setSales(paginatedSales);
+    setLoadingSales(false);
+  }, [page]);
 
   return (
     <>
@@ -357,49 +360,7 @@ export function TableSales() {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Entregador</TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loadingSales ? (
-                <TableRow>
-                  <TableCell colSpan={6}>Carregando...</TableCell>
-                </TableRow>
-              ) : (
-                sales.map((sale) => (
-                  <TableRow key={sale.id}>
-                    <TableCell>{sale.id}</TableCell>
-                    <TableCell>{sale.customer}</TableCell>
-                    <TableCell>{sale.deliveryman}</TableCell>
-                    <TableCell>{sale.date.toLocaleDateString()}</TableCell>
-                    <TableCell>{sale.total.toFixed(2)}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <Button variant="outline">
-                            <EllipsisVertical />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem asChild>
-                            <Link href={`/sales/${sale.id}`}>Ver Detalhes</Link>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <TableSale />
         </CardContent>
       </Card>
     </>
