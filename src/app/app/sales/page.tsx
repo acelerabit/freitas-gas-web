@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { TableSales } from "./_components/table-sales";
+import TableSale from "./_components/table-sale";
 
 export default function SalesPage() {
   return (
@@ -17,7 +18,7 @@ export default function SalesPage() {
               <Link href="/sales/new">Nova Venda</Link>
             </Button>
           </div>
-          <TableSales />
+          <TableSale />
         </CardContent>
       </Card>
     </div>

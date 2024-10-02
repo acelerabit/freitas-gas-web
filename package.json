@@ -51,6 +51,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.51.5",
     "react-input-mask": "^2.0.4",
+    "react-tailwindcss-datepicker": "^1.7.2",
     "recharts": "^2.12.7",
     "socket.io-client": "^4.7.5",
     "sonner": "^1.4.41",

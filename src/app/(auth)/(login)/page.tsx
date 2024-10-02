@@ -104,7 +104,7 @@ export default function Login() {
                       </FormControl>
                       <FormMessage />
                       <Link
-                        href="/forgot-password"
+                        href="/recovery-password"
                         className="ml-auto inline-block text-sm underline"
                       >
                         Forgot your password?
