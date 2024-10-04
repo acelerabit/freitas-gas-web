@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Separator } from "@/components/ui/separator";
 
 interface Customer {
   id: string;
@@ -39,6 +40,16 @@ interface Product {
   quantity: number;
   price: number;
   status: string;
+}
+
+interface SaleProduct {
+  id: string;
+  type: ProductType;
+  quantity: number;
+  price: number;
+  status: string;
+  productId: string;
+  salePrice: number;
 }
 
 interface UpdateSaleDialogProps {
@@ -66,7 +77,7 @@ export function UpdateSaleDialog({
 }: UpdateSaleDialogProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [saleProducts, setSaleProducts] = useState<Product[]>([]);
+  const [saleProducts, setSaleProducts] = useState<SaleProduct[]>([]);
   const { control, handleSubmit, setValue, watch, formState } = useForm();
 
   async function getSale() {
@@ -80,11 +91,10 @@ export function UpdateSaleDialog({
 
     const data = await response.json();
 
-    setValue("customerId", data.customerId);
-    setValue("deliverymanId", data.deliverymanId);
+    setValue("customerId", data?.customer?.id);
+    setValue("deliverymanId", data?.deliveryman?.id);
     setValue("paymentMethod", data.paymentMethod);
 
-    console.log('SALE', data)
     setSaleProducts(data.products);
   }
 
@@ -99,7 +109,13 @@ export function UpdateSaleDialog({
 
     const data = await response.json();
 
-    setCustomers(data);
+    const formattedCustomers = data.map(
+      (customer: { id: any; props: { id: any; name: any } }) => ({
+        id: customer.props.id,
+        name: customer.props.name,
+      })
+    );
+    setCustomers(formattedCustomers);
   }
 
   async function fetchProducts() {
@@ -113,12 +129,29 @@ export function UpdateSaleDialog({
 
     const data = await response.json();
 
-    setProducts(data);
+    const formattedProducts = data.map(
+      (product: {
+        _id: any;
+        _props: { type: any; status: any; price: any; quantity: any };
+      }) => ({
+        id: product._id,
+        type: product._props.type,
+        status: product._props.status,
+        price: product._props.price,
+        quantity: product._props.quantity,
+      })
+    );
+    setProducts(formattedProducts);
   }
 
   const onSubmit = async (values: any) => {
-    const requestData = {};
-    const response = await fetchApi("/sales", {
+    const requestData = {
+      customerId: values.customerId,
+      // deliverymanId: values.deliverymanId,
+      paymentMethod: values.paymentMethod,
+      products: saleProducts
+    };
+    const response = await fetchApi(`/sales/${saleId}`, {
       method: "PUT",
       body: JSON.stringify(requestData),
       headers: {
@@ -128,7 +161,7 @@ export function UpdateSaleDialog({
 
     if (!response.ok) {
       const respError = await response.json();
-      toast.error(respError.error || "Erro ao cadastrar a venda.");
+      toast.error(respError.error || "Erro ao atualizar a venda.");
       return;
     }
 
@@ -141,7 +174,7 @@ export function UpdateSaleDialog({
       (product) => product.id === productId
     );
     if (selectedProduct) {
-      const updatedProducts = [...products];
+      const updatedProducts = [...saleProducts];
       updatedProducts[index] = {
         ...updatedProducts[index],
         id: productId,
@@ -151,17 +184,14 @@ export function UpdateSaleDialog({
         quantity: updatedProducts[index].quantity,
       };
 
-      // setSaleProducts(updatedProducts);
+      setSaleProducts(updatedProducts);
 
+      setValue(`products[${index}].productId`, selectedProduct.id);
       setValue(`products[${index}].type`, selectedProduct.type);
       setValue(`products[${index}].status`, selectedProduct.status);
       setValue(`products[${index}].price`, selectedProduct.price);
     }
   };
-
-  const addProductField = () => {
-    // setSaleProducts([...saleProducts, { id: "", type: "FULL", status: "", price: 0, quantity: 1 }])
-  }
 
   useEffect(() => {
     fetchCustomers();
@@ -170,9 +200,7 @@ export function UpdateSaleDialog({
 
   useEffect(() => {
     getSale();
-  }, [saleId])
-
-  console.log(saleProducts, 'SALE PRODUCTS')
+  }, [saleId]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -206,87 +234,100 @@ export function UpdateSaleDialog({
               </Select>
             )}
           />
-          {saleProducts && saleProducts.length > 0 && saleProducts.map((product, index) => (
-            <div key={index} className="space-y-4">
-              <Controller
-                name={`products[${product.id}]`}
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    onValueChange={(value) => handleProductSelect(value, index)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um produto" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              <Controller
-                name={`products[${index}].status`}
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    placeholder="Status"
-                    {...field}
-                    value={
-                      productTypes[
-                        product.status as keyof typeof productTypes
-                      ] || product.status
-                    }
-                    readOnly
+          {saleProducts &&
+            saleProducts.length > 0 &&
+            saleProducts.map((product, index) => (
+              <>
+                <div key={index} className="space-y-4">
+                  <Controller
+                    name={`products[${index}].id`}
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        defaultValue={product.productId}
+                        onValueChange={(value) =>
+                          handleProductSelect(value, index)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um produto" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {products.map((product) => (
+                            <SelectItem key={product.id} value={product.id}>
+                              {product.type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
-                )}
-              />
-              <Controller
-                name={`products[${index}].price`}
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    placeholder="Preço"
-                    type="number"
-                    {...field}
-                    value={product.price}
-                    onChange={(e) => {
-                      const updatedProducts = [...saleProducts];
-                      updatedProducts[index].price = parseFloat(e.target.value);
-                      setSaleProducts(updatedProducts);
-                      field.onChange(parseFloat(e.target.value));
-                    }}
+                  <Controller
+                    name={`products[${index}].status`}
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        placeholder="Status"
+                        {...field}
+                        value={
+                          productTypes[
+                            product.status as keyof typeof productTypes
+                          ] || product.status
+                        }
+                        readOnly
+                      />
+                    )}
                   />
-                )}
-              />
-              <Controller
-                name={`products[${index}].quantity`}
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    placeholder="Quantidade"
-                    type="number"
-                    {...field}
-                    value={product.quantity}
-                    onChange={(e) => {
-                      const updatedProducts = [...saleProducts];
-                      updatedProducts[index].quantity =
-                        parseInt(e.target.value, 10) || 1;
-                      setSaleProducts(updatedProducts);
-                      field.onChange(parseInt(e.target.value, 10) || 1);
-                    }}
+
+                  <Controller
+                    name={`products[${index}].price`}
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        placeholder="Preço"
+                        type="number"
+                        {...field}
+                        value={product.salePrice}
+                        onChange={(e) => {
+                          const updatedProducts = [...saleProducts];
+                          updatedProducts[index].salePrice = parseFloat(
+                            e.target.value
+                          );
+                          setSaleProducts(updatedProducts);
+                          field.onChange(parseFloat(e.target.value));
+                        }}
+                      />
+                    )}
                   />
-                )}
-              />
-            </div>
-          ))}
-          <Button type="button" onClick={addProductField}>
+                  <Controller
+                    name={`products[${index}].quantity`}
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        placeholder="Quantidade"
+                        type="number"
+                        {...field}
+                        value={product.quantity}
+                        onChange={(e) => {
+                          const updatedProducts = [...saleProducts];
+                          updatedProducts[index].quantity =
+                            parseInt(e.target.value, 10) || 1;
+                          setSaleProducts(updatedProducts);
+                          field.onChange(parseInt(e.target.value, 10) || 1);
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+
+                <Separator />
+              </>
+
+            ))}
+          {/* <Button type="button" onClick={addProductField}>
             Adicionar Produto
-          </Button>
+          </Button> */}
           <Controller
             name="paymentMethod"
             control={control}
