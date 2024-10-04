@@ -23,6 +23,7 @@ import { DataTable } from "./data-table-sales";
 import { SearchSales } from "./search-sales";
 import useModal from "@/hooks/use-modal";
 import { UpdateSaleDialog } from "./edit-sale-dialog";
+import { DeleteSaleDialog } from "./delete-sale-dialog";
 
 interface Product {
   id: string;
@@ -101,6 +102,7 @@ export default function TableSale() {
   const itemsPerPage = 10;
   const [filter, setFilter] = useState("");
   const { user, loadingUser } = useUser();
+  const [deleteSaleOpen, setDeleteSaleOpen] = useState(false);
 
   const { isOpen: openUpdateSale, onOpenChange: updateSaleOnOpenChange } =
     useModal();
@@ -307,19 +309,20 @@ export default function TableSale() {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu </span>
+              <Button variant="ghost" className="h-6 w-6 p-0 flex items-center justify-center">
+                <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>Ações</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href={`/app/sales/${row.original.id}`}>Ver detalhes</Link>
+                <Link href={`/app/sales/${row.original.id}`} className="text-sm">Ver detalhes</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Button
+                  className="text-sm p-2 mb-2"
                   onClick={() => {
                     setSaleId(row.original.id);
                     updateSaleOnOpenChange();
@@ -328,11 +331,30 @@ export default function TableSale() {
                   Editar
                 </Button>
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Button
+                  variant="destructive"
+                  className="text-sm p-2"
+                  onClick={() => {
+                    setSaleId(row.original.id);
+                    setDeleteSaleOpen(true);
+                  }}
+                >
+                  Deletar
+                </Button>
+              </DropdownMenuItem>
             </DropdownMenuContent>
+            {saleId && (
+              <DeleteSaleDialog
+                open={deleteSaleOpen}
+                onOpenChange={() => setDeleteSaleOpen(false)}
+                saleId={saleId}
+              />
+            )}
           </DropdownMenu>
         );
       },
-    },
+    }
   ];
 
   function handleFilterProjects(filter: string) {
