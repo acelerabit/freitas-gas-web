@@ -16,12 +16,14 @@ import {
   BarChart,
   ChevronRight,
   CreditCard,
+  HandCoins,
   LayoutList,
   Menu,
   Mountain,
   ShoppingBasket,
   SquareUserRound,
   Users,
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { ReactNode } from "react";
@@ -67,16 +69,24 @@ export function MainSidebar({ children }: { children: ReactNode }) {
               <Link
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
                 href="/app/customers"
-                >
-                  <Users className="h-4 w-4" />
-                    Clientes
+              >
+                <Users className="h-4 w-4" />
+                Clientes
               </Link>
               <Link
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
                 href="/app/sales"
               >
-                <Users className="h-4 w-4" />
+                <HandCoins className="h-4 w-4" />
                 Vendas
+              </Link>
+
+              <Link
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                href="/app/finance"
+              >
+                <Wallet className="h-4 w-4" />
+                Financeiro
               </Link>
               <Collapsible className="grid gap-4">
                 <CollapsibleTrigger className="flex items-center gap-3 rounded-lg py-2 [&[data-state=open]>svg]:rotate-90">
