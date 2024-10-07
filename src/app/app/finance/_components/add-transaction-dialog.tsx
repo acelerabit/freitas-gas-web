@@ -72,6 +72,7 @@ const transactionCategoryOptions = [
 const formSchema = z.object({
   transactionType: TransactionTypeSchema,
   category: TransactionCategorySchema,
+  description: z.string().optional().nullable(),
   customCategory: z.string().optional().nullable(), // Campo opcional
   amount: z.coerce
     .number()
@@ -89,8 +90,8 @@ export function AddTransactionDialog({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: 0
-    }
+      amount: 0,
+    },
   });
 
   const { watch } = form;
@@ -100,6 +101,7 @@ export function AddTransactionDialog({
       transactionType: values.transactionType,
       category: values.category,
       customCategory: values.customCategory,
+      description: values.description,
       amount: values.amount,
       userId: user?.id,
     };
@@ -255,6 +257,25 @@ export function AddTransactionDialog({
                 )}
               />
             )}
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição da transação</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="descrição"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="w-full flex justify-end">
               <Button className="mt-4" type="submit">
