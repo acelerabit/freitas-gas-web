@@ -106,11 +106,12 @@ export function SaleDialogForm({ isOpen, onClose, onSubmit }: SaleDialogFormProp
           deliverymanId: user?.id || "",
         };
         onSubmit(saleData);
+        window.location.reload();
     };
   
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent>
+        <DialogContent className="max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Cadastrar Nova Venda</DialogTitle>
           </DialogHeader>
