@@ -22,6 +22,7 @@ import {
   Menu,
   Mountain,
   ShoppingBasket,
+  SquareGanttChart,
   SquareUserRound,
   Users,
   Wallet,
@@ -89,102 +90,14 @@ export function MainSidebar({ children }: { children: ReactNode }) {
                 <Barcode className="h-4 w-4" />
                 Despesas
               </Link>
-              <Collapsible className="grid gap-4">
-                <CollapsibleTrigger className="flex items-center gap-3 rounded-lg py-2 [&[data-state=open]>svg]:rotate-90">
-                  <div
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-                    // href="#"
-                  >
-                    <ShoppingBasket className="h-4 w-4" />
-                    Products
-                  </div>
-                  <ChevronRight className="ml-auto h-5 w-5 transition-all" />
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="ml-2 p-2 space-y-4 bg-gray-100 dark:bg-gray-800">
-                    <Link
-                      className="group grid h-auto w-full justify-start gap-1"
-                      href="#"
-                    >
-                      <div className="text-sm font-medium leading-none group-hover:underline">
-                        Shoes
-                      </div>
-                    </Link>
-                    <Link
-                      className="group grid h-auto w-full justify-start gap-1"
-                      href="#"
-                    >
-                      <div className="text-sm font-medium leading-none group-hover:underline">
-                        Tops & T-Shirts
-                      </div>
-                    </Link>
-                    <Link
-                      className="group grid h-auto w-full justify-start gap-1"
-                      href="#"
-                    >
-                      <div className="text-sm font-medium leading-none group-hover:underline">
-                        Shorts
-                      </div>
-                    </Link>
-                    <Link
-                      className="group grid h-auto w-full justify-start gap-1"
-                      href="#"
-                    >
-                      <div className="text-sm font-medium leading-none group-hover:underline">
-                        Hoodies & Pullovers
-                      </div>
-                    </Link>
-                    <Link
-                      className="group grid h-auto w-full justify-start gap-1"
-                      href="#"
-                    >
-                      <div className="text-sm font-medium leading-none group-hover:underline">
-                        Pants & Tights
-                      </div>
-                    </Link>
-                    <Link
-                      className="group grid h-auto w-full justify-start gap-1"
-                      href="#"
-                    >
-                      <div className="text-sm font-medium leading-none group-hover:underline">
-                        Jackets & Vests
-                      </div>
-                    </Link>
-                    <Link
-                      className="group grid h-auto w-full justify-start gap-1"
-                      href="#"
-                    >
-                      <div className="text-sm font-medium leading-none group-hover:underline">
-                        Tracksuits
-                      </div>
-                    </Link>
-                    <Link
-                      className="group grid h-auto w-full justify-start gap-1"
-                      href="#"
-                    >
-                      <div className="text-sm font-medium leading-none group-hover:underline">
-                        Jordan
-                      </div>
-                    </Link>
-                    <Link
-                      className="group grid h-auto w-full justify-start gap-1"
-                      href="#"
-                    >
-                      <div className="text-sm font-medium leading-none group-hover:underline">
-                        Socks
-                      </div>
-                    </Link>
-                    <Link
-                      className="group grid h-auto w-full justify-start gap-1"
-                      href="#"
-                    >
-                      <div className="text-sm font-medium leading-none group-hover:underline">
-                        Accessories & Equipment
-                      </div>
-                    </Link>
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
+
+              <Link
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                href="/app/products"
+              >
+                <SquareGanttChart className="h-4 w-4" />
+                Produtos
+              </Link>
             </nav>
           </div>
           <div className="p-4">
