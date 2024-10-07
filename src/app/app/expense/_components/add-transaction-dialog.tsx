@@ -70,7 +70,7 @@ const transactionCategoryOptions = [
 ];
 
 const formSchema = z.object({
-  transactionType: TransactionTypeSchema,
+  // transactionType: TransactionTypeSchema,
   category: TransactionCategorySchema,
   description: z.string().optional().nullable(),
   customCategory: z.string().optional().nullable(), // Campo opcional
@@ -91,6 +91,7 @@ export function AddTransactionDialog({
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: 0,
+      category: 'EXPENSE'
     },
   });
 
@@ -98,7 +99,7 @@ export function AddTransactionDialog({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const requestData = {
-      transactionType: values.transactionType,
+      transactionType: 'EXIT',
       category: values.category,
       customCategory: values.customCategory,
       description: values.description,
@@ -157,6 +158,7 @@ export function AddTransactionDialog({
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -179,7 +181,7 @@ export function AddTransactionDialog({
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="transactionType"
               render={({ field }) => (
@@ -188,6 +190,7 @@ export function AddTransactionDialog({
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -208,7 +211,7 @@ export function AddTransactionDialog({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <FormField
               control={form.control}

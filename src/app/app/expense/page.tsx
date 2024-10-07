@@ -16,7 +16,7 @@ export default function Finance() {
   const { isOpen, onOpenChange } = useModal();
   return (
     <main className="p-8 flex flex-col">
-      <h1 className="text-4xl font-semibold">Financeiro</h1>
+      <h1 className="text-4xl font-semibold">Despesas</h1>
 
       <Breadcrumb className="my-4">
         <BreadcrumbList>
@@ -25,7 +25,7 @@ export default function Finance() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>financeiro</BreadcrumbPage>
+            <BreadcrumbPage>despesa</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
