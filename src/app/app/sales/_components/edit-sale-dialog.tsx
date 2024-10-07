@@ -20,6 +20,8 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import { CurrencyInput } from "react-currency-mask";
 
 interface Customer {
   id: string;
@@ -137,7 +139,7 @@ export function UpdateSaleDialog({
         id: product._id,
         type: product._props.type,
         status: product._props.status,
-        price: product._props.price,
+        price: product._props.price / 100,
         quantity: product._props.quantity,
       })
     );
@@ -149,7 +151,7 @@ export function UpdateSaleDialog({
       customerId: values.customerId,
       // deliverymanId: values.deliverymanId,
       paymentMethod: values.paymentMethod,
-      products: saleProducts
+      products: saleProducts,
     };
     const response = await fetchApi(`/sales/${saleId}`, {
       method: "PUT",
@@ -267,16 +269,19 @@ export function UpdateSaleDialog({
                     name={`products[${index}].status`}
                     control={control}
                     render={({ field }) => (
-                      <Input
-                        placeholder="Status"
-                        {...field}
-                        value={
-                          productTypes[
-                            product.status as keyof typeof productTypes
-                          ] || product.status
-                        }
-                        readOnly
-                      />
+                      <div>
+                        <Label>Status</Label>
+                        <Input
+                          placeholder="Status"
+                          {...field}
+                          value={
+                            productTypes[
+                              product.status as keyof typeof productTypes
+                            ] || product.status
+                          }
+                          readOnly
+                        />
+                      </div>
                     )}
                   />
 
@@ -284,46 +289,72 @@ export function UpdateSaleDialog({
                     name={`products[${index}].price`}
                     control={control}
                     render={({ field }) => (
-                      <Input
-                        placeholder="Preço"
-                        type="number"
-                        {...field}
-                        value={product.salePrice}
-                        onChange={(e) => {
-                          const updatedProducts = [...saleProducts];
-                          updatedProducts[index].salePrice = parseFloat(
-                            e.target.value
-                          );
-                          setSaleProducts(updatedProducts);
-                          field.onChange(parseFloat(e.target.value));
-                        }}
-                      />
+                      <div>
+                        <Label>Preço</Label>
+
+                        <CurrencyInput
+                          {...field}
+                          value={product.salePrice}
+                          onChangeValue={(_, value) => {
+                            const updatedProducts = [...saleProducts];
+                            updatedProducts[index].salePrice =
+                              parseFloat(String(value));
+                            setSaleProducts(updatedProducts);
+                            field.onChange(parseFloat(String(value)));
+                          }}
+                          InputElement={
+                            <input
+                              type="text"
+                              id="currency"
+                              placeholder="R$ 0,00"
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            />
+                          }
+                        />
+
+                        {/* <Input
+                          placeholder="Preço"
+                          type="number"
+                          {...field}
+                          value={product.salePrice}
+                          onChange={(e) => {
+                            const updatedProducts = [...saleProducts];
+                            updatedProducts[index].salePrice = parseFloat(
+                              e.target.value
+                            );
+                            setSaleProducts(updatedProducts);
+                            field.onChange(parseFloat(e.target.value));
+                          }}
+                        /> */}
+                      </div>
                     )}
                   />
                   <Controller
                     name={`products[${index}].quantity`}
                     control={control}
                     render={({ field }) => (
-                      <Input
-                        placeholder="Quantidade"
-                        type="number"
-                        {...field}
-                        value={product.quantity}
-                        onChange={(e) => {
-                          const updatedProducts = [...saleProducts];
-                          updatedProducts[index].quantity =
-                            parseInt(e.target.value, 10) || 1;
-                          setSaleProducts(updatedProducts);
-                          field.onChange(parseInt(e.target.value, 10) || 1);
-                        }}
-                      />
+                      <div>
+                        <Label>Quantidade</Label>
+                        <Input
+                          placeholder="Quantidade"
+                          type="number"
+                          {...field}
+                          value={product.quantity}
+                          onChange={(e) => {
+                            const updatedProducts = [...saleProducts];
+                            updatedProducts[index].quantity =
+                              parseInt(e.target.value, 10) || 1;
+                            setSaleProducts(updatedProducts);
+                            field.onChange(parseInt(e.target.value, 10) || 1);
+                          }}
+                        />
+                      </div>
                     )}
                   />
                 </div>
 
                 <Separator />
               </>
-
             ))}
           {/* <Button type="button" onClick={addProductField}>
             Adicionar Produto

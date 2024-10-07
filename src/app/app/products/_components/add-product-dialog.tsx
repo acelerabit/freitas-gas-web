@@ -33,78 +33,69 @@ import { useUser } from "@/contexts/user-context";
 import { fetchApi } from "@/services/fetchApi";
 import { toast } from "sonner";
 
-type TransactionCategory = "DEPOSIT" | "SALE" | "EXPENSE" | "CUSTOM";
-
-type TransactionType = "ENTRY" | "EXIT" | "TRANSFER";
-
-interface AddTransactionDialogProps {
+interface AddProductDialogProps {
   open: boolean;
   onOpenChange: () => void;
 }
 
-const TransactionCategorySchema = z.enum([
-  "DEPOSIT",
-  "SALE",
-  "EXPENSE",
-  "CUSTOM",
-]);
-const TransactionTypeSchema = z.enum(["ENTRY", "EXIT", "TRANSFER"]);
+const BottleStatusSchema = z.enum(["FULL", "EMPTY", "COMODATO"]);
 
-const transactionTypeOptions = [
+const ProductTypeSchema = z.enum(["P3", "P13", "P20", "P45"]);
+
+const ProductTypeOptions = [
   {
-    key: "ENTRY",
-    value: "entrada",
+    key: "P3",
+    value: "P3",
   },
-  { key: "EXIT", value: "saida" },
-  { key: "TRANSFER", value: "transferência" },
+  { key: "P13", value: "P13" },
+  { key: "P20", value: "P20" },
+  { key: "P45", value: "P45" },
 ];
 
-const transactionCategoryOptions = [
+const bottleStatusOptions = [
   {
-    key: "DEPOSIT",
-    value: "depósito",
+    key: "FULL",
+    value: "cheio",
   },
-  { key: "SALE", value: "venda" },
-  { key: "EXPENSE", value: "despesa" },
-  { key: "CUSTOM", value: "outro" },
+  { key: "EMPTY", value: "vazio" },
+  { key: "COMODATO", value: "comodato" },
 ];
 
 const formSchema = z.object({
-  transactionType: TransactionTypeSchema,
-  category: TransactionCategorySchema,
-  customCategory: z.string().optional().nullable(), // Campo opcional
-  amount: z.coerce
+  type: ProductTypeSchema,
+  status: BottleStatusSchema,
+  quantity: z.coerce.number().min(0, "insira um numero maior ou igual a 0"),
+  price: z.coerce
     .number()
     .min(0, "insira um numero maior ou igual a 0")
     .positive("O valor deve ser um inteiro positivo.")
     .refine((val) => !isNaN(val), "insira um numero"),
 });
 
-export function AddTransactionDialog({
+export function AddProductDialog({
   open,
   onOpenChange,
-}: AddTransactionDialogProps) {
+}: AddProductDialogProps) {
   const { user, loadingUser } = useUser();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: 0
-    }
+      price: 0,
+    },
   });
 
   const { watch } = form;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const requestData = {
-      transactionType: values.transactionType,
-      category: values.category,
-      customCategory: values.customCategory,
-      amount: values.amount,
-      userId: user?.id,
+      type: values.type,
+      status: values.status,
+      price: values.price,
+      quantity: values.quantity,
     };
 
-    const response = await fetchApi(`/transactions`, {
+    const response = await fetchApi(`/products`, {
       method: "POST",
       body: JSON.stringify(requestData),
     });
@@ -121,7 +112,7 @@ export function AddTransactionDialog({
       return;
     }
 
-    toast.success("Transação cadastrada com sucesso", {
+    toast.success("Produto cadastrado com sucesso", {
       action: {
         label: "Undo",
         onClick: () => console.log("Undo"),
@@ -131,8 +122,6 @@ export function AddTransactionDialog({
     window.location.reload();
   }
 
-  const transactionCategory = watch("category");
-
   if (!user) {
     return;
   }
@@ -141,33 +130,33 @@ export function AddTransactionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Cadastrar Nova Transação</DialogTitle>
+          <DialogTitle>Cadastrar Novo Produto</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
             <FormField
               control={form.control}
-              name="category"
+              name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Categoria</FormLabel>
+                  <FormLabel>Estado do produto</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione a categoria" />
+                        <SelectValue placeholder="Selecione o estado do produto" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {transactionCategoryOptions.map((transactionOption) => (
+                      {bottleStatusOptions.map((bottleStatus) => (
                         <SelectItem
-                          key={transactionOption.key}
-                          value={transactionOption.key}
+                          key={bottleStatus.key}
+                          value={bottleStatus.key}
                         >
-                          {transactionOption.value}
+                          {bottleStatus.value}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -179,7 +168,7 @@ export function AddTransactionDialog({
 
             <FormField
               control={form.control}
-              name="transactionType"
+              name="type"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tipo de transação</FormLabel>
@@ -189,16 +178,16 @@ export function AddTransactionDialog({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo de transação" />
+                        <SelectValue placeholder="Selecione o tipo de produto" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {transactionTypeOptions.map((transactionOption) => (
+                      {ProductTypeOptions.map((productType) => (
                         <SelectItem
-                          key={transactionOption.key}
-                          value={transactionOption.key}
+                          key={productType.key}
+                          value={productType.key}
                         >
-                          {transactionOption.value}
+                          {productType.value}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -210,7 +199,7 @@ export function AddTransactionDialog({
 
             <FormField
               control={form.control}
-              name="amount"
+              name="price"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Valor</FormLabel>
@@ -235,26 +224,27 @@ export function AddTransactionDialog({
               )}
             />
 
-            {transactionCategory === "CUSTOM" && (
-              <FormField
-                control={form.control}
-                name="customCategory"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome da categoria</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="nome da categoria"
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
+            
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
+            <FormField
+              control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quantidade</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="quantidade"
+                      {...field}
+                      value={field.value}
+                      type="number"
+                    />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="w-full flex justify-end">
               <Button className="mt-4" type="submit">

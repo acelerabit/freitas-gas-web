@@ -1,5 +1,7 @@
 "use client";
 
+import useModal from "@/hooks/use-modal";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,15 +11,15 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import useModal from "@/hooks/use-modal";
-import { AddTransactionDialog } from "./_components/add-transaction-dialog";
-import { TableTransactions } from "./_components/table-transactions";
+import { AddProductDialog } from "./_components/add-product-dialog";
+import { ProductList } from "./_components/products-list";
 
-export default function Finance() {
+export default function Products() {
   const { isOpen, onOpenChange } = useModal();
+
   return (
     <main className="p-8 flex flex-col">
-      <h1 className="text-4xl font-semibold">Financeiro</h1>
+      <h1 className="text-4xl font-semibold">Produtos</h1>
 
       <Breadcrumb className="my-4">
         <BreadcrumbList>
@@ -26,21 +28,22 @@ export default function Finance() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>financeiro</BreadcrumbPage>
+            <BreadcrumbPage>produtos</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="w-full">
+      <div className="w-full ">
         <div className="w-full flex justify-end">
-          <Button onClick={onOpenChange}>Adicionar transação</Button>
+          <Button onClick={onOpenChange}>Adicionar produto</Button>
         </div>
-        <div>
-          <TableTransactions />
+
+        <div className="mt-8">
+          <ProductList />
         </div>
       </div>
 
-      <AddTransactionDialog open={isOpen} onOpenChange={onOpenChange} />
+      <AddProductDialog open={isOpen} onOpenChange={onOpenChange} />
     </main>
   );
 }

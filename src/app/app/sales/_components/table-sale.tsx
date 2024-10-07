@@ -269,6 +269,9 @@ export default function TableSale() {
           </Button>
         );
       },
+      cell: ({ row }) => {
+        return <p>{row.original.total}</p>;
+      },
     },
     {
       accessorKey: "date",
