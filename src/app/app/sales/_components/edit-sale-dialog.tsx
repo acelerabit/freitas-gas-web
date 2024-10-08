@@ -31,10 +31,12 @@ interface Customer {
 type ProductType = "FULL" | "EMPTY" | "COMODATO";
 
 const productTypes: Record<ProductType, string> = {
-  FULL: "COMPLETO",
+  FULL: "CHEIO",
   EMPTY: "VAZIO",
   COMODATO: "COMODATO",
 };
+
+type BottleStatus = "EMPTY" | 'FULL' | 'COMODATO'
 
 interface Product {
   id: string;
@@ -259,7 +261,7 @@ export function UpdateSaleDialog({
                         <SelectContent>
                           {products.map((product) => (
                             <SelectItem key={product.id} value={product.id}>
-                              {product.type}
+                              {product.type} - {productTypes[product.status as BottleStatus]}
                             </SelectItem>
                           ))}
                         </SelectContent>
