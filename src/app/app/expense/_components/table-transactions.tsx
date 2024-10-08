@@ -1,7 +1,12 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import { fetchApi } from "@/services/fetchApi";
+import { formatDate } from "@/utils/formatDate";
+import { formatCurrency } from "@/utils/formatCurrent";
+import { EllipsisVertical } from "lucide-react";
+import EditTransactionDialog from "./edit-transaction-dialog";
 
 interface Transaction {
   _id: string;
@@ -10,8 +15,9 @@ interface Transaction {
   category: string;
   userId: string;
   customCategory?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const transactionTypeLabels: { [key: string]: string } = {
@@ -34,6 +40,8 @@ export function TableTransactions() {
   const itemsPerPage = 5;
   const [loadingTransactions, setLoadingTransactions] = useState(true);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   async function getTransactions() {
     setLoadingTransactions(true);
@@ -61,6 +69,8 @@ export function TableTransactions() {
       category: transactionCategoryLabels[item._props.category],
       userId: item._props.userId,
       customCategory: item._props.customCategory || '-',
+      description: item._props.description || '-',
+      createdAt: item._props.createdAt || ''
     }));
 
     setTransactions(transactionsList);
@@ -97,12 +107,6 @@ export function TableTransactions() {
     getTransactions();
   }, [page]);
 
-  const formatCurrency = (value: number) => {
-    const isValueInCents = value >= 1000;
-    const divisor = isValueInCents ? 100 : 1;
-    return (value / divisor).toFixed(2).replace(".", ",");
-  };
-
   function nextPage() {
     setPage((currentPage) => currentPage + 1);
   }
@@ -110,6 +114,11 @@ export function TableTransactions() {
   function previousPage() {
     setPage((currentPage) => currentPage - 1);
   }
+
+  const openEditDialog = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsEditDialogOpen(true);
+  };
 
   return (
     <>
@@ -120,8 +129,11 @@ export function TableTransactions() {
             <TableHead>Tipo de Transação</TableHead>
             <TableHead>Categoria</TableHead>
             <TableHead>Usuário</TableHead>
-            <TableHead>Detalhes</TableHead>
+            <TableHead>Categoria customizada</TableHead>
             <TableHead>Valor</TableHead>
+            <TableHead>Descrição</TableHead>
+            <TableHead>Data de criação</TableHead>
+            <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -141,10 +153,38 @@ export function TableTransactions() {
                 <TableCell>{usersMap[transaction.userId] || "Desconhecido"}</TableCell>
                 <TableCell>{transaction.customCategory}</TableCell>
                 <TableCell>{formatCurrency(transaction.amount)}</TableCell>
+                <TableCell>{transaction.description}</TableCell>
+                <TableCell>{formatDate(transaction.createdAt)}</TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="icon">
+                        <EllipsisVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onSelect={() => openEditDialog(transaction)}>
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Button variant="destructive">Remover</Button>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
               </TableRow>
             ))
           )}
         </TableBody>
+        {selectedTransaction && (
+          <EditTransactionDialog
+            isOpen={isEditDialogOpen}
+            transaction={selectedTransaction}
+            onClose={() => setIsEditDialogOpen(false)}
+          />
+        )}
       </Table>
       <div className="w-full flex gap-2 items-center justify-end mt-4">
         <Button
