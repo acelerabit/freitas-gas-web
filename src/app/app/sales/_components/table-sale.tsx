@@ -24,6 +24,7 @@ import { SearchSales } from "./search-sales";
 import useModal from "@/hooks/use-modal";
 import { UpdateSaleDialog } from "./edit-sale-dialog";
 import { DeleteSaleDialog } from "./delete-sale-dialog";
+import { fCurrencyIntlBRL } from "@/utils/formatNumber";
 
 interface Product {
   id: string;
@@ -270,7 +271,7 @@ export default function TableSale() {
         );
       },
       cell: ({ row }) => {
-        return <p>{row.original.total}</p>;
+        return <p>{fCurrencyIntlBRL(row.original.total)}</p>;
       },
     },
     {

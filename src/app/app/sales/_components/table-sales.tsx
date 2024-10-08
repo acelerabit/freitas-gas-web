@@ -20,24 +20,23 @@ export function TableSales() {
   };
 
   const handleFormSubmit = async (data: any) => {
-    try {
-      const response = await fetchApi("/sales", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+    const response = await fetchApi("/sales", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
-      if (!response.ok) {
-        throw new Error("Failed to submit the sale");
-      }
-      toast.success("Venda cadastrada com sucesso!");
-      handleCloseDialog();
-    } catch (error) {
-      console.error("Erro ao cadastrar a venda:", error);
-      toast.error("Erro ao cadastrar a venda");
+    if (!response.ok) {
+      const respError = await response.json();
+      toast.error(respError.message);
+      return
     }
+
+    toast.success("Venda cadastrada com sucesso!");
+    handleCloseDialog();
+    window.location.reload()
   };
 
   return (
@@ -55,7 +54,11 @@ export function TableSales() {
           <TableSale />
         </CardContent>
       </Card>
-      <SaleDialogForm isOpen={isDialogOpen} onClose={handleCloseDialog} onSubmit={handleFormSubmit} />
+      <SaleDialogForm
+        isOpen={isDialogOpen}
+        onClose={handleCloseDialog}
+        onSubmit={handleFormSubmit}
+      />
     </>
   );
 }

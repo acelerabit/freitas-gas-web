@@ -11,15 +11,17 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { AddProductDialog } from "./_components/add-product-dialog";
 import { ProductList } from "./_components/products-list";
+import { AddProductDialog } from "./_components/add-product-dialog";
+import { Stock } from "./_components/stock";
+import { Separator } from "@/components/ui/separator";
 
 export default function Products() {
   const { isOpen, onOpenChange } = useModal();
 
   return (
     <main className="p-8 flex flex-col">
-      <h1 className="text-4xl font-semibold">Produtos</h1>
+      <h1 className="text-4xl font-semibold">Estoque</h1>
 
       <Breadcrumb className="my-4">
         <BreadcrumbList>
@@ -28,18 +30,22 @@ export default function Products() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>produtos</BreadcrumbPage>
+            <BreadcrumbPage>estoque</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="w-full ">
+      <div className="w-full space-y-4">
         <div className="w-full flex justify-end">
           <Button onClick={onOpenChange}>Adicionar produto</Button>
         </div>
 
         <div className="mt-8">
           <ProductList />
+        </div>
+
+        <div>
+          <Stock />
         </div>
       </div>
 
