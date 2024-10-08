@@ -13,6 +13,12 @@ type BottleStatus = "FULL" | "EMPTY" | "COMODATO";
 
 type ProductType = "P3" | "P13" | "P20" | "P45";
 
+const bottleStatusMapper = {
+  FULL: 'CHEIO',
+  EMPTY: 'VAZIO',
+  COMODATO: 'COMODATO',
+}
+
 export interface Product {
   id: string;
   type: ProductType;
@@ -86,7 +92,7 @@ export function ProductList() {
             <Card key={product.id}>
               <CardHeader>
                 <CardTitle>
-                  {product.type} {product.status}
+                  {product.type} {bottleStatusMapper[product.status]}
                 </CardTitle>
               </CardHeader>
 

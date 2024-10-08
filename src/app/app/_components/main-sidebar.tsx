@@ -96,7 +96,7 @@ export function MainSidebar({ children }: { children: ReactNode }) {
                 href="/app/products"
               >
                 <SquareGanttChart className="h-4 w-4" />
-                Produtos
+                Estoque
               </Link>
             </nav>
           </div>

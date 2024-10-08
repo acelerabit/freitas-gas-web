@@ -45,10 +45,12 @@ interface SaleDialogFormProps {
 }
 
 const productTypes = {
-  FULL: "COMPLETO",
+  FULL: "CHEIO",
   EMPTY: "VAZIO",
   COMODATO: "COMODATO",
 };
+
+type BottleStatus = "EMPTY" | 'FULL' | 'COMODATO'
 
 export function SaleDialogForm({
   isOpen,
@@ -190,7 +192,7 @@ export function SaleDialogForm({
                     <SelectContent>
                       {products.map((product) => (
                         <SelectItem key={product.id} value={product.id}>
-                          {product.type}
+                          {product.type} - {productTypes[product.status as BottleStatus]}
                         </SelectItem>
                       ))}
                     </SelectContent>

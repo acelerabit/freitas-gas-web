@@ -169,6 +169,7 @@ export function UpdateSaleDialog({
 
     toast.success("Venda editada com sucesso.");
     onOpenChange();
+    window.location.reload()
   };
 
   const handleProductSelect = (productId: string, index: number) => {
