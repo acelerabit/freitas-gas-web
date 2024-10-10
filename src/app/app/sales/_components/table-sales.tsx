@@ -43,7 +43,7 @@ export function TableSales() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Vendas</CardTitle>
+          {/* <CardTitle>Vendas</CardTitle> */}
           <div className="flex justify-end mb-4">
             <Button onClick={handleOpenDialog} className="w-full sm:w-auto">
               Cadastrar Venda

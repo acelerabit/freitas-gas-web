@@ -38,12 +38,36 @@ const productTypes: Record<ProductType, string> = {
 
 type BottleStatus = "EMPTY" | 'FULL' | 'COMODATO'
 
+const productTypesMapper = [
+  {
+    key: 'P3',
+    value: 'P3'
+  },
+  {
+    key: 'P13',
+    value: 'P13'
+  },
+  {
+    key: 'P20',
+    value: 'P20'
+  },
+  {
+    key: 'P45',
+    value: 'P45'
+  }
+]
+
+const bottleStatusMapper = [
+  {key: 'EMPTY', value: 'Vasilhame'}, {key: 'FULL', value: 'Vasilhame + gás'}, {key: 'COMODATO', value: 'comodato'}
+]
+
 interface Product {
   id: string;
   type: ProductType;
   quantity: number;
   price: number;
   status: string;
+
 }
 
 interface SaleProduct {
@@ -54,6 +78,7 @@ interface SaleProduct {
   status: string;
   productId: string;
   salePrice: number;
+  typeSale: string;
 }
 
 interface UpdateSaleDialogProps {
@@ -155,6 +180,8 @@ export function UpdateSaleDialog({
       paymentMethod: values.paymentMethod,
       products: saleProducts,
     };
+
+    // console.log(saleProducts)
     const response = await fetchApi(`/sales/${saleId}`, {
       method: "PUT",
       body: JSON.stringify(requestData),
@@ -174,17 +201,42 @@ export function UpdateSaleDialog({
     window.location.reload()
   };
 
-  const handleProductSelect = (productId: string, index: number) => {
-    const selectedProduct = products.find(
-      (product) => product.id === productId
-    );
+  const handleProductSelect = (type: ProductType, index: number) => {
+    const selectedProduct = products[index]
+
+
     if (selectedProduct) {
       const updatedProducts = [...saleProducts];
       updatedProducts[index] = {
         ...updatedProducts[index],
-        id: productId,
-        type: selectedProduct.type,
+        id: selectedProduct.id,
+        type: type,
         status: selectedProduct.status,
+        typeSale: selectedProduct.status,
+        price: selectedProduct.price,
+        quantity: updatedProducts[index].quantity,
+      };
+
+      setSaleProducts(updatedProducts);
+
+      setValue(`products[${index}].productId`, selectedProduct.id);
+      setValue(`products[${index}].type`, type);
+      setValue(`products[${index}].status`, selectedProduct.status);
+      setValue(`products[${index}].price`, selectedProduct.price);
+    }
+  };
+
+  function handleTypeSaleSelect(status: string, index: number) {
+    const selectedProduct = products[index]
+
+
+    if (selectedProduct) {
+      const updatedProducts = [...saleProducts];
+      updatedProducts[index] = {
+        ...updatedProducts[index],
+        id: selectedProduct.id,
+        type: selectedProduct.type,
+        status,
         price: selectedProduct.price,
         quantity: updatedProducts[index].quantity,
       };
@@ -193,7 +245,7 @@ export function UpdateSaleDialog({
 
       setValue(`products[${index}].productId`, selectedProduct.id);
       setValue(`products[${index}].type`, selectedProduct.type);
-      setValue(`products[${index}].status`, selectedProduct.status);
+      setValue(`products[${index}].status`, status);
       setValue(`products[${index}].price`, selectedProduct.price);
     }
   };
@@ -209,7 +261,7 @@ export function UpdateSaleDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Atualizar Venda</DialogTitle>
         </DialogHeader>
@@ -244,49 +296,50 @@ export function UpdateSaleDialog({
             saleProducts.map((product, index) => (
               <>
                 <div key={index} className="space-y-4">
-                  <Controller
-                    name={`products[${index}].id`}
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        defaultValue={product.productId}
-                        onValueChange={(value) =>
-                          handleProductSelect(value, index)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um produto" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {products.map((product) => (
-                            <SelectItem key={product.id} value={product.id}>
-                              {product.type} - {productTypes[product.status as BottleStatus]}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  <Controller
-                    name={`products[${index}].status`}
-                    control={control}
-                    render={({ field }) => (
-                      <div>
-                        <Label>Status</Label>
-                        <Input
-                          placeholder="Status"
-                          {...field}
-                          value={
-                            productTypes[
-                              product.status as keyof typeof productTypes
-                            ] || product.status
-                          }
-                          readOnly
-                        />
-                      </div>
-                    )}
-                  />
+                <Controller
+                name={`products[${index}].id`}
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    defaultValue={product.type}
+                    onValueChange={(value) => handleProductSelect(value as ProductType, index)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um produto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {productTypesMapper.map((product) => (
+                        <SelectItem key={product.key} value={product.key}>
+                          {product.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+                   <Controller
+                name={`products[${index}].status`}
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    defaultValue={product.typeSale}
+                    onValueChange={(value) => handleTypeSaleSelect(value, index)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um tipo de venda" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {bottleStatusMapper.map((bottle) => (
+                        <SelectItem key={bottle.key} value={bottle.key}>
+                          {bottle.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
 
                   <Controller
                     name={`products[${index}].price`}
@@ -378,8 +431,9 @@ export function UpdateSaleDialog({
                 <SelectContent>
                   <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
                   <SelectItem value="CARTAO">Cartão</SelectItem>
+                  <SelectItem value="CARTAO_CREDITO">Cartão de crédito</SelectItem>
                   <SelectItem value="PIX">Pix</SelectItem>
-                  <SelectItem value="FIADO">Fiado</SelectItem>
+                  <SelectItem value="FIADO">Venda à receber</SelectItem>
                   <SelectItem value="TRANSFERENCIA">Transferência</SelectItem>
                 </SelectContent>
               </Select>
@@ -394,4 +448,5 @@ export function UpdateSaleDialog({
       </DialogContent>
     </Dialog>
   );
+  
 }
