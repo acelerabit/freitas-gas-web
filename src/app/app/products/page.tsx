@@ -15,9 +15,13 @@ import { ProductList } from "./_components/products-list";
 import { AddProductDialog } from "./_components/add-product-dialog";
 import { Stock } from "./_components/stock";
 import { Separator } from "@/components/ui/separator";
+import { TransferProductQuantityDialog } from "./_components/transfer-product-status-dialog";
 
 export default function Products() {
   const { isOpen, onOpenChange } = useModal();
+  const { isOpen: isOpenTransfer, onOpenChange: onOpenChangeTransfer } =
+  useModal();
+
 
   return (
     <main className="p-8 flex flex-col">
@@ -36,8 +40,9 @@ export default function Products() {
       </Breadcrumb>
 
       <div className="w-full space-y-4">
-        <div className="w-full flex justify-end">
+        <div className="w-full flex justify-end gap-4">
           <Button onClick={onOpenChange}>Adicionar produto</Button>
+          <Button onClick={() => onOpenChangeTransfer()}>Transferir</Button>
         </div>
 
         <div className="mt-8">
@@ -48,6 +53,11 @@ export default function Products() {
           <Stock />
         </div>
       </div>
+
+      <TransferProductQuantityDialog
+        open={isOpenTransfer}
+        onOpenChange={onOpenChangeTransfer}
+      />
 
       <AddProductDialog open={isOpen} onOpenChange={onOpenChange} />
     </main>

@@ -8,16 +8,18 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DecreaseProductQuantityDialog } from "./decrease-product-quantity-dialog";
 import { IncreaseProductQuantityDialog } from "./increase-product-quantity-dialog";
+import { fCurrencyIntlBRL } from "@/utils/formatNumber";
+import { TransferProductQuantityDialog } from "./transfer-product-status-dialog";
 
 type BottleStatus = "FULL" | "EMPTY" | "COMODATO";
 
 type ProductType = "P3" | "P13" | "P20" | "P45";
 
 const bottleStatusMapper = {
-  FULL: 'CHEIO',
-  EMPTY: 'VAZIO',
-  COMODATO: 'COMODATO',
-}
+  FULL: "CHEIO",
+  EMPTY: "VAZIO",
+  COMODATO: "COMODATO",
+};
 
 export interface Product {
   id: string;
@@ -35,6 +37,7 @@ export function ProductList() {
     useModal();
   const { isOpen: isOpenDecrease, onOpenChange: onOpenChangeDecrease } =
     useModal();
+
 
   async function fetchProducts() {
     const response = await fetchApi("/products/list");
@@ -80,13 +83,15 @@ export function ProductList() {
     onOpenChangeDecrease();
   }
 
+
+
   useEffect(() => {
     fetchProducts();
   }, []);
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {products.map((product) => {
           return (
             <Card key={product.id}>
@@ -97,9 +102,9 @@ export function ProductList() {
               </CardHeader>
 
               <CardContent>
-                <p>estado: {product.status}</p>
+                <p>estado: {bottleStatusMapper[product.status]}</p>
                 <p>tipo: {product.type}</p>
-                <p>preço: {product.price / 100}</p>
+                <p>preço: {fCurrencyIntlBRL(product.price / 100)}</p>
                 <p>quantidade: {product.quantity}</p>
 
                 <div className="mt-4 space-x-4">
@@ -109,12 +114,15 @@ export function ProductList() {
                   <Button onClick={() => selectCurrentProductDecrease(product)}>
                     Remover items
                   </Button>
+                  
                 </div>
               </CardContent>
             </Card>
           );
         })}
       </div>
+
+      
 
       {product && (
         <IncreaseProductQuantityDialog

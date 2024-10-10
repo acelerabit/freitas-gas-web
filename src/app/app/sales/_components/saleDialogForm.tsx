@@ -50,7 +50,30 @@ const productTypes = {
   COMODATO: "COMODATO",
 };
 
+const productTypesMapper = [
+  {
+    key: 'P3',
+    value: 'P3'
+  },
+  {
+    key: 'P13',
+    value: 'P13'
+  },
+  {
+    key: 'P20',
+    value: 'P20'
+  },
+  {
+    key: 'P45',
+    value: 'P45'
+  }
+]
+
 type BottleStatus = "EMPTY" | 'FULL' | 'COMODATO'
+
+const bottleStatusMapper = [
+  {key: 'EMPTY', value: 'Vasilhame'}, {key: 'FULL', value: 'Vasilhame + gás'}, {key: 'COMODATO', value: 'comodato'}
+]
 
 export function SaleDialogForm({
   isOpen,
@@ -64,7 +87,7 @@ export function SaleDialogForm({
   const [formData, setFormData] = useState({
     customerId: "",
     deliverymanId: user?.id || "",
-    products: [{ productId: "", type: "", status: "", price: 0, quantity: 1 }],
+    products: [{ type: "", status: "", price: 0, quantity: 1 }],
     paymentMethod: "",
   });
 
@@ -104,17 +127,36 @@ export function SaleDialogForm({
     fetchData();
   }, []);
 
-  const handleProductSelect = (productId: string, index: number) => {
-    const selectedProduct = products.find(
-      (product) => product.id === productId
-    );
+  const handleProductSelect = (type: string, index: number) => {
+    const selectedProduct = products[index]
+
     if (selectedProduct) {
       const updatedProducts = [...formData.products];
       updatedProducts[index] = {
-        productId,
-        type: selectedProduct.type,
+        type: type,
         status: selectedProduct.status,
         price: selectedProduct.price,
+        quantity: updatedProducts[index].quantity || 1,
+      };
+
+      setFormData((prev) => ({ ...prev, products: updatedProducts }));
+      setValue(`products[${index}]`, updatedProducts[index]);
+    }
+  };
+
+  function handleTypeSaleSelect(value: string, index: number) {
+    const selectedProduct = products[index]
+
+    const findProduct = products.find(
+      (product) => product.type === selectedProduct.type && product.status === value
+    );
+
+    if (selectedProduct && findProduct) {
+      const updatedProducts = [...formData.products];
+      updatedProducts[index] = {
+        type: selectedProduct.type,
+        status: value,
+        price: findProduct.price,
         quantity: updatedProducts[index].quantity || 1,
       };
 
@@ -128,7 +170,7 @@ export function SaleDialogForm({
       ...prevData,
       products: [
         ...prevData.products,
-        { productId: "", type: "", status: "", price: 0, quantity: 1 },
+        { type: "", status: "", price: 0, quantity: 1 },
       ],
     }));
   };
@@ -138,6 +180,7 @@ export function SaleDialogForm({
       ...data,
       deliverymanId: user?.id || "",
     };
+
     onSubmit(saleData);
     window.location.reload();
   };
@@ -190,32 +233,37 @@ export function SaleDialogForm({
                       <SelectValue placeholder="Selecione um produto" />
                     </SelectTrigger>
                     <SelectContent>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.type} - {productTypes[product.status as BottleStatus]}
+                      {productTypesMapper.map((product) => (
+                        <SelectItem key={product.key} value={product.key}>
+                          {product.value}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 )}
               />
+
+
+
               <Controller
                 name={`products[${index}].status`}
                 control={control}
                 render={({ field }) => (
-                  <div>
-                    <Label>Status</Label>
-                    <Input
-                      placeholder="Status"
-                      {...field}
-                      value={
-                        productTypes[
-                          product.status as keyof typeof productTypes
-                        ]
-                      }
-                      readOnly
-                    />
-                  </div>
+                  <Select
+                    {...field}
+                    onValueChange={(value) => handleTypeSaleSelect(value, index)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um tipo de venda" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {bottleStatusMapper.map((bottle) => (
+                        <SelectItem key={bottle.key} value={bottle.key}>
+                          {bottle.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
               />
               <Controller
@@ -314,9 +362,10 @@ export function SaleDialogForm({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
-                  <SelectItem value="CARTAO">Cartão</SelectItem>
+                  <SelectItem value="CARTAO">Cartão de débito</SelectItem>
+                  <SelectItem value="CARTAO_CREDITO">Cartão de crédito</SelectItem>
                   <SelectItem value="PIX">Pix</SelectItem>
-                  <SelectItem value="FIADO">Fiado</SelectItem>
+                  <SelectItem value="FIADO">Venda à receber</SelectItem>
                   <SelectItem value="TRANSFERENCIA">Transferência</SelectItem>
                 </SelectContent>
               </Select>

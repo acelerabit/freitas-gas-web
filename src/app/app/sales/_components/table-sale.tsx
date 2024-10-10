@@ -33,6 +33,7 @@ interface Product {
   status: "FULL" | "EMPTY" | "COMODATO";
   quantity: number;
   unitPrice: number;
+  typeSale: "FULL" | "EMPTY" | "COMODATO"
 }
 
 export interface Sale {
@@ -238,7 +239,7 @@ export default function TableSale() {
                 {product.type} {`(x${product.quantity})`} -{" "}
                 {
                   saleTypesMapper[
-                    product.status as "FULL" | "EMPTY" | "COMODATO"
+                    product.typeSale as "FULL" | "EMPTY" | "COMODATO"
                   ]
                 }
               </p>

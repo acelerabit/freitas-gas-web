@@ -4,18 +4,28 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { TableSales } from "./_components/table-sales";
 import TableSale from "./_components/table-sale";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 export default function SalesPage() {
   return (
-    <div className="container mx-auto p-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Listagem de Vendas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <TableSales />
-        </CardContent>
-      </Card>
-    </div>
+    <main className="p-8 flex flex-col">
+      <h1 className="text-4xl font-semibold">Vendas</h1>
+
+      <Breadcrumb className="my-4">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/app">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>vendas</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <div>
+        <TableSales />
+      </div>
+    </main>
   );
 }

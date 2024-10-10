@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -69,17 +69,32 @@ const transactionCategoryOptions = [
   { key: "CUSTOM", value: "outro" },
 ];
 
-const formSchema = z.object({
-  // transactionType: TransactionTypeSchema,
-  category: TransactionCategorySchema,
-  description: z.string().optional().nullable(),
-  customCategory: z.string().optional().nullable(), // Campo opcional
-  amount: z.coerce
-    .number()
-    .min(0, "insira um numero maior ou igual a 0")
-    .positive("O valor deve ser um inteiro positivo.")
-    .refine((val) => !isNaN(val), "insira um numero"),
-});
+const formSchema = z
+  .object({
+    // transactionType: TransactionTypeSchema,
+    category: TransactionCategorySchema,
+    description: z.string().optional().nullable(),
+    type: z.string().optional().nullable(),
+    custom: z.string().optional().nullable(),
+    customCategory: z.string().optional().nullable(), // Campo opcional
+    amount: z.coerce
+      .number()
+      .min(0, "insira um numero maior ou igual a 0")
+      .positive("O valor deve ser um inteiro positivo.")
+      .refine((val) => !isNaN(val), "insira um numero"),
+  })
+  .refine(
+    (data) => {
+      if (data.type === "OTHER") {
+        return !!data.custom;
+      }
+      return true;
+    },
+    {
+      message: "O campo custom é obrigatório quando o tipo é 'outros'",
+      path: ["custom"],
+    }
+  );
 
 export function AddTransactionDialog({
   open,
@@ -87,21 +102,28 @@ export function AddTransactionDialog({
 }: AddTransactionDialogProps) {
   const { user, loadingUser } = useUser();
 
+  const [expenseTypeOptions, setExpenseTypeOptions] = useState([
+    {
+      key: "combustível",
+      value: "combustível",
+    },
+    { key: "oficina mecânica", value: "oficina mecânica" },
+    { key: "outros", value: "outros" },
+  ]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: 0,
-      category: 'EXPENSE'
+      category: "EXPENSE",
     },
   });
 
-  const { watch } = form;
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const requestData = {
-      transactionType: 'EXIT',
+      transactionType: "EXIT",
       category: values.category,
-      customCategory: values.customCategory,
+      customCategory: values.customCategory ?? values.type,
       description: values.description,
       amount: values.amount,
       userId: user?.id,
@@ -134,11 +156,49 @@ export function AddTransactionDialog({
     window.location.reload();
   }
 
-  const transactionCategory = watch("category");
+  async function getExpenseTypes() {
+    const response = await fetchApi(`/transactions/expense/types`);
+
+    if (!response.ok) {
+      const respError = await response.json();
+
+      toast.error(respError.error, {
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+      return;
+    }
+
+    const data = await response.json();
+
+    const otherExpenseTypes = data.map(
+      (expenseType: { id: string; name: string }) => {
+        return {
+          key: expenseType.name,
+          value: expenseType.name,
+        };
+      }
+    );
+
+    const expenseTypesUpdate: any = [
+      ...otherExpenseTypes,
+      ...expenseTypeOptions,
+    ];
+
+    setExpenseTypeOptions(expenseTypesUpdate);
+  }
+
+  useEffect(() => {
+    getExpenseTypes();
+  }, []);
 
   if (!user) {
     return;
   }
+
+  const expenseTypeWatch = form.watch("type");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -181,6 +241,36 @@ export function AddTransactionDialog({
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de despesa</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value ?? ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tipo de despesa" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {expenseTypeOptions.map((expenseType) => (
+                        <SelectItem
+                          key={expenseType.key}
+                          value={expenseType.key}
+                        >
+                          {expenseType.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             {/* <FormField
               control={form.control}
               name="transactionType"
@@ -213,6 +303,27 @@ export function AddTransactionDialog({
               )}
             /> */}
 
+            {expenseTypeWatch === "outros" && (
+              <FormField
+                control={form.control}
+                name="customCategory"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome da nova categoria</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="nome da categoria"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="amount"
@@ -240,27 +351,6 @@ export function AddTransactionDialog({
               )}
             />
 
-            {transactionCategory === "CUSTOM" && (
-              <FormField
-                control={form.control}
-                name="customCategory"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome da categoria</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="nome da categoria"
-                        {...field}
-                        value={field.value ?? ""}
-                      />
-                    </FormControl>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
             <FormField
               control={form.control}
               name="description"
@@ -279,7 +369,6 @@ export function AddTransactionDialog({
                 </FormItem>
               )}
             />
-
             <div className="w-full flex justify-end">
               <Button className="mt-4" type="submit">
                 Salvar
