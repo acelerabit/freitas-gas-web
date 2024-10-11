@@ -36,7 +36,7 @@ export function TableSales() {
 
     toast.success("Venda cadastrada com sucesso!");
     handleCloseDialog();
-    window.location.reload()
+    // window.location.reload()
   };
 
   return (

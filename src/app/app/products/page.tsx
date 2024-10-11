@@ -19,8 +19,7 @@ import { TransferProductQuantityDialog } from "./_components/transfer-product-st
 
 export default function Products() {
   const { isOpen, onOpenChange } = useModal();
-  const { isOpen: isOpenTransfer, onOpenChange: onOpenChangeTransfer } =
-  useModal();
+
 
 
   return (
@@ -42,7 +41,7 @@ export default function Products() {
       <div className="w-full space-y-4">
         <div className="w-full flex justify-end gap-4">
           <Button onClick={onOpenChange}>Adicionar produto</Button>
-          <Button onClick={() => onOpenChangeTransfer()}>Transferir</Button>
+          
         </div>
 
         <div className="mt-8">
@@ -54,10 +53,7 @@ export default function Products() {
         </div>
       </div>
 
-      <TransferProductQuantityDialog
-        open={isOpenTransfer}
-        onOpenChange={onOpenChangeTransfer}
-      />
+      
 
       <AddProductDialog open={isOpen} onOpenChange={onOpenChange} />
     </main>

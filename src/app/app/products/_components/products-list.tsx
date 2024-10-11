@@ -10,10 +10,13 @@ import { DecreaseProductQuantityDialog } from "./decrease-product-quantity-dialo
 import { IncreaseProductQuantityDialog } from "./increase-product-quantity-dialog";
 import { fCurrencyIntlBRL } from "@/utils/formatNumber";
 import { TransferProductQuantityDialog } from "./transfer-product-status-dialog";
+import { Separator } from "@/components/ui/separator";
+import { Pencil } from "lucide-react";
+import { UpdateProductDialog } from "./update-product-dialog";
 
 type BottleStatus = "FULL" | "EMPTY" | "COMODATO";
 
-type ProductType = "P3" | "P13" | "P20" | "P45";
+export type ProductType = "P3" | "P13" | "P20" | "P45";
 
 const bottleStatusMapper = {
   FULL: "CHEIO",
@@ -29,15 +32,23 @@ export interface Product {
   quantity: number;
 }
 
+interface Stock {
+  type: ProductType;
+  products: Product[];
+}
+
 export function ProductList() {
+  const [stock, setStock] = useState<Stock | null>(null);
+  const [productType, setProductType] = useState<ProductType | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
-  const [product, setProduct] = useState<Product | null>(null);
 
   const { isOpen: isOpenIncrease, onOpenChange: onOpenChangeIncrease } =
     useModal();
   const { isOpen: isOpenDecrease, onOpenChange: onOpenChangeDecrease } =
     useModal();
-
+  const { isOpen: isOpenUpdate, onOpenChange: onOpenChangeUpdate } = useModal();
+  const { isOpen: isOpenTransfer, onOpenChange: onOpenChangeTransfer } =
+    useModal();
 
   async function fetchProducts() {
     const response = await fetchApi("/products/list");
@@ -56,34 +67,72 @@ export function ProductList() {
 
     const data = await response.json();
 
+    const groupedProducts = data.reduce((acc: any, product: any) => {
+      const { type } = product;
+
+      if (!acc[type]) {
+        acc[type] = {
+          type,
+          products: [],
+        };
+      }
+
+      acc[type].products.push(product);
+
+      return acc;
+    }, {} as Record<string, { type: string; products: Product[] }>);
+
+    setStock(groupedProducts);
     setProducts(data);
   }
 
-  function selectCurrentProductDecrease(product: Product) {
-    setProduct(product);
+  function selectCurrentProductDecrease(productType: ProductType) {
+    setProductType(productType);
 
     onOpenChangeDecrease();
   }
 
-  function selectCurrentProductIncrease(product: Product) {
-    setProduct(product);
+  function selectCurrentProductIncrease(productType: ProductType) {
+    setProductType(productType);
 
     onOpenChangeIncrease();
   }
 
+  function selectCurrentProductUpdate(productType: ProductType) {
+    setProductType(productType);
+
+    onOpenChangeUpdate();
+  }
+
+  function selectCurrentProductTransfer(productType: ProductType) {
+    setProductType(productType);
+
+    onOpenChangeTransfer();
+  }
+
   function handleCloseDecrease() {
-    setProduct(null);
+    setProductType(null);
 
     onOpenChangeDecrease();
   }
 
   function handleCloseIncrease() {
-    setProduct(null);
+    setProductType(null);
 
     onOpenChangeDecrease();
   }
 
+  function handleCloseTransfer() {
+    setProductType(null);
 
+    onOpenChangeTransfer();
+  }
+
+  function handleCloseUpdate() {
+    setProductType(null);
+
+    onOpenChangeUpdate();
+  }
 
   useEffect(() => {
     fetchProducts();
@@ -92,51 +141,88 @@ export function ProductList() {
   return (
     <>
       <div className="grid grid-cols-2 gap-4">
-        {products.map((product) => {
-          return (
-            <Card key={product.id}>
-              <CardHeader>
-                <CardTitle>
-                  {product.type} {bottleStatusMapper[product.status]}
-                </CardTitle>
-              </CardHeader>
+        {Object.values(stock ?? {}).map((group) => (
+          <Card key={group.type}>
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                <p>{group.type}</p>
+                <Button
+                  onClick={() => selectCurrentProductUpdate(group.type)}
+                  variant="ghost"
+                >
+                  <Pencil />
+                </Button>
+              </CardTitle>
+            </CardHeader>
 
-              <CardContent>
-                <p>estado: {bottleStatusMapper[product.status]}</p>
-                <p>tipo: {product.type}</p>
-                <p>preço: {fCurrencyIntlBRL(product.price / 100)}</p>
-                <p>quantidade: {product.quantity}</p>
-
-                <div className="mt-4 space-x-4">
-                  <Button onClick={() => selectCurrentProductIncrease(product)}>
-                    Adicionar items
-                  </Button>
-                  <Button onClick={() => selectCurrentProductDecrease(product)}>
-                    Remover items
-                  </Button>
-                  
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+            <CardContent>
+              <div>
+                {group.products.map((product: Product) => (
+                  <>
+                    <div key={product.id} className="py-2">
+                      <p>Estado: {bottleStatusMapper[product.status]}</p>
+                      <p>Tipo: {product.type}</p>
+                      <p>Preço: {fCurrencyIntlBRL(product.price / 100)}</p>
+                      <p>Quantidade: {product.quantity}</p>
+                    </div>
+                    <Separator />
+                  </>
+                ))}
+              </div>
+              <div className="mt-4 space-x-4">
+                <Button
+                  onClick={() => selectCurrentProductIncrease(group.type)}
+                >
+                  Adicionar items
+                </Button>
+                <Button
+                  onClick={() => selectCurrentProductDecrease(group.type)}
+                >
+                  Remover items
+                </Button>
+                <Button
+                  onClick={() => selectCurrentProductTransfer(group.type)}
+                >
+                  Transferir
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      
-
-      {product && (
-        <IncreaseProductQuantityDialog
-          open={isOpenIncrease}
-          onOpenChange={handleCloseIncrease}
-          product={product}
+      {productType && (
+        <UpdateProductDialog
+          open={isOpenUpdate}
+          onOpenChange={handleCloseUpdate}
+          productType={productType}
+          products={products}
         />
       )}
 
-      {product && (
+      {productType && (
+        <TransferProductQuantityDialog
+          open={isOpenTransfer}
+          onOpenChange={handleCloseTransfer}
+          productType={productType}
+        />
+      )}
+
+      {productType && (
+        <IncreaseProductQuantityDialog
+          open={isOpenIncrease}
+          onOpenChange={handleCloseIncrease}
+          productType={productType}
+          products={products}
+        />
+      )}
+
+      {productType && (
         <DecreaseProductQuantityDialog
           open={isOpenDecrease}
           onOpenChange={handleCloseDecrease}
-          product={product}
+          productType={productType}
+          products={products}
         />
       )}
     </>

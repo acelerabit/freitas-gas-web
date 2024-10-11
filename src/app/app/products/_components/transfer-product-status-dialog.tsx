@@ -32,28 +32,35 @@ import {
 import { useUser } from "@/contexts/user-context";
 import { fetchApi } from "@/services/fetchApi";
 import { toast } from "sonner";
-import { Product } from "./products-list";
+import { Product, ProductType } from "./products-list";
 
-const bottleStatusOptions = {
-  FULL: "CHEIO",
-  EMPTY: "VAZIO",
-  COMODATO: "COMODATO",
-};
+const BottleStatusSchema = z.enum(["FULL", "EMPTY", "COMODATO"]);
+
+const bottleStatusOptions = [
+  {
+    key: "FULL",
+    value: "cheio",
+  },
+  { key: "EMPTY", value: "vazio" },
+  { key: "COMODATO", value: "comodato" },
+];
 
 interface TransferProductQuantityDialogProps {
   open: boolean;
   onOpenChange: () => void;
+  productType: ProductType
 }
 
 const formSchema = z.object({
-  productFrom: z.string(),
-  productTo: z.string(),
+  productFromStatus: BottleStatusSchema,
+  productToStatus: BottleStatusSchema,
   quantity: z.coerce.number().min(0, "insira um numero maior ou igual a 0"),
 });
 
 export function TransferProductQuantityDialog({
   open,
   onOpenChange,
+  productType
 }: TransferProductQuantityDialogProps) {
   const { user, loadingUser } = useUser();
   const [products, setProducts] = useState<Product[]>([]);
@@ -90,9 +97,40 @@ export function TransferProductQuantityDialog({
       quantity: values.quantity,
     };
 
+    const productFrom = products.find(
+      (product) =>
+        product.type === productType && product.status === values.productFromStatus
+    );
+
+    if (!productFrom) {
+      toast.error("Produto de partida não encontrado", {
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+
+      return;
+    }
+
+    const productTo = products.find(
+      (product) =>
+        product.type === productType && product.status === values.productToStatus
+    );
+
+    if (!productTo) {
+      toast.error("Produto de chegada não encontrado", {
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+
+      return;
+    }
 
     const response = await fetchApi(
-      `/products/productFrom/${values.productFrom}/productTo/${values.productTo}`,
+      `/products/productFrom/${productFrom.id}/productTo/${productTo.id}`,
       {
         method: "PATCH",
         body: JSON.stringify(requestData),
@@ -133,17 +171,17 @@ export function TransferProductQuantityDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Transferir items para outro</DialogTitle>
+          <DialogTitle>Transferir items do tipo {productType}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
             <FormField
               control={form.control}
-              name="productFrom"
+              name="productFromStatus"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>De:</FormLabel>
+                  <FormLabel>Estado do produto de partida</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -154,9 +192,12 @@ export function TransferProductQuantityDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.type} {bottleStatusOptions[product.status]}
+                      {bottleStatusOptions.map((bottleStatus) => (
+                        <SelectItem
+                          key={bottleStatus.key}
+                          value={bottleStatus.key}
+                        >
+                          {bottleStatus.value}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -168,10 +209,10 @@ export function TransferProductQuantityDialog({
 
             <FormField
               control={form.control}
-              name="productTo"
+              name="productToStatus"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Para:</FormLabel>
+                  <FormLabel>Estado do produto de chegada</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -182,9 +223,12 @@ export function TransferProductQuantityDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.type} {bottleStatusOptions[product.status]}
+                      {bottleStatusOptions.map((bottleStatus) => (
+                        <SelectItem
+                          key={bottleStatus.key}
+                          value={bottleStatus.key}
+                        >
+                          {bottleStatus.value}
                         </SelectItem>
                       ))}
                     </SelectContent>

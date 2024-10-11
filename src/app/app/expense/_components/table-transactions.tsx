@@ -1,12 +1,29 @@
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import { fetchApi } from "@/services/fetchApi";
 import { formatDate } from "@/utils/formatDate";
 import { formatCurrency } from "@/utils/formatCurrent";
 import { EllipsisVertical } from "lucide-react";
 import EditTransactionDialog from "./edit-transaction-dialog";
+import useModal from "@/hooks/use-modal";
+import { ConfirmDelete } from "./confirm-delete";
 
 interface Transaction {
   _id: string;
@@ -40,8 +57,11 @@ export function TableTransactions() {
   const itemsPerPage = 5;
   const [loadingTransactions, setLoadingTransactions] = useState(true);
   const [loadingUsers, setLoadingUsers] = useState(true);
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const { isOpen, onOpenChange } = useModal();
 
   async function getTransactions() {
     setLoadingTransactions(true);
@@ -68,9 +88,9 @@ export function TableTransactions() {
       transactionType: transactionTypeLabels[item._props.transactionType],
       category: transactionCategoryLabels[item._props.category],
       userId: item._props.userId,
-      customCategory: item._props.customCategory || '-',
-      description: item._props.description || '-',
-      createdAt: item._props.createdAt || ''
+      customCategory: item._props.customCategory || "-",
+      description: item._props.description || "-",
+      createdAt: item._props.createdAt || "",
     }));
 
     setTransactions(transactionsList);
@@ -93,11 +113,14 @@ export function TableTransactions() {
     }
 
     const usersData = await response.json();
-    const userMap = usersData.reduce((acc: { [key: string]: string }, user: any) => {
-      acc[user._id] = user.props.email;
-      return acc;
-    }, {});
-    
+    const userMap = usersData.reduce(
+      (acc: { [key: string]: string }, user: any) => {
+        acc[user._id] = user.props.email;
+        return acc;
+      },
+      {}
+    );
+
     setUsersMap(userMap);
     setLoadingUsers(false);
   }
@@ -120,6 +143,12 @@ export function TableTransactions() {
     setIsEditDialogOpen(true);
   };
 
+  const openConfirmDeleteDialog = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+
+    onOpenChange();
+  };
+
   return (
     <>
       <Table className="min-w-full">
@@ -139,18 +168,24 @@ export function TableTransactions() {
         <TableBody>
           {loadingTransactions || loadingUsers ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center">Carregando...</TableCell>
+              <TableCell colSpan={5} className="text-center">
+                Carregando...
+              </TableCell>
             </TableRow>
           ) : transactions.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center">Nenhuma transação encontrada.</TableCell>
+              <TableCell colSpan={5} className="text-center">
+                Nenhuma transação encontrada.
+              </TableCell>
             </TableRow>
           ) : (
             transactions.map((transaction) => (
               <TableRow key={transaction._id}>
                 <TableCell>{transaction.transactionType}</TableCell>
                 <TableCell>{transaction.category}</TableCell>
-                <TableCell>{usersMap[transaction.userId] || "Desconhecido"}</TableCell>
+                <TableCell>
+                  {usersMap[transaction.userId] || "Desconhecido"}
+                </TableCell>
                 <TableCell>{transaction.customCategory}</TableCell>
                 <TableCell>{formatCurrency(transaction.amount)}</TableCell>
                 <TableCell>{transaction.description}</TableCell>
@@ -165,11 +200,15 @@ export function TableTransactions() {
                     <DropdownMenuContent>
                       <DropdownMenuLabel>Ações</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onSelect={() => openEditDialog(transaction)}>
+                      <DropdownMenuItem
+                        onSelect={() => openEditDialog(transaction)}
+                      >
                         Editar
                       </DropdownMenuItem>
                       <DropdownMenuItem>
-                        <Button variant="destructive">Remover</Button>
+                        <Button variant="destructive" onClick={() => openConfirmDeleteDialog(transaction)}>
+                          Remover
+                        </Button>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -183,6 +222,13 @@ export function TableTransactions() {
             isOpen={isEditDialogOpen}
             transaction={selectedTransaction}
             onClose={() => setIsEditDialogOpen(false)}
+          />
+        )}
+        {selectedTransaction && (
+          <ConfirmDelete
+            open={isOpen}
+            onOpenChange={onOpenChange}
+            expenseId={selectedTransaction?._id}
           />
         )}
       </Table>

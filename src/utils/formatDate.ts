@@ -24,6 +24,10 @@ export function formatToUTC(date: Date) {
   return dayjs(date).utc().format('DD/MM/YYYY');
 }
 
+export function formatToUTCDate(date: Date) {
+  return dayjs(date).utc().format('YYYY-MM-DD');
+}
+
 export function formatDateWithHours(date: string) {
   const dateFormat = new Date(date);
 

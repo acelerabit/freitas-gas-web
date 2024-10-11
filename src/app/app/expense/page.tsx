@@ -33,7 +33,7 @@ export default function Finance() {
 
       <div className="w-full">
         <div className="w-full flex justify-end">
-          <Button onClick={onOpenChange}>Adicionar transação</Button>
+          <Button onClick={onOpenChange}>Adicionar despesa</Button>
         </div>
         <div>
           <TableTransactions />

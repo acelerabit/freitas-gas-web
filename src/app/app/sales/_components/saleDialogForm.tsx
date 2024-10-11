@@ -145,11 +145,14 @@ export function SaleDialogForm({
   };
 
   function handleTypeSaleSelect(value: string, index: number) {
-    const selectedProduct = products[index]
+    const selectedProduct = formData.products[index]
 
     const findProduct = products.find(
       (product) => product.type === selectedProduct.type && product.status === value
     );
+
+    console.log({findProduct, value, type: selectedProduct.type, index}, 'UPDATED PRODUCTS')
+
 
     if (selectedProduct && findProduct) {
       const updatedProducts = [...formData.products];
@@ -159,6 +162,7 @@ export function SaleDialogForm({
         price: findProduct.price,
         quantity: updatedProducts[index].quantity || 1,
       };
+
 
       setFormData((prev) => ({ ...prev, products: updatedProducts }));
       setValue(`products[${index}]`, updatedProducts[index]);

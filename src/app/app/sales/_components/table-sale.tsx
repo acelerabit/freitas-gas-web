@@ -25,6 +25,7 @@ import useModal from "@/hooks/use-modal";
 import { UpdateSaleDialog } from "./edit-sale-dialog";
 import { DeleteSaleDialog } from "./delete-sale-dialog";
 import { fCurrencyIntlBRL } from "@/utils/formatNumber";
+import { formatToUTC, formatToUTCDate } from "@/utils/formatDate";
 
 interface Product {
   id: string;
@@ -386,8 +387,12 @@ export default function TableSale() {
     }
 
     if (dateFilter.startDate && dateFilter.endDate) {
-      fetchSalesUrl.searchParams.set("startDate", String(dateFilter.startDate));
-      fetchSalesUrl.searchParams.set("endDate", String(dateFilter.endDate));
+        const startDateFormat =
+        formatToUTCDate(dateFilter.startDate)
+         const endDateFormat = formatToUTCDate(dateFilter.endDate)
+
+      fetchSalesUrl.searchParams.set("startDate", String(startDateFormat));
+      fetchSalesUrl.searchParams.set("endDate", String(endDateFormat));
     }
 
     if (saleSelectType && saleSelectType != "none") {

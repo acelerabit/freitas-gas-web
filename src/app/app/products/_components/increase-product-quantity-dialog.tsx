@@ -32,22 +32,36 @@ import {
 import { useUser } from "@/contexts/user-context";
 import { fetchApi } from "@/services/fetchApi";
 import { toast } from "sonner";
-import { Product } from "./products-list";
+import { Product, ProductType } from "./products-list";
 
 interface IncreaseProductQuantityDialogProps {
   open: boolean;
   onOpenChange: () => void;
-  product: Product;
+  productType: ProductType;
+  products: Product[];
 }
 
+const BottleStatusSchema = z.enum(["FULL", "EMPTY", "COMODATO"]);
+
+const bottleStatusOptions = [
+  {
+    key: "FULL",
+    value: "cheio",
+  },
+  { key: "EMPTY", value: "vazio" },
+  { key: "COMODATO", value: "comodato" },
+];
+
 const formSchema = z.object({
+  status: BottleStatusSchema,
   quantity: z.coerce.number().min(0, "insira um numero maior ou igual a 0"),
 });
 
 export function IncreaseProductQuantityDialog({
   open,
   onOpenChange,
-  product
+  productType,
+  products,
 }: IncreaseProductQuantityDialogProps) {
   const { user, loadingUser } = useUser();
 
@@ -58,12 +72,26 @@ export function IncreaseProductQuantityDialog({
     },
   });
 
-  const { watch } = form;
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const requestData = {
       quantity: values.quantity,
     };
+
+    const product = products.find(
+      (product) =>
+        product.type === productType && product.status === values.status
+    );
+
+    if (!product) {
+      toast.error("Produto não encontrado", {
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+
+      return;
+    }
 
     const response = await fetchApi(`/products/${product.id}/increase`, {
       method: "PATCH",
@@ -100,10 +128,41 @@ export function IncreaseProductQuantityDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Remover itens do estoque {product.type} {product.status}</DialogTitle>
+          <DialogTitle>Adicionar ao estoque do item {productType}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Estado do produto</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o estado do produto" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {bottleStatusOptions.map((bottleStatus) => (
+                      <SelectItem
+                        key={bottleStatus.key}
+                        value={bottleStatus.key}
+                      >
+                        {bottleStatus.value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
             <FormField
               control={form.control}
