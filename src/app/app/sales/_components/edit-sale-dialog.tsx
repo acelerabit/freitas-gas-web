@@ -58,7 +58,7 @@ const productTypesMapper = [
 ]
 
 const bottleStatusMapper = [
-  {key: 'EMPTY', value: 'Vasilhame'}, {key: 'FULL', value: 'Vasilhame + gás'}, {key: 'COMODATO', value: 'comodato'}
+  {key: 'EMPTY', value: 'Troca de gás'}, {key: 'FULL', value: 'Vasilhame + gás'}, {key: 'COMODATO', value: 'comodato'}
 ]
 
 interface Product {

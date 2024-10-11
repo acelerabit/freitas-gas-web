@@ -72,7 +72,7 @@ const productTypesMapper = [
 type BottleStatus = "EMPTY" | 'FULL' | 'COMODATO'
 
 const bottleStatusMapper = [
-  {key: 'EMPTY', value: 'Vasilhame'}, {key: 'FULL', value: 'Vasilhame + gás'}, {key: 'COMODATO', value: 'comodato'}
+  {key: 'EMPTY', value: 'Troca de gás'}, {key: 'FULL', value: 'Vasilhame + gás'}, {key: 'COMODATO', value: 'comodato'}
 ]
 
 export function SaleDialogForm({

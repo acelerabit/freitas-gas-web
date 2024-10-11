@@ -60,11 +60,11 @@ interface DateFilter {
 
 const saleTypes = [
   {
-    name: "Vasilhame cheio",
+    name: "Vasilhame + gás",
     value: "FULL",
   },
   {
-    name: "Vasilhame vazio",
+    name: "Troca de gás",
     value: "EMPTY",
   },
   {
@@ -74,8 +74,8 @@ const saleTypes = [
 ];
 
 const saleTypesMapper = {
-  FULL: "Vasilhame cheio",
-  EMPTY: "Vasilhame vazio",
+  FULL: "Vasilhame + gás",
+  EMPTY: "Troca de gás",
   COMODATO: "Comodato",
 };
 
