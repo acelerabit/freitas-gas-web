@@ -39,10 +39,10 @@ export default function Products() {
       </Breadcrumb>
 
       <div className="w-full space-y-4">
-        <div className="w-full flex justify-end gap-4">
+        {/* <div className="w-full flex justify-end gap-4">
           <Button onClick={onOpenChange}>Adicionar produto</Button>
           
-        </div>
+        </div> */}
 
         <div className="mt-8">
           <ProductList />
