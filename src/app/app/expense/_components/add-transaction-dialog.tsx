@@ -204,7 +204,7 @@ export function AddTransactionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Cadastrar Nova Transação</DialogTitle>
+          <DialogTitle>Cadastrar Nova despesa</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>

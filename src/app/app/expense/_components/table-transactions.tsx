@@ -21,9 +21,9 @@ import { fetchApi } from "@/services/fetchApi";
 import { formatDate } from "@/utils/formatDate";
 import { formatCurrency } from "@/utils/formatCurrent";
 import { EllipsisVertical } from "lucide-react";
-import EditTransactionDialog from "./edit-transaction-dialog";
 import useModal from "@/hooks/use-modal";
 import { ConfirmDelete } from "./confirm-delete";
+import { UpdateTransactionDialog } from "./edit-transaction-dialog";
 
 interface Transaction {
   _id: string;
@@ -62,6 +62,8 @@ export function TableTransactions() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { isOpen, onOpenChange } = useModal();
+  const { isOpen: isOpenModalUpdate, onOpenChange: onOpenChangeModalUpdate } =
+    useModal();
 
   async function getTransactions() {
     setLoadingTransactions(true);
@@ -140,7 +142,8 @@ export function TableTransactions() {
 
   const openEditDialog = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
-    setIsEditDialogOpen(true);
+
+    onOpenChangeModalUpdate();
   };
 
   const openConfirmDeleteDialog = (transaction: Transaction) => {
@@ -148,6 +151,12 @@ export function TableTransactions() {
 
     onOpenChange();
   };
+
+  function onCloseUpdateModal() {
+    setSelectedTransaction(null);
+
+    onOpenChangeModalUpdate();
+  }
 
   return (
     <>
@@ -200,13 +209,20 @@ export function TableTransactions() {
                     <DropdownMenuContent>
                       <DropdownMenuLabel>Ações</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onSelect={() => openEditDialog(transaction)}
-                      >
-                        Editar
+                      <DropdownMenuItem>
+                        <Button
+                          className="w-full"
+                          onClick={() => openEditDialog(transaction)}
+                        >
+                          Editar
+                        </Button>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
-                        <Button variant="destructive" onClick={() => openConfirmDeleteDialog(transaction)}>
+                        <Button
+                          className="w-full"
+                          variant="destructive"
+                          onClick={() => openConfirmDeleteDialog(transaction)}
+                        >
                           Remover
                         </Button>
                       </DropdownMenuItem>
@@ -218,12 +234,13 @@ export function TableTransactions() {
           )}
         </TableBody>
         {selectedTransaction && (
-          <EditTransactionDialog
-            isOpen={isEditDialogOpen}
+          <UpdateTransactionDialog
+            open={isOpenModalUpdate}
             transaction={selectedTransaction}
-            onClose={() => setIsEditDialogOpen(false)}
+            onClose={onCloseUpdateModal}
           />
         )}
+
         {selectedTransaction && (
           <ConfirmDelete
             open={isOpen}

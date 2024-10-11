@@ -34,7 +34,7 @@ interface Product {
   status: "FULL" | "EMPTY" | "COMODATO";
   quantity: number;
   unitPrice: number;
-  typeSale: "FULL" | "EMPTY" | "COMODATO"
+  typeSale: "FULL" | "EMPTY" | "COMODATO";
 }
 
 export interface Sale {
@@ -315,20 +315,27 @@ export default function TableSale() {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-6 w-6 p-0 flex items-center justify-center">
+              <Button
+                variant="ghost"
+                className="h-6 w-6 p-0 flex items-center justify-center"
+              >
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Ações</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href={`/app/sales/${row.original.id}`} className="text-sm">Ver detalhes</Link>
-              </DropdownMenuItem>
+              {/* <DropdownMenuItem asChild>
+                <Link
+                  href={`/app/sales/${row.original.id}`}
+                  className="text-sm"
+                >
+                  Ver detalhes
+                </Link>
+              </DropdownMenuItem> */}
               <DropdownMenuItem asChild>
                 <Button
-                  className="text-sm p-2 mb-2"
+                  className="w-full cursor-pointer"
                   onClick={() => {
                     setSaleId(row.original.id);
                     updateSaleOnOpenChange();
@@ -337,10 +344,12 @@ export default function TableSale() {
                   Editar
                 </Button>
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+
               <DropdownMenuItem asChild>
                 <Button
                   variant="destructive"
-                  className="text-sm p-2"
+                  className="w-full cursor-pointer"
                   onClick={() => {
                     setSaleId(row.original.id);
                     setDeleteSaleOpen(true);
@@ -350,17 +359,10 @@ export default function TableSale() {
                 </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
-            {saleId && (
-              <DeleteSaleDialog
-                open={deleteSaleOpen}
-                onOpenChange={() => setDeleteSaleOpen(false)}
-                saleId={saleId}
-              />
-            )}
           </DropdownMenu>
         );
       },
-    }
+    },
   ];
 
   function handleFilterProjects(filter: string) {
@@ -387,9 +389,8 @@ export default function TableSale() {
     }
 
     if (dateFilter.startDate && dateFilter.endDate) {
-        const startDateFormat =
-        formatToUTCDate(dateFilter.startDate)
-         const endDateFormat = formatToUTCDate(dateFilter.endDate)
+      const startDateFormat = formatToUTCDate(dateFilter.startDate);
+      const endDateFormat = formatToUTCDate(dateFilter.endDate);
 
       fetchSalesUrl.searchParams.set("startDate", String(startDateFormat));
       fetchSalesUrl.searchParams.set("endDate", String(endDateFormat));
@@ -466,6 +467,14 @@ export default function TableSale() {
         open={openUpdateSale}
         onOpenChange={updateSaleOnOpenChange}
       />
+
+      {saleId && (
+        <DeleteSaleDialog
+          open={deleteSaleOpen}
+          onOpenChange={() => setDeleteSaleOpen(false)}
+          saleId={saleId}
+        />
+      )}
     </div>
   );
 }
