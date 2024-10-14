@@ -26,6 +26,7 @@ import {
   SquareUserRound,
   Users,
   Wallet,
+  BaggageClaim ,
 } from "lucide-react";
 import Link from "next/link";
 import { ReactNode } from "react";
@@ -97,6 +98,13 @@ export function MainSidebar({ children }: { children: ReactNode }) {
               >
                 <SquareGanttChart className="h-4 w-4" />
                 Estoque
+              </Link>
+              <Link
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                href="/app/supplier"
+              >
+                <BaggageClaim  className="h-4 w-4" />
+                Fornecedores
               </Link>
             </nav>
           </div>
