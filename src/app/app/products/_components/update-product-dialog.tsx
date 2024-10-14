@@ -37,9 +37,10 @@ import { Product, ProductType } from "./products-list";
 interface DecreaseProductQuantityDialogProps {
   open: boolean;
   onOpenChange: () => void;
-  productType: ProductType;
   products: Product[]
 }
+
+const ProductTypeSchema = z.enum(["P3", "P13", "P20", "P45"]);
 
 const BottleStatusSchema = z.enum(["FULL", "EMPTY", "COMODATO"]);
 
@@ -52,7 +53,18 @@ const bottleStatusOptions = [
   { key: "COMODATO", value: "comodato" },
 ];
 
+const ProductTypeOptions = [
+  {
+    key: "P3",
+    value: "P3",
+  },
+  { key: "P13", value: "P13" },
+  { key: "P20", value: "P20" },
+  { key: "P45", value: "P45" },
+];
+
 const formSchema = z.object({
+  type: ProductTypeSchema,
   status: BottleStatusSchema,
   price: z.coerce
     .number()
@@ -65,7 +77,6 @@ export function UpdateProductDialog({
   open,
   onOpenChange,
   products,
-  productType
 }: DecreaseProductQuantityDialogProps) {
   const { user, loadingUser } = useUser();
 
@@ -84,7 +95,7 @@ export function UpdateProductDialog({
 
     const product = products.find(
       (product) =>
-        product.type === productType && product.status === values.status
+        product.type === values.type && product.status === values.status
     );
 
     if (!product) {
@@ -133,17 +144,48 @@ export function UpdateProductDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Atualizar produto {productType}</DialogTitle>
+          <DialogTitle>Atualizar preço do produto</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
           <FormField
               control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de produto</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tipo de produto" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {ProductTypeOptions.map((productType) => (
+                        <SelectItem
+                          key={productType.key}
+                          value={productType.key}
+                        >
+                          {productType.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+          <FormField
+              control={form.control}
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Estado do produto de partida</FormLabel>
+                  <FormLabel>Estado do produto</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}

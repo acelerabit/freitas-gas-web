@@ -171,7 +171,7 @@ export function AddProductDialog({
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de transação</FormLabel>
+                  <FormLabel>Tipo de produto</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}

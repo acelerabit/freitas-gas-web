@@ -13,6 +13,15 @@ import { TransferProductQuantityDialog } from "./transfer-product-status-dialog"
 import { Separator } from "@/components/ui/separator";
 import { Pencil } from "lucide-react";
 import { UpdateProductDialog } from "./update-product-dialog";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 type BottleStatus = "FULL" | "EMPTY" | "COMODATO";
 
@@ -37,10 +46,18 @@ interface Stock {
   products: Product[];
 }
 
+type Prices = Record<ProductType, Record<BottleStatus, number>>;
+
 export function ProductList() {
   const [stock, setStock] = useState<Stock | null>(null);
   const [productType, setProductType] = useState<ProductType | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [prices, setPrices] = useState<Prices>({
+    P3: { EMPTY: 0, FULL: 0, COMODATO: 0 },
+    P13: { EMPTY: 0, FULL: 0, COMODATO: 0 },
+    P20: { EMPTY: 0, FULL: 0, COMODATO: 0 },
+    P45: { EMPTY: 0, FULL: 0, COMODATO: 0 },
+  });
 
   const { isOpen: isOpenIncrease, onOpenChange: onOpenChangeIncrease } =
     useModal();
@@ -67,21 +84,54 @@ export function ProductList() {
 
     const data = await response.json();
 
-    const groupedProducts = data.reduce((acc: any, product: any) => {
-      const { type } = product;
+    const groupedProducts = data.reduce(
+      (acc: any, product: any) => {
+        const { type } = product;
 
-      if (!acc[type]) {
-        acc[type] = {
-          type,
-          products: [],
-        };
-      }
+        if (!acc[type]) {
+          acc[type] = {
+            type,
+            products: [],
+          };
+        }
 
-      acc[type].products.push(product);
+        acc[type].products.push(product);
 
-      return acc;
-    }, {} as Record<string, { type: string; products: Product[] }>);
+        return acc;
+      },
+      {
+        P3: { type: "P3", products: [] },
+        P13: { type: "P13", products: [] },
+        P20: { type: "P20", products: [] },
+        P45: { type: "P45", products: [] },
+      } as Record<string, { type: string; products: Product[] }>
+    );
 
+    const pricesByTypeAndStatus = data.reduce(
+      (
+        acc: Record<ProductType, Record<BottleStatus, number>>,
+        product: Product
+      ) => {
+        const { type, status, price } = product;
+
+        // Inicializa o agrupamento por tipo se não existir
+        if (!acc[type]) {
+          acc[type] = {
+            EMPTY: 0,
+            FULL: 0,
+            COMODATO: 0,
+          };
+        }
+
+        // Adiciona o preço ao status correspondente
+        acc[type][status] += price;
+
+        return acc;
+      },
+      {} as Record<ProductType, Record<BottleStatus, number>>
+    );
+
+    setPrices(pricesByTypeAndStatus);
     setStock(groupedProducts);
     setProducts(data);
   }
@@ -98,9 +148,7 @@ export function ProductList() {
     onOpenChangeIncrease();
   }
 
-  function selectCurrentProductUpdate(productType: ProductType) {
-    setProductType(productType);
-
+  function selectCurrentProductUpdate() {
     onOpenChangeUpdate();
   }
 
@@ -129,9 +177,19 @@ export function ProductList() {
   }
 
   function handleCloseUpdate() {
-    setProductType(null);
-
     onOpenChangeUpdate();
+  }
+
+  function calculateTotal(products: Product[]) {
+    const result = products.reduce((acc: any, product: any) => {
+      const { quantity } = product;
+
+      acc += quantity;
+
+      return acc;
+    }, 0);
+
+    return result;
   }
 
   useEffect(() => {
@@ -146,23 +204,20 @@ export function ProductList() {
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
                 <p>{group.type}</p>
-                <Button
-                  onClick={() => selectCurrentProductUpdate(group.type)}
-                  variant="ghost"
-                >
-                  <Pencil />
-                </Button>
               </CardTitle>
             </CardHeader>
 
             <CardContent>
               <div>
+                <p className="text-xl">
+                  Total: {calculateTotal(group.products)}
+                </p>
                 {group.products.map((product: Product) => (
                   <>
                     <div key={product.id} className="py-2">
                       <p>Estado: {bottleStatusMapper[product.status]}</p>
-                      <p>Tipo: {product.type}</p>
-                      <p>Preço: {fCurrencyIntlBRL(product.price / 100)}</p>
+                      {/* <p>Tipo: {product.type}</p> */}
+                      {/* <p>Preço: {fCurrencyIntlBRL(product.price / 100)}</p> */}
                       <p>Quantidade: {product.quantity}</p>
                     </div>
                     <Separator />
@@ -191,14 +246,55 @@ export function ProductList() {
         ))}
       </div>
 
-      {productType && (
-        <UpdateProductDialog
-          open={isOpenUpdate}
-          onOpenChange={handleCloseUpdate}
-          productType={productType}
-          products={products}
-        />
-      )}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardHeader>
+            <CardTitle className="flex justify-between items-center">
+              <p>Preços</p>
+
+              <Button onClick={() => onOpenChangeUpdate()} variant="ghost">
+                <Pencil />
+              </Button>
+            </CardTitle>
+          </CardHeader>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Table>
+            <TableCaption>Listagem de preços</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Produto / Tipo</TableHead>
+                <TableHead>Troca de gás</TableHead>
+                <TableHead>Vasilhame + gás</TableHead>
+                <TableHead>Comodato</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {prices &&
+                Object.entries(prices).map(([key, value], index) => (
+                  <TableRow key={key}>
+                    <TableCell className="font-medium">{key}</TableCell>
+                    <TableCell className="font-medium truncate">
+                      {fCurrencyIntlBRL(value.EMPTY / 100)}
+                    </TableCell>
+                    <TableCell className="font-medium truncate">
+                      {fCurrencyIntlBRL(value.FULL / 100)}
+                    </TableCell>
+                    <TableCell className="font-medium truncate">
+                      {fCurrencyIntlBRL(value.COMODATO / 100)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <UpdateProductDialog
+        open={isOpenUpdate}
+        onOpenChange={handleCloseUpdate}
+        products={products}
+      />
 
       {productType && (
         <TransferProductQuantityDialog
