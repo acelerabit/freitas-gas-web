@@ -304,7 +304,10 @@ export default function TableSale() {
       },
       cell: ({ row }) => {
         const value = new Date(row.original.createdAt);
-        const formatted = new Intl.DateTimeFormat("pt-br").format(value);
+        const formatted = new Intl.DateTimeFormat("pt-br", {
+          dateStyle: "short",
+          timeStyle: "short",
+        }).format(value);
 
         return <div>{formatted}</div>;
       },
