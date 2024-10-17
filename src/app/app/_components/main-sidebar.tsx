@@ -17,6 +17,7 @@ import {
   Barcode,
   ChevronRight,
   CreditCard,
+  Cylinder,
   HandCoins,
   LayoutList,
   Menu,
@@ -77,6 +78,22 @@ export function MainSidebar({ children }: { children: ReactNode }) {
               </Link>
               <Link
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                href="/app/finance"
+              >
+                <Wallet className="h-4 w-4" />
+                Financeiro
+              </Link>
+
+              <Link
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                href="/app/my-sales"
+              >
+                <HandCoins className="h-4 w-4" />
+                Minhas vendas
+              </Link>
+
+              <Link
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
                 href="/app/sales"
               >
                 <HandCoins className="h-4 w-4" />
@@ -97,6 +114,14 @@ export function MainSidebar({ children }: { children: ReactNode }) {
               >
                 <SquareGanttChart className="h-4 w-4" />
                 Estoque
+              </Link>
+
+              <Link
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
+                href="/app/collect"
+              >
+                <Cylinder className="h-4 w-4" />
+                Coletar vasilhame
               </Link>
             </nav>
           </div>

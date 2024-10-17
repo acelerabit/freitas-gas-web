@@ -93,7 +93,7 @@ export function Stock() {
 
               <TableHead>Telefone</TableHead>
 
-              <TableHead>Valor</TableHead>
+              {/* <TableHead>Valor</TableHead> */}
               <TableHead>Produtos</TableHead>
             </TableRow>
           </TableHeader>
@@ -110,9 +110,9 @@ export function Stock() {
                   <TableCell className="font-medium">
                     {sale.customer.phone}
                   </TableCell>
-                  <TableCell className="font-medium truncate">
+                  {/* <TableCell className="font-medium truncate">
                     {fCurrencyIntlBRL(sale.total)}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell className="font-medium truncate">
                     {sale.products.map((product, index) => (
                       <p key={index}>

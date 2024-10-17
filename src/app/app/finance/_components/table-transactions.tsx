@@ -19,37 +19,78 @@ import { useUser } from "@/contexts/user-context";
 import { fetchApi } from "@/services/fetchApi";
 import Link from "next/link";
 import { toast } from "sonner";
-import { DataTable } from "./data-table-sales";
-import { SearchSales } from "./search-sales";
+
 import useModal from "@/hooks/use-modal";
-import { UpdateSaleDialog } from "./edit-sale-dialog";
-import { DeleteSaleDialog } from "./delete-sale-dialog";
 import { fCurrencyIntlBRL } from "@/utils/formatNumber";
 import { formatToUTC, formatToUTCDate } from "@/utils/formatDate";
+import { SearchTransactions } from "./search-transaction";
+import { DataTable } from "./data-table-transactions";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface Product {
-  id: string;
-  type: string;
-  name: string;
-  status: "FULL" | "EMPTY" | "COMODATO";
-  quantity: number;
-  unitPrice: number;
-  typeSale: "FULL" | "EMPTY" | "COMODATO";
-}
+const transactionTypeLabels: { [key: string]: string } = {
+  ENTRY: "Entrada",
+  EXIT: "Saída",
+  TRANSFER: "Transferência",
+};
 
-export interface Sale {
+const transactionCategoryLabels: { [key: string]: string } = {
+  INCOME: "Entrada",
+  WITHDRAW: "Saida",
+  DEPOSIT: "Depósito",
+  SALE: "Venda",
+  EXPENSE: "Despesa",
+  CUSTOM: "Personalizado",
+  TRANSFER: 'Transferência'
+};
+
+const categories = [
+  {
+    name: "Entrada",
+    value: "INCOME",
+  },
+  {
+    name: "Saida",
+    value: "WITHDRAW",
+  },
+  {
+    name: "Depósito",
+    value: "DEPOSIT",
+  },
+  {
+    name: "Venda",
+    value: "SALE",
+  },
+  {
+    name: "Despesa",
+    value: "EXPENSE",
+  },
+  {
+    name: "Transferência",
+    value: "TRANSFER",
+  },
+];
+
+
+export type TransactionType = {
+  ENTRY: 'ENTRY',
+  EXIT: 'EXIT',
+  TRANSFER: 'TRANSFER'
+};
+
+export type TransactionCategory = {
+  DEPOSIT: 'DEPOSIT',
+  SALE: 'SALE',
+  EXPENSE: 'EXPENSE',
+  CUSTOM: 'CUSTOM'
+};
+
+export interface Transaction {
   id: string;
-  products: Product[];
-  deliveryman: {
-    name: string;
-  };
-  paymentMethod: string;
-  customer: {
-    name: string;
-  };
-  saleType: string;
-  total: number;
-  date: Date;
+  transactionType: string;
+  category: string;
+  customCategory?: string;
+  amount: number;
+  description?: string;
   createdAt: string;
 }
 
@@ -58,42 +99,20 @@ interface DateFilter {
   endDate: Date | null;
 }
 
-const saleTypes = [
-  {
-    name: "Vasilhame + gás",
-    value: "FULL",
-  },
-  {
-    name: "Troca de gás",
-    value: "EMPTY",
-  },
-  {
-    name: "Comodato",
-    value: "COMODATO",
-  },
-];
-
-const saleTypesMapper = {
-  FULL: "Vasilhame + gás",
-  EMPTY: "Troca de gás",
-  COMODATO: "Comodato",
-};
 
 type SortType =
   | "createdAt"
   | "customer"
-  | "saleType"
-  | "total"
-  | "deliveryman"
-  | "paymentMethod"
-  | "total"
-  | "quantity";
+  | "transactionType"
+  | "category"
+  | "amount"
+  | "customCategory"
 
-export default function TableSale() {
-  const [sales, setSales] = useState<Sale[] | []>([]);
+export default function TableTransaction() {
+  const [transactions, setTransactions] = useState<Transaction[] | []>([]);
   const [page, setPage] = useState(1);
-  const [saleSelectType, setSaleSelectType] = useState("");
-  const [saleId, setSaleId] = useState("");
+  const [category, setCategory] = useState("");
+  const [transactionId, setTransactionId] = useState("");
   const [dateFilter, setDateFilter] = useState<DateFilter>({
     startDate: null,
     endDate: null,
@@ -105,10 +124,6 @@ export default function TableSale() {
   const itemsPerPage = 10;
   const [filter, setFilter] = useState("");
   const { user, loadingUser } = useUser();
-  const [deleteSaleOpen, setDeleteSaleOpen] = useState(false);
-
-  const { isOpen: openUpdateSale, onOpenChange: updateSaleOnOpenChange } =
-    useModal();
 
   const handleSort = (sortField: SortType, direction: "desc" | "asc") => {
     setOrderByField(sortField);
@@ -119,9 +134,9 @@ export default function TableSale() {
     setDateFilter(newDateFilter);
   };
 
-  const columns: ColumnDef<Sale>[] = [
+  const columns: ColumnDef<Transaction>[] = [
     {
-      accessorKey: "deliveryman",
+      accessorKey: "category",
       header: ({ column }) => {
         return (
           <Button
@@ -133,61 +148,14 @@ export default function TableSale() {
             }`}
             onClick={() =>
               handleSort(
-                "deliveryman",
+                "category",
                 orderDirection === "desc" ? "asc" : "desc"
               )
             }
           >
-            Entregador
+            Tipo de movimentação
             <ArrowUpDown className="ml-2 h-4 w-4" />
-            {orderByField === "deliveryman" && (
-              <span className="text-[8px]">{orderDirection}</span>
-            )}
-          </Button>
-        );
-      },
-      cell: ({ row }) => {
-        return <p>{row.original.deliveryman.name}</p>;
-      },
-    },
-    {
-      accessorKey: "products",
-      header: ({ column }) => {
-        return <p>Produtos</p>;
-      },
-      cell: ({ row }) => {
-        return (
-          <>
-            {row.original.products.map((product, index) => (
-              <p key={index}>
-                {product.type} {`(x${product.quantity})`}
-              </p>
-            ))}
-          </>
-        );
-      },
-    },
-    {
-      accessorKey: "paymentMethod",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            className={`p-0 ${
-              column.getIsSorted() === "asc" || column.getIsSorted() === "desc"
-                ? "text-accent-foreground"
-                : ""
-            }`}
-            onClick={() =>
-              handleSort(
-                "paymentMethod",
-                orderDirection === "desc" ? "asc" : "desc"
-              )
-            }
-          >
-            Método de pagamento
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-            {orderByField === "paymentMethod" && (
+            {orderByField === "category" && (
               <span className="text-[8px]">
                 {/* {column.getIsSorted() && column.getIsSorted()} */}
                 {orderDirection}
@@ -198,7 +166,7 @@ export default function TableSale() {
       },
     },
     {
-      accessorKey: "customer",
+      accessorKey: "customCategory",
       header: ({ column }) => {
         return (
           <Button
@@ -209,12 +177,12 @@ export default function TableSale() {
                 : ""
             }`}
             onClick={() =>
-              handleSort("customer", orderDirection === "desc" ? "asc" : "desc")
+              handleSort("customCategory", orderDirection === "desc" ? "asc" : "desc")
             }
           >
-            Cliente
+            Categoria
             <ArrowUpDown className="ml-2 h-4 w-4" />
-            {orderByField === "customer" && (
+            {orderByField === "customCategory" && (
               <span className="text-[8px]">
                 {/* {column.getIsSorted() && column.getIsSorted()} */}
                 {orderDirection}
@@ -224,33 +192,24 @@ export default function TableSale() {
         );
       },
       cell: ({ row }) => {
-        return <p>{row.original.customer.name}</p>;
+        return <p>{row.original.customCategory}</p>;
       },
     },
     {
-      accessorKey: "saleType",
+      accessorKey: "description",
       header: ({ column }) => {
-        return <p>Tipo de venda</p>;
+        return <p>Descrição</p>;
       },
       cell: ({ row }) => {
         return (
           <p>
-            {row.original.products.map((product, index) => (
-              <p key={index}>
-                {product.type} {`(x${product.quantity})`} -{" "}
-                {
-                  saleTypesMapper[
-                    product.typeSale as "FULL" | "EMPTY" | "COMODATO"
-                  ]
-                }
-              </p>
-            ))}
+            {row.original.description}
           </p>
         );
       },
     },
     {
-      accessorKey: "total",
+      accessorKey: "amount",
       header: ({ column }) => {
         return (
           <Button
@@ -261,19 +220,19 @@ export default function TableSale() {
                 : ""
             }`}
             onClick={() =>
-              handleSort("total", orderDirection === "desc" ? "asc" : "desc")
+              handleSort("amount", orderDirection === "desc" ? "asc" : "desc")
             }
           >
-            Total
+            Valor
             <ArrowUpDown className="ml-2 h-4 w-4" />
-            {orderByField === "total" && (
+            {orderByField === "amount" && (
               <span className="text-[8px]">{orderDirection}</span>
             )}
           </Button>
         );
       },
       cell: ({ row }) => {
-        return <p>{fCurrencyIntlBRL(row.original.total / 100)}</p>;
+        return <p>{fCurrencyIntlBRL(row.original.amount / 100)}</p>;
       },
     },
     {
@@ -327,7 +286,7 @@ export default function TableSale() {
               <DropdownMenuLabel>Ações</DropdownMenuLabel>
               {/* <DropdownMenuItem asChild>
                 <Link
-                  href={`/app/sales/${row.original.id}`}
+                  href={`/app/transactions/${row.original.id}`}
                   className="text-sm"
                 >
                   Ver detalhes
@@ -337,8 +296,8 @@ export default function TableSale() {
                 <Button
                   className="w-full cursor-pointer"
                   onClick={() => {
-                    setSaleId(row.original.id);
-                    updateSaleOnOpenChange();
+                    setTransactionId(row.original.id);
+                    // updateTransactionOnOpenChange();
                   }}
                 >
                   Editar
@@ -351,8 +310,8 @@ export default function TableSale() {
                   variant="destructive"
                   className="w-full cursor-pointer"
                   onClick={() => {
-                    setSaleId(row.original.id);
-                    setDeleteSaleOpen(true);
+                    setTransactionId(row.original.id);
+                    // setDeleteTransactionOpen(true);
                   }}
                 >
                   Deletar
@@ -379,35 +338,41 @@ export default function TableSale() {
   }
 
   const queryData = async () => {
-    const fetchSalesUrl = new URL(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/sales`
+    const fetchTransactionsUrl = new URL(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions`
     );
 
     if (filter) {
-      fetchSalesUrl.searchParams.set("deliveryman", filter);
-      fetchSalesUrl.searchParams.set("customer", filter);
+      // fetchTransactionsUrl.searchParams.set("category", filter);
+      fetchTransactionsUrl.searchParams.set("type", filter);
     }
 
     if (dateFilter.startDate && dateFilter.endDate) {
       const startDateFormat = formatToUTCDate(dateFilter.startDate);
       const endDateFormat = formatToUTCDate(dateFilter.endDate);
 
-      fetchSalesUrl.searchParams.set("startDate", String(startDateFormat));
-      fetchSalesUrl.searchParams.set("endDate", String(endDateFormat));
+      fetchTransactionsUrl.searchParams.set(
+        "startDate",
+        String(startDateFormat)
+      );
+      fetchTransactionsUrl.searchParams.set("endDate", String(endDateFormat));
     }
 
-    if (saleSelectType && saleSelectType != "none") {
-      fetchSalesUrl.searchParams.set("saleSelectType", saleSelectType);
+    if (category && category != "none") {
+      fetchTransactionsUrl.searchParams.set(
+        "category",
+        category
+      );
     }
 
-    fetchSalesUrl.searchParams.set("orderByField", orderByField);
-    fetchSalesUrl.searchParams.set("orderDirection", orderDirection);
+    fetchTransactionsUrl.searchParams.set("orderByField", orderByField);
+    fetchTransactionsUrl.searchParams.set("orderDirection", orderDirection);
 
-    fetchSalesUrl.searchParams.set("page", String(page));
-    fetchSalesUrl.searchParams.set("itemsPerPage", String(itemsPerPage));
+    fetchTransactionsUrl.searchParams.set("page", String(page));
+    fetchTransactionsUrl.searchParams.set("itemsPerPage", String(itemsPerPage));
 
     const response = await fetchApi(
-      `${fetchSalesUrl.pathname}${fetchSalesUrl.search}`
+      `${fetchTransactionsUrl.pathname}${fetchTransactionsUrl.search}`
     );
 
     if (!response.ok) {
@@ -416,14 +381,32 @@ export default function TableSale() {
       return;
     }
 
-    const data: Sale[] = await response.json();
+    const data = await response.json();
 
-    setSales(data);
+    const transactionsList = data.map((item: any) => ({
+      id: item._id,
+      amount: item._props.amount,
+      transactionType: transactionTypeLabels[item._props.transactionType],
+      category: transactionCategoryLabels[item._props.category],
+      userId: item._props.userId,
+      customCategory: item._props.customCategory || "-",
+      description: item._props.description || "-",
+      createdAt: item._props.createdAt || "",
+    }));
+
+    setTransactions(transactionsList);
   };
 
   useEffect(() => {
     queryData();
-  }, [filter, page, orderDirection, orderByField, dateFilter, saleSelectType]);
+  }, [
+    filter,
+    page,
+    orderDirection,
+    orderByField,
+    dateFilter,
+    category,
+  ]);
 
   if (loadingUser) {
     return <LoadingAnimation />;
@@ -433,7 +416,7 @@ export default function TableSale() {
     <div className="w-full h-full flex flex-col relative">
       <div>
         <div className="w-full flex items-center justify-between">
-          <SearchSales handleFilterSales={handleFilterProjects} />
+          <SearchTransactions handleFilterTransactions={handleFilterProjects} />
         </div>
         <div className="w-full flex items-center gap-2">
           <div className="w-full md:max-w-xs my-4">
@@ -448,33 +431,37 @@ export default function TableSale() {
               onChange={handleValueChange}
             />
           </div>
+          <Select value={category} onValueChange={(value) => setCategory(value)}>
+            <SelectTrigger className="w-[320px]">
+              <SelectValue placeholder="Selecione um tipo de movimentação" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Tipo de movimentação</SelectLabel>
+                <SelectItem value="none">---- Nenhum ----</SelectItem>
+                {categories.map((category) => {
+                  return (
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       <div className="relative pb-10 rounded-md">
         <DataTable
           columns={columns}
-          data={sales}
+          data={transactions}
           page={page}
           itemsPerPage={itemsPerPage}
           nextPage={nextPage}
           previousPage={previousPage}
         />
       </div>
-
-      <UpdateSaleDialog
-        saleId={saleId}
-        open={openUpdateSale}
-        onOpenChange={updateSaleOnOpenChange}
-      />
-
-      {saleId && (
-        <DeleteSaleDialog
-          open={deleteSaleOpen}
-          onOpenChange={() => setDeleteSaleOpen(false)}
-          saleId={saleId}
-        />
-      )}
     </div>
   );
 }

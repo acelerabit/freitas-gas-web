@@ -181,7 +181,7 @@ export function TransferProductQuantityDialog({
               name="productFromStatus"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Estado do produto de partida</FormLabel>
+                  <FormLabel>Estado de origem</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -212,7 +212,7 @@ export function TransferProductQuantityDialog({
               name="productToStatus"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Estado do produto de chegada</FormLabel>
+                  <FormLabel>Estado de destino</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}

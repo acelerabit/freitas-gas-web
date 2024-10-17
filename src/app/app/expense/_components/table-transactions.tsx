@@ -24,6 +24,7 @@ import { EllipsisVertical } from "lucide-react";
 import useModal from "@/hooks/use-modal";
 import { ConfirmDelete } from "./confirm-delete";
 import { UpdateTransactionDialog } from "./edit-transaction-dialog";
+import { fCurrencyIntlBRL } from "@/utils/formatNumber";
 
 interface Transaction {
   _id: string;
@@ -68,7 +69,7 @@ export function TableTransactions() {
   async function getTransactions() {
     setLoadingTransactions(true);
     const fetchTransactionsUrl = new URL(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions/expenses`
     );
 
     fetchTransactionsUrl.searchParams.set("page", String(page));
@@ -196,7 +197,7 @@ export function TableTransactions() {
                   {usersMap[transaction.userId] || "Desconhecido"}
                 </TableCell>
                 <TableCell>{transaction.customCategory}</TableCell>
-                <TableCell>{formatCurrency(transaction.amount)}</TableCell>
+                <TableCell>{fCurrencyIntlBRL(transaction.amount / 100)}</TableCell>
                 <TableCell>{transaction.description}</TableCell>
                 <TableCell>{formatDate(transaction.createdAt)}</TableCell>
                 <TableCell>
