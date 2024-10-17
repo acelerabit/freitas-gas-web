@@ -15,7 +15,7 @@ import { fetchApi } from "@/services/fetchApi";
 import { formatPhone } from "@/utils/phoneUtils";
 
 interface EditSupplierDialogProps {
-  supplier: { id: string; name: string; email: string; phone: string };
+  supplier: { id: string; name: string; email?: string; phone?: string };
   onUpdate: () => void;
 }
 
@@ -25,7 +25,11 @@ const EditSupplierDialog: React.FC<EditSupplierDialogProps> = ({
 }) => {
   const [editedSupplier, setEditedSupplier] = useState({ ...supplier });
 
-  const [errors, setErrors] = useState({
+  const [errors, setErrors] = useState<{
+    name: boolean;
+    email: boolean;
+    phone: boolean;
+  }>({
     name: false,
     email: false,
     phone: false,
@@ -38,9 +42,10 @@ const EditSupplierDialog: React.FC<EditSupplierDialogProps> = ({
   function validateFields() {
     const newErrors = {
       name: !editedSupplier.name,
-      email: !editedSupplier.email || !emailRegex.test(editedSupplier.email),
-      phone: !editedSupplier.phone || !phoneRegex.test(editedSupplier.phone),
+      email: editedSupplier.email ? !emailRegex.test(editedSupplier.email) : false,
+      phone: editedSupplier.phone ? !phoneRegex.test(editedSupplier.phone) : false,
     };
+
     setErrors(newErrors);
     return Object.values(newErrors).every((error) => !error);
   }

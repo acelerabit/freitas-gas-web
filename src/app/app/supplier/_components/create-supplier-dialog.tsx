@@ -1,6 +1,13 @@
 "use client";
 
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -9,8 +16,8 @@ import { formatPhone } from "@/utils/phoneUtils";
 
 interface NewSupplier {
   name: string;
-  email: string;
-  phone: string;
+  email?: string;
+  phone?: string;
 }
 
 interface CreateSupplierDialogProps {
@@ -25,7 +32,11 @@ const CreateSupplierDialog: React.FC<CreateSupplierDialogProps> = ({ open, onOpe
     phone: "",
   });
 
-  const [errors, setErrors] = useState({
+  const [errors, setErrors] = useState<{
+    name: boolean;
+    email: boolean;
+    phone: boolean;
+  }>({
     name: false,
     email: false,
     phone: false,
@@ -36,9 +47,10 @@ const CreateSupplierDialog: React.FC<CreateSupplierDialogProps> = ({ open, onOpe
   function validateFields() {
     const newErrors = {
       name: !newSupplier.name,
-      email: !newSupplier.email || !emailRegex.test(newSupplier.email),
-      phone: !newSupplier.phone || !/\(\d{2}\) \d{5}-\d{4}|\(\d{2}\) \d{4}-\d{4}/.test(newSupplier.phone),
+      email: newSupplier.email ? !emailRegex.test(newSupplier.email) : false,
+      phone: newSupplier.phone ? !/\(\d{2}\) \d{5}-\d{4}|\(\d{2}\) \d{4}-\d{4}/.test(newSupplier.phone) : false,
     };
+
     setErrors(newErrors);
     return Object.values(newErrors).every((error) => !error);
   }
@@ -51,11 +63,7 @@ const CreateSupplierDialog: React.FC<CreateSupplierDialogProps> = ({ open, onOpe
     try {
       const response = await fetchApi("/suppliers", {
         method: "POST",
-        body: JSON.stringify({
-          name: newSupplier.name,
-          email: newSupplier.email,
-          phone: newSupplier.phone,
-        }),
+        body: JSON.stringify(newSupplier),
         headers: { "Content-Type": "application/json" },
       });
 
@@ -93,7 +101,7 @@ const CreateSupplierDialog: React.FC<CreateSupplierDialogProps> = ({ open, onOpe
             onChange={(e) => setNewSupplier({ ...newSupplier, email: e.target.value })}
             className={errors.email ? "border-red-500" : ""}
           />
-          {errors.email && <p className="text-red-500 text-xs">Campo obrigatório</p>}
+          {errors.email && <p className="text-red-500 text-xs">Campo inválido</p>}
 
           <Input
             placeholder="Telefone"
