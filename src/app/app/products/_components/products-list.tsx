@@ -25,7 +25,7 @@ import {
 
 type BottleStatus = "FULL" | "EMPTY" | "COMODATO";
 
-export type ProductType = "P3" | "P13" | "P20" | "P45";
+export type ProductType = "P13" | "P20" | "P45";
 
 const bottleStatusMapper = {
   FULL: "CHEIO",
@@ -53,7 +53,6 @@ export function ProductList() {
   const [productType, setProductType] = useState<ProductType | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [prices, setPrices] = useState<Prices>({
-    P3: { EMPTY: 0, FULL: 0, COMODATO: 0 },
     P13: { EMPTY: 0, FULL: 0, COMODATO: 0 },
     P20: { EMPTY: 0, FULL: 0, COMODATO: 0 },
     P45: { EMPTY: 0, FULL: 0, COMODATO: 0 },
@@ -100,7 +99,6 @@ export function ProductList() {
         return acc;
       },
       {
-        P3: { type: "P3", products: [] },
         P13: { type: "P13", products: [] },
         P20: { type: "P20", products: [] },
         P45: { type: "P45", products: [] },

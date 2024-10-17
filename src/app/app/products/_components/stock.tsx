@@ -23,7 +23,7 @@ import { useEffect, useState } from "react";
 
 interface Product {
   id: string;
-  type: "P3" | "P13" | "P20" | "P45",
+  type: "P13" | "P20" | "P45",
   quantity: number;
   status: 'EMPTY' | 'FULL' | 'COMODATO'
 }

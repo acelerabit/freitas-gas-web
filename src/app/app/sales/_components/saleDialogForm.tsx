@@ -53,10 +53,6 @@ const productTypes = {
 
 const productTypesMapper = [
   {
-    key: "P3",
-    value: "P3",
-  },
-  {
     key: "P13",
     value: "P13",
   },

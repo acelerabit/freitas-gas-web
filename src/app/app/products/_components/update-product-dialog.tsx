@@ -40,7 +40,7 @@ interface DecreaseProductQuantityDialogProps {
   products: Product[]
 }
 
-const ProductTypeSchema = z.enum(["P3", "P13", "P20", "P45"]);
+const ProductTypeSchema = z.enum(["P13", "P20", "P45"]);
 
 const BottleStatusSchema = z.enum(["FULL", "EMPTY", "COMODATO"]);
 
@@ -54,10 +54,6 @@ const bottleStatusOptions = [
 ];
 
 const ProductTypeOptions = [
-  {
-    key: "P3",
-    value: "P3",
-  },
   { key: "P13", value: "P13" },
   { key: "P20", value: "P20" },
   { key: "P45", value: "P45" },
