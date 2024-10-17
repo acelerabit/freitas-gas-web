@@ -24,6 +24,7 @@ import { toast } from "react-hot-toast";
 import { FormLabel } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { CurrencyInput } from "react-currency-mask";
+import { Separator } from "@/components/ui/separator";
 
 interface ProductType {
   id: string;
@@ -52,28 +53,30 @@ const productTypes = {
 
 const productTypesMapper = [
   {
-    key: 'P3',
-    value: 'P3'
+    key: "P3",
+    value: "P3",
   },
   {
-    key: 'P13',
-    value: 'P13'
+    key: "P13",
+    value: "P13",
   },
   {
-    key: 'P20',
-    value: 'P20'
+    key: "P20",
+    value: "P20",
   },
   {
-    key: 'P45',
-    value: 'P45'
-  }
-]
+    key: "P45",
+    value: "P45",
+  },
+];
 
-type BottleStatus = "EMPTY" | 'FULL' | 'COMODATO'
+type BottleStatus = "EMPTY" | "FULL" | "COMODATO";
 
 const bottleStatusMapper = [
-  {key: 'EMPTY', value: 'Troca de gás'}, {key: 'FULL', value: 'Vasilhame + gás'}, {key: 'COMODATO', value: 'comodato'}
-]
+  { key: "EMPTY", value: "Troca de gás" },
+  { key: "FULL", value: "Vasilhame + gás" },
+  { key: "COMODATO", value: "comodato" },
+];
 
 export function SaleDialogForm({
   isOpen,
@@ -128,7 +131,7 @@ export function SaleDialogForm({
   }, []);
 
   const handleProductSelect = (type: string, index: number) => {
-    const selectedProduct = products[index]
+    const selectedProduct = products[index];
 
     if (selectedProduct) {
       const updatedProducts = [...formData.products];
@@ -145,14 +148,12 @@ export function SaleDialogForm({
   };
 
   function handleTypeSaleSelect(value: string, index: number) {
-    const selectedProduct = formData.products[index]
+    const selectedProduct = formData.products[index];
 
     const findProduct = products.find(
-      (product) => product.type === selectedProduct.type && product.status === value
+      (product) =>
+        product.type === selectedProduct.type && product.status === value
     );
-
-    console.log({findProduct, value, type: selectedProduct.type, index}, 'UPDATED PRODUCTS')
-
 
     if (selectedProduct && findProduct) {
       const updatedProducts = [...formData.products];
@@ -163,11 +164,10 @@ export function SaleDialogForm({
         quantity: updatedProducts[index].quantity || 1,
       };
 
-
       setFormData((prev) => ({ ...prev, products: updatedProducts }));
       setValue(`products[${index}]`, updatedProducts[index]);
     }
-  };
+  }
 
   const addProductField = () => {
     setFormData((prevData) => ({
@@ -186,7 +186,6 @@ export function SaleDialogForm({
     };
 
     onSubmit(saleData);
-    window.location.reload();
   };
 
   return (
@@ -224,81 +223,86 @@ export function SaleDialogForm({
             )}
           />
           {formData.products.map((product, index) => (
-            <div key={index} className="space-y-4">
-              <Controller
-                name={`products[${index}].id`}
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    onValueChange={(value) => handleProductSelect(value, index)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um produto" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {productTypesMapper.map((product) => (
-                        <SelectItem key={product.key} value={product.key}>
-                          {product.value}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-
-
-
-              <Controller
-                name={`products[${index}].status`}
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    onValueChange={(value) => handleTypeSaleSelect(value, index)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um tipo de venda" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {bottleStatusMapper.map((bottle) => (
-                        <SelectItem key={bottle.key} value={bottle.key}>
-                          {bottle.value}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              <Controller
-                name={`products[${index}].price`}
-                control={control}
-                render={({ field }) => (
-                  <div>
-                    <Label>Preço</Label>
-
-                    <CurrencyInput
-                      value={field.value}
-                      onChangeValue={(_, value) => {
-                        const updatedProducts = [...formData.products];
-                        updatedProducts[index].price = parseFloat(String(value));
-                        setFormData((prev) => ({
-                          ...prev,
-                          products: updatedProducts,
-                        }));
-
-                        field.onChange(value);
-                      }}
-                      InputElement={
-                        <input
-                          type="text"
-                          id="currency"
-                          placeholder="R$ 0,00"
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        />
+            <>
+              <div key={index} className="space-y-4">
+                <Controller
+                  name={`products[${index}].id`}
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      onValueChange={(value) =>
+                        handleProductSelect(value, index)
                       }
-                    />
-                    {/* <Input
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um produto" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {productTypesMapper.map((product) => (
+                          <SelectItem key={product.key} value={product.key}>
+                            {product.value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+
+                <Controller
+                  name={`products[${index}].status`}
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      onValueChange={(value) =>
+                        handleTypeSaleSelect(value, index)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um tipo de venda" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {bottleStatusMapper.map((bottle) => (
+                          <SelectItem key={bottle.key} value={bottle.key}>
+                            {bottle.value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <Controller
+                  name={`products[${index}].price`}
+                  control={control}
+                  render={({ field }) => (
+                    <div>
+                      <Label>Preço</Label>
+
+                      <CurrencyInput
+                        value={field.value}
+                        onChangeValue={(_, value) => {
+                          const updatedProducts = [...formData.products];
+                          updatedProducts[index].price = parseFloat(
+                            String(value)
+                          );
+                          setFormData((prev) => ({
+                            ...prev,
+                            products: updatedProducts,
+                          }));
+
+                          field.onChange(value);
+                        }}
+                        InputElement={
+                          <input
+                            type="text"
+                            id="currency"
+                            placeholder="R$ 0,00"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                          />
+                        }
+                      />
+                      {/* <Input
                       placeholder="Preço"
                       type="number"
                       {...field}
@@ -315,35 +319,37 @@ export function SaleDialogForm({
                         field.onChange(parseFloat(e.target.value));
                       }}
                     /> */}
-                  </div>
-                )}
-              />
-              <Controller
-                name={`products[${index}].quantity`}
-                control={control}
-                render={({ field }) => (
-                  <div>
-                    <Label>Quantidade</Label>
-                    <Input
-                      placeholder="Quantidade"
-                      type="number"
-                      {...field}
-                      value={product.quantity}
-                      onChange={(e) => {
-                        const updatedProducts = [...formData.products];
-                        updatedProducts[index].quantity =
-                          parseInt(e.target.value, 10) || 1;
-                        setFormData((prev) => ({
-                          ...prev,
-                          products: updatedProducts,
-                        }));
-                        field.onChange(parseInt(e.target.value, 10) || 1);
-                      }}
-                    />
-                  </div>
-                )}
-              />
-            </div>
+                    </div>
+                  )}
+                />
+                <Controller
+                  name={`products[${index}].quantity`}
+                  control={control}
+                  render={({ field }) => (
+                    <div>
+                      <Label>Quantidade</Label>
+                      <Input
+                        placeholder="Quantidade"
+                        type="number"
+                        {...field}
+                        value={product.quantity}
+                        onChange={(e) => {
+                          const updatedProducts = [...formData.products];
+                          updatedProducts[index].quantity =
+                            parseInt(e.target.value, 10) || 1;
+                          setFormData((prev) => ({
+                            ...prev,
+                            products: updatedProducts,
+                          }));
+                          field.onChange(parseInt(e.target.value, 10) || 1);
+                        }}
+                      />
+                    </div>
+                  )}
+                />
+              </div>
+              <Separator className="last:hidden" />
+            </>
           ))}
 
           <Button type="button" onClick={addProductField}>
@@ -367,7 +373,9 @@ export function SaleDialogForm({
                 <SelectContent>
                   <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
                   <SelectItem value="CARTAO">Cartão de débito</SelectItem>
-                  <SelectItem value="CARTAO_CREDITO">Cartão de crédito</SelectItem>
+                  <SelectItem value="CARTAO_CREDITO">
+                    Cartão de crédito
+                  </SelectItem>
                   <SelectItem value="PIX">Pix</SelectItem>
                   <SelectItem value="FIADO">Venda à receber</SelectItem>
                   <SelectItem value="TRANSFERENCIA">Transferência</SelectItem>

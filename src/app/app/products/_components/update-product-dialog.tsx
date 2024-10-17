@@ -47,10 +47,10 @@ const BottleStatusSchema = z.enum(["FULL", "EMPTY", "COMODATO"]);
 const bottleStatusOptions = [
   {
     key: "FULL",
-    value: "cheio",
+    value: "Vasilhame + gás",
   },
-  { key: "EMPTY", value: "vazio" },
-  { key: "COMODATO", value: "comodato" },
+  { key: "EMPTY", value: "Troca de gás" },
+  { key: "COMODATO", value: "Comodato" },
 ];
 
 const ProductTypeOptions = [
