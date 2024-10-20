@@ -1,8 +1,9 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/services/fetchApi";
-import SalesDashboard from "../dashboard/_components/salesDashboard";
+import SalesDashboard from "./_components/salesDashboard";
+import Filters from "./_components/filters";
+import dayjs from "dayjs";
 
 interface SalesIndicators {
   totalSales: number;
@@ -20,9 +21,14 @@ export default function CardsStats() {
   const [loadingSalesIndicators, setLoadingSalesIndicators] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+  
+  const [startDate, setStartDate] = useState<string>(dayjs().startOf('month').format('YYYY-MM-DD'));
+  const [endDate, setEndDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
   const [deliverymanId, setDeliverymanId] = useState<string>("");
+
+  const [averageDailySales, setAverageDailySales] = useState<number>(0);
+  const [averageMonthlySales, setAverageMonthlySales] = useState<number>(0);
+  const [loadingAverages, setLoadingAverages] = useState(true);
 
   async function getSalesIndicators() {
     setLoadingSalesIndicators(true);
@@ -65,33 +71,61 @@ export default function CardsStats() {
     setUsers(usersWithProps);
     setLoadingUsers(false);
   }
+  async function getAverageSales() {
+    setLoadingAverages(true);
+    const fetchUrl = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sales/average-sales`);
+
+    if (startDate) {
+      fetchUrl.searchParams.append("startDate", startDate);
+    }
+
+    if (endDate) {
+      fetchUrl.searchParams.append("endDate", endDate);
+    }
+
+    if (deliverymanId) {
+      fetchUrl.searchParams.append("deliverymanId", deliverymanId);
+    }
+
+    const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
+    if (!response.ok) {
+      setLoadingAverages(false);
+      return;
+    }
+
+    const averageData = await response.json();
+    setAverageDailySales(averageData.averageDailySales || 0);
+    setAverageMonthlySales(averageData.averageMonthlySales || 0);
+    setLoadingAverages(false);
+  }
 
   useEffect(() => {
     getUsers();
   }, []);
 
   useEffect(() => {
-    if (startDate || endDate || deliverymanId) {
-      getSalesIndicators();
-    } else {
-      getSalesIndicators();
-    }
+    getSalesIndicators();
+    getAverageSales();
   }, [startDate, endDate, deliverymanId]);
 
   return (
     <main className="p-4">
-      <SalesDashboard
+      <Filters
         startDate={startDate}
         endDate={endDate}
         deliverymanId={deliverymanId}
         setStartDate={setStartDate}
         setEndDate={setEndDate}
         setDeliverymanId={setDeliverymanId}
-        loadingSalesIndicators={loadingSalesIndicators}
-        salesIndicators={salesIndicators}
+        getSalesIndicators={getSalesIndicators}
         loadingUsers={loadingUsers}
         users={users}
-        getSalesIndicators={getSalesIndicators}
+      />
+      <SalesDashboard
+        loadingSalesIndicators={loadingSalesIndicators}
+        salesIndicators={salesIndicators}
+        averageDailySales={averageDailySales}
+        averageMonthlySales={averageMonthlySales}
       />
     </main>
   );
