@@ -62,7 +62,7 @@ const SalesDashboard = ({
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Card de Total de Vendas */}
+              {/* Card de Total de Vendass */}
               <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg font-semibold">Total de Vendas</CardTitle>
