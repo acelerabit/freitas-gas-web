@@ -48,6 +48,12 @@ interface Stock {
 
 type Prices = Record<ProductType, Record<BottleStatus, number>>;
 
+const statusPriority: { [key: string]: number } = {
+  FULL: 1,
+  EMPTY: 2,
+  COMODATO: 3,
+};
+
 export function ProductList() {
   const [stock, setStock] = useState<Stock | null>(null);
   const [productType, setProductType] = useState<ProductType | null>(null);
@@ -210,7 +216,7 @@ export function ProductList() {
                 <p className="text-xl">
                   Total: {calculateTotal(group.products)}
                 </p>
-                {group.products.map((product: Product) => (
+                {group.products.sort((a: Product, b: Product) => statusPriority[a.status] - statusPriority[b.status]).map((product: Product) => (
                   <>
                     <div key={product.id} className="py-2">
                       <p>Estado: {bottleStatusMapper[product.status]}</p>
