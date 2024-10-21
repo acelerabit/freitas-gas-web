@@ -11,6 +11,12 @@ interface SalesIndicators {
   totalPerMonth: { year: number; month: number; total: number }[];
 }
 
+interface ExpenseIndicators {
+  totalExpenses: number;
+  totalPerDay: { createdAt: Date; total: number }[];
+  totalPerMonth: { year: number; month: number; total: number }[];
+}
+
 interface User {
   id: string;
   name: string;
@@ -18,7 +24,9 @@ interface User {
 
 export default function CardsStats() {
   const [salesIndicators, setSalesIndicators] = useState<SalesIndicators | null>(null);
+  const [expenseIndicators, setExpenseIndicators] = useState<ExpenseIndicators | null>(null);
   const [loadingSalesIndicators, setLoadingSalesIndicators] = useState(true);
+  const [loadingExpenseIndicators, setLoadingExpenseIndicators] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
   
@@ -48,12 +56,18 @@ export default function CardsStats() {
 
     const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
     if (!response.ok) {
+      console.log(response);
+      setSalesIndicators({ totalSales: 0, totalPerDay: [], totalPerMonth: [] });
       setLoadingSalesIndicators(false);
       return;
     }
 
     const data = await response.json();
-    setSalesIndicators(data);
+    const totalSales = data?.totalSales || 0;
+    const totalPerDay = data?.totalPerDay || [];
+    const totalPerMonth = data?.totalPerMonth || [];
+
+    setSalesIndicators({ totalSales, totalPerDay, totalPerMonth });
     setLoadingSalesIndicators(false);
   }
 
@@ -98,6 +112,32 @@ export default function CardsStats() {
     setAverageMonthlySales(averageData.averageMonthlySales || 0);
     setLoadingAverages(false);
   }
+  async function getExpenseIndicators() {
+    setLoadingExpenseIndicators(true);
+    const fetchUrl = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions/expenses/indicators`);
+
+    if (startDate) {
+      fetchUrl.searchParams.append("startDate", startDate);
+    }
+
+    if (endDate) {
+      fetchUrl.searchParams.append("endDate", endDate);
+    }
+
+    if (deliverymanId) {
+      fetchUrl.searchParams.append("deliverymanId", deliverymanId);
+    }
+
+    const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
+    if (!response.ok) {
+      setLoadingExpenseIndicators(false);
+      return;
+    }
+
+    const data = await response.json();
+    setExpenseIndicators(data);
+    setLoadingExpenseIndicators(false);
+  }
 
   useEffect(() => {
     getUsers();
@@ -106,6 +146,7 @@ export default function CardsStats() {
   useEffect(() => {
     getSalesIndicators();
     getAverageSales();
+    getExpenseIndicators()
   }, [startDate, endDate, deliverymanId]);
 
   return (
@@ -124,6 +165,8 @@ export default function CardsStats() {
       <SalesDashboard
         loadingSalesIndicators={loadingSalesIndicators}
         salesIndicators={salesIndicators}
+        expenseIndicators={expenseIndicators}
+        loadingExpenseIndicators={loadingExpenseIndicators}
         averageDailySales={averageDailySales}
         averageMonthlySales={averageMonthlySales}
       />

@@ -25,17 +25,26 @@ interface SalesIndicators {
   totalPerDay: { createdAt: string | Date; total: number }[];
   totalPerMonth: { year: number; month: number; total: number }[];
 }
+interface ExpenseIndicators {
+  totalExpenses: number;
+  totalPerDay: { createdAt: string | Date; total: number }[];
+  totalPerMonth: { year: number; month: number; total: number }[];
+}
 
 interface SalesDashboardProps {
   salesIndicators: SalesIndicators | null;
+  expenseIndicators: ExpenseIndicators | null;
   loadingSalesIndicators: boolean;
+  loadingExpenseIndicators: boolean;
   averageDailySales: number;
   averageMonthlySales: number;
 }
 
 const SalesDashboard = ({
   salesIndicators,
+  expenseIndicators,
   loadingSalesIndicators,
+  loadingExpenseIndicators,
   averageDailySales,
   averageMonthlySales,
 }: SalesDashboardProps) => {
@@ -95,6 +104,19 @@ const SalesDashboard = ({
                 <CardContent className="space-y-4">
                   <div className="text-3xl font-bold">
                     {formatCurrency(averageMonthlySales)}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Card de Total de Despesas */}
+              <Card className="bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-lg h-full">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-lg font-semibold">Total de Despesas</CardTitle>
+                  <CurrencyDollarIcon className="w-6 h-6" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-3xl font-bold">
+                    {expenseIndicators ? formatCurrency(expenseIndicators.totalExpenses) : formatCurrency(0)}
                   </div>
                 </CardContent>
               </Card>
@@ -163,6 +185,46 @@ const SalesDashboard = ({
                       />
                       <Tooltip formatter={(value: number) => formatCurrency(value)} />
                     </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Gráfico de Despesas por Dia */}
+              <Card className="h-60">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">Despesas por Dia</CardTitle>
+                </CardHeader>
+                <CardContent className="h-full">
+                  <ResponsiveContainer>
+                    <BarChart data={expenseIndicators?.totalPerDay} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <XAxis dataKey="createdAt" tickFormatter={(date) => dayjs(date).format('DD/MM')} />
+                      <YAxis />
+                      <Tooltip
+                        formatter={(value: any) => (typeof value === "number" ? formatCurrency(value) : value)}
+                        labelFormatter={(label) => dayjs(label).format("DD/MM/YYYY")}
+                      />
+                      <Bar dataKey="total" fill="#ff7300" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Gráfico de Despesas por Mês */}
+              <Card className="h-60">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">Despesas por Mês</CardTitle>
+                </CardHeader>
+                <CardContent className="h-full">
+                  <ResponsiveContainer>
+                    <LineChart data={expenseIndicators?.totalPerMonth} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <XAxis dataKey="month" tickFormatter={(month) => getMonthName(month)} />
+                      <YAxis />
+                      <Tooltip
+                        formatter={(value: any) => (typeof value === "number" ? formatCurrency(value) : value)}
+                        labelFormatter={(label) => dayjs(label).format("DD/MM/YYYY")}
+                      />
+                      <Line type="monotone" dataKey="total" stroke="#ff6f61" />
+                    </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>

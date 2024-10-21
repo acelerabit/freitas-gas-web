@@ -39,31 +39,43 @@ const Filters = ({
       <CardContent>
         <div className="flex flex-col gap-4 md:flex-row">
           <div className="flex gap-4">
-            <label>
+            <label htmlFor="startDate">
               Data de Início:
               <input
+                id="startDate"
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  getSalesIndicators();
+                }}
                 className="ml-2 p-2 border border-gray-300 rounded"
               />
             </label>
-            <label>
+            <label htmlFor="endDate">
               Data de Fim:
               <input
+                id="endDate"
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  getSalesIndicators();
+                }}
                 className="ml-2 p-2 border border-gray-300 rounded"
               />
             </label>
           </div>
           <div className="flex gap-4">
-            <label>
+            <label htmlFor="deliveryman">
               Entregador:
               <select
+                id="deliveryman"
                 value={deliverymanId}
-                onChange={(e) => setDeliverymanId(e.target.value)}
+                onChange={(e) => {
+                  setDeliverymanId(e.target.value);
+                  getSalesIndicators();
+                }}
                 className="ml-2 p-2 border border-gray-300 rounded"
               >
                 <option value="">Todos</option>
