@@ -15,6 +15,9 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  PieChart,
+  Pie,
+  Cell
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import dayjs from "dayjs";
@@ -38,6 +41,8 @@ interface SalesDashboardProps {
   loadingExpenseIndicators: boolean;
   averageDailySales: number;
   averageMonthlySales: number;
+  expenseProportion: { category: string; percentage: number }[] | null;
+  loadingExpenseProportion: boolean;
 }
 
 const SalesDashboard = ({
@@ -47,6 +52,8 @@ const SalesDashboard = ({
   loadingExpenseIndicators,
   averageDailySales,
   averageMonthlySales,
+  expenseProportion,
+  loadingExpenseProportion,
 }: SalesDashboardProps) => {
   const getMonthName = (month: number) => {
     const months = [
@@ -121,15 +128,14 @@ const SalesDashboard = ({
                 </CardContent>
               </Card>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {/* Gráfico de Total de Vendas por Dia */}
-              <Card>
+              <Card className="h-auto">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg font-semibold">Total de Vendas por Dia</CardTitle>
                 </CardHeader>
-                <CardContent className="h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
+                <CardContent className="h-full">
+                  <ResponsiveContainer width="100%" height={300}>
                     <LineChart
                       data={salesIndicators.totalPerDay}
                       margin={{ top: 5, right: 10, left: 10, bottom: 0 }}
@@ -139,6 +145,7 @@ const SalesDashboard = ({
                         strokeWidth={2}
                         dataKey="total"
                         name="Total"
+                        stroke="#007BFF"
                         activeDot={{
                           r: 6,
                           style: { fill: "var(--theme-primary)", opacity: 0.25 },
@@ -149,85 +156,110 @@ const SalesDashboard = ({
                         tickFormatter={(tick) =>
                           typeof tick === "string" ? dayjs(tick).format("DD/MM/YYYY") : dayjs(tick).format("DD/MM/YYYY")
                         }
+                        tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }}
                       />
-                      <YAxis
-                        tickFormatter={(value) => formatCurrency(value)}
-                      />
-                      <Tooltip
-                        formatter={(value: number) => formatCurrency(value)}
-                        labelFormatter={(label) =>
-                          dayjs(label).format("DD/MM/YYYY")
-                        }
-                      />
+                      <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
+                      <Tooltip formatter={(value: number) => formatCurrency(value)} labelFormatter={(label) => dayjs(label).format("DD/MM/YYYY")} />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
 
               {/* Gráfico de Total de Vendas por Mês */}
-              <Card>
+              <Card className="h-auto">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg font-semibold">Total de Vendas por Mês</CardTitle>
                 </CardHeader>
-                <CardContent className="h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={salesIndicators.totalPerMonth.map((item: { year: any; month: number; total: any; }) => ({
-                        year: item.year,
-                        month: getMonthName(item.month),
-                        total: item.total,
-                      }))}
-                    >
-                      <Bar dataKey="total" fill="var(--theme-primary)" />
-                      <XAxis dataKey="month" />
-                      <YAxis
-                        tickFormatter={(value) => formatCurrency(value)}
-                      />
-                      <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                    </BarChart>
+                <CardContent className="h-full">
+                  <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={salesIndicators.totalPerMonth.map(item => ({
+                      month: getMonthName(item.month),
+                      total: item.total,
+                    }))}>
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="total" fill="#28A745" />
+                  </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
 
               {/* Gráfico de Despesas por Dia */}
-              <Card className="h-60">
+              <Card className="h-auto">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">Despesas por Dia</CardTitle>
                 </CardHeader>
                 <CardContent className="h-full">
-                  <ResponsiveContainer>
-                    <BarChart data={expenseIndicators?.totalPerDay} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                      <XAxis dataKey="createdAt" tickFormatter={(date) => dayjs(date).format('DD/MM')} />
-                      <YAxis />
-                      <Tooltip
-                        formatter={(value: any) => (typeof value === "number" ? formatCurrency(value) : value)}
-                        labelFormatter={(label) => dayjs(label).format("DD/MM/YYYY")}
-                      />
-                      <Bar dataKey="total" fill="#ff7300" />
-                    </BarChart>
+                  <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={expenseIndicators?.totalPerDay} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <XAxis dataKey="createdAt" tickFormatter={(date) => dayjs(date).format('DD/MM')} />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="total" fill="#17A2B8" />
+                  </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
 
               {/* Gráfico de Despesas por Mês */}
-              <Card className="h-60">
+              <Card className="h-auto">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">Despesas por Mês</CardTitle>
                 </CardHeader>
                 <CardContent className="h-full">
-                  <ResponsiveContainer>
+                  <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={expenseIndicators?.totalPerMonth} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                      <XAxis dataKey="month" tickFormatter={(month) => getMonthName(month)} />
-                      <YAxis />
-                      <Tooltip
-                        formatter={(value: any) => (typeof value === "number" ? formatCurrency(value) : value)}
-                        labelFormatter={(label) => dayjs(label).format("DD/MM/YYYY")}
+                      <XAxis 
+                        dataKey="month" 
+                        hide={true}
                       />
-                      <Line type="monotone" dataKey="total" stroke="#ff6f61" />
+                      <YAxis tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
+                      <Tooltip 
+                        formatter={(value: any) => (typeof value === "number" ? formatCurrency(value) : value)} 
+                      />
+                      <Line type="monotone" dataKey="total" stroke="#FF6F61" strokeWidth={2} />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
+
+              {/* Gráfico de Proporção de Despesas por Categoria */}
+              {loadingExpenseProportion ? (
+                <Skeleton className="h-auto w-full" />
+              ) : (
+                <Card className="h-auto">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold">Proporção de Despesas por Categoria</CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-full flex items-center justify-center">
+                    {expenseProportion && expenseProportion.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={expenseProportion}
+                            dataKey="percentage"
+                            nameKey="category"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={60}
+                            label
+                          >
+                            {expenseProportion.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={['#28A745', '#FF6F61', '#17A2B8'][index % 3]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div>No data available</div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </>
         )}
