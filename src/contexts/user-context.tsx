@@ -24,6 +24,7 @@ interface User {
   loggedWithGoogle: boolean;
   avatarUrl: string;
   acceptNotifications: boolean;
+  accountAmount: number;
 }
 
 const UserContext = createContext({} as UserContextParams);
