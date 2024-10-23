@@ -41,3 +41,25 @@ export function formatDateWithHours(date: string) {
 
   return `${dateDay} ás ${dateTime}`;
 }
+
+export const handleDateAndTimeFormat = (selectedDate: Date, time: string) => {
+  if (!selectedDate || !time) {
+    return null;
+  }
+
+  const [hours, minutes] = time.split(':');
+
+  
+  const combinedDateTime = dayjs(selectedDate)
+    .hour(Number(hours))
+    .minute(Number(minutes));
+
+  const isoFormat = combinedDateTime.toISOString();
+
+  return isoFormat;
+};
+
+export const disablePastDates = (date: Date) => {
+  const today = dayjs().startOf('day');
+  return dayjs(date).isBefore(today);
+};
