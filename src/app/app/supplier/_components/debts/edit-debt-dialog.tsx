@@ -29,7 +29,7 @@ const EditDebtDialog: React.FC<EditDebtDialogProps> = ({ open, onOpenChange, deb
   useEffect(() => {
     if (debt) {
       setUpdatedDebt({
-        amount: debt.amount,
+        amount: (debt.amount / 100).toString(), // Formata o valor em centavos
         dueDate: debt.dueDate ? new Date(debt.dueDate).toISOString().split("T")[0] : "",
         paid: debt.paid,
       });
@@ -42,7 +42,7 @@ const EditDebtDialog: React.FC<EditDebtDialogProps> = ({ open, onOpenChange, deb
         method: "PATCH",
         body: JSON.stringify({
           ...updatedDebt,
-          amount: Number(updatedDebt.amount),
+          amount: Number(updatedDebt.amount.replace(",", ".")) * 100, // Converte para centavos
           dueDate: new Date(updatedDebt.dueDate),
         }),
         headers: { "Content-Type": "application/json" },
@@ -59,6 +59,11 @@ const EditDebtDialog: React.FC<EditDebtDialogProps> = ({ open, onOpenChange, deb
     }
   }
 
+  const formatCurrency = (value: string) => {
+    const parsedValue = parseFloat(value.replace(",", "."));
+    return isNaN(parsedValue) ? "" : `R$ ${parsedValue.toFixed(2).replace(".", ",")}`;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -66,17 +71,26 @@ const EditDebtDialog: React.FC<EditDebtDialogProps> = ({ open, onOpenChange, deb
           <DialogTitle>Editar Débito</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <Input
-            type="number"
-            value={updatedDebt.amount}
-            onChange={(e) => setUpdatedDebt({ ...updatedDebt, amount: e.target.value })}
-            placeholder="Valor"
-          />
-          <Input
-            type="date"
-            value={updatedDebt.dueDate}
-            onChange={(e) => setUpdatedDebt({ ...updatedDebt, dueDate: e.target.value })}
-          />
+          <label>
+            Valor
+            <Input
+              type="text"
+              value={updatedDebt.amount}
+              onChange={(e) => {
+                const newValue = e.target.value.replace("R$ ", "").replace(".", "").replace(",", ".");
+                setUpdatedDebt({ ...updatedDebt, amount: newValue });
+              }}
+              placeholder="0,00"
+            />
+          </label>
+          <label>
+            Vencimento
+            <Input
+              type="date"
+              value={updatedDebt.dueDate}
+              onChange={(e) => setUpdatedDebt({ ...updatedDebt, dueDate: e.target.value })}
+            />
+          </label>
           <div className="flex items-center">
             <Checkbox
               checked={updatedDebt.paid}

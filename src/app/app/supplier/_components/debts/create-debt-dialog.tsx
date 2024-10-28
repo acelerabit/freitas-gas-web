@@ -44,7 +44,7 @@ const CreateDebtDialog: React.FC<CreateDebtDialogProps> = ({
 
   function validateFields() {
     const newErrors = {
-      amount: !newDebt.amount || isNaN(Number(newDebt.amount)),
+      amount: !newDebt.amount || isNaN(Number(newDebt.amount.replace(/[^0-9]/g, ''))),
       dueDate: !newDebt.dueDate,
     };
     setErrors(newErrors);
@@ -57,29 +57,47 @@ const CreateDebtDialog: React.FC<CreateDebtDialogProps> = ({
     }
 
     try {
-        const response = await fetchApi(`/debts`, {
-            method: "POST",
-            body: JSON.stringify({
-              supplierId: supplierId,
-              amount: Number(newDebt.amount),
-              dueDate: newDebt.dueDate,
-              paid: newDebt.paid,
-            }),
-            headers: { "Content-Type": "application/json" },
-          });
+      const response = await fetchApi(`/debts`, {
+        method: "POST",
+        body: JSON.stringify({
+          supplierId: supplierId,
+          amount: Number(newDebt.amount.replace(/[^0-9]/g, '')),
+          dueDate: newDebt.dueDate,
+          paid: newDebt.paid,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
 
-        if (!response.ok) {
-            throw new Error("Erro ao criar débito");
-        }
+      if (!response.ok) {
+        throw new Error("Erro ao criar débito");
+      }
 
-        setNewDebt({ amount: "", dueDate: "", paid: false });
-        setErrors({ amount: false, dueDate: false });
-        onOpenChange();
-        window.location.reload();
+      setNewDebt({ amount: "", dueDate: "", paid: false });
+      setErrors({ amount: false, dueDate: false });
+      onOpenChange();
+      window.location.reload();
     } catch (error) {
       console.error("Erro ao criar débito:", error);
     }
   }
+
+  const formatCurrency = (value: string) => {
+    const cleanValue = value.replace(/[^\d]/g, "");
+    const numberValue = parseInt(cleanValue, 10) / 100;
+    return numberValue.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const cleanValue = inputValue.replace(/[^\d]/g, "");
+    setNewDebt({
+      ...newDebt,
+      amount: formatCurrency(cleanValue),
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -88,23 +106,29 @@ const CreateDebtDialog: React.FC<CreateDebtDialogProps> = ({
           <DialogTitle>Cadastrar Novo Débito</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <Input
-            type="number"
-            placeholder="Valor"
-            value={newDebt.amount}
-            onChange={(e) => setNewDebt({ ...newDebt, amount: e.target.value })}
-            className={errors.amount ? "border-red-500" : ""}
-          />
-          {errors.amount && <p className="text-red-500 text-xs">Campo obrigatório e deve ser um número</p>}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Valor (R$)</label>
+            <Input
+              type="text"
+              placeholder="Valor"
+              value={newDebt.amount}
+              onChange={handleAmountChange}
+              className={errors.amount ? "border-red-500" : ""}
+            />
+            {errors.amount && <p className="text-red-500 text-xs">Campo obrigatório e deve ser um número</p>}
+          </div>
 
-          <Input
-            type="date"
-            placeholder="Data de Vencimento"
-            value={newDebt.dueDate}
-            onChange={(e) => setNewDebt({ ...newDebt, dueDate: e.target.value })}
-            className={errors.dueDate ? "border-red-500" : ""}
-          />
-          {errors.dueDate && <p className="text-red-500 text-xs">Campo obrigatório</p>}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Data de Vencimento</label>
+            <Input
+              type="date"
+              placeholder="Data de Vencimento"
+              value={newDebt.dueDate}
+              onChange={(e) => setNewDebt({ ...newDebt, dueDate: e.target.value })}
+              className={errors.dueDate ? "border-red-500" : ""}
+            />
+            {errors.dueDate && <p className="text-red-500 text-xs">Campo obrigatório</p>}
+          </div>
 
           <div className="flex items-center">
             <Checkbox

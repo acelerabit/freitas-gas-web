@@ -65,7 +65,12 @@ const ViewDebtsDialog: React.FC<ViewDebtsDialogProps> = ({ supplierId }) => {
                 debts.map((debt) => (
                   <TableRow key={debt.id}>
                     <TableCell>{debt.description}</TableCell>
-                    <TableCell>{debt.amount}</TableCell>
+                    <TableCell>
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                      }).format(Number(debt.amount) / 100)}
+                    </TableCell>
                     <TableCell>{debt.date}</TableCell>
                     <TableCell>
                       {/* Botões para editar e excluir o débito */}

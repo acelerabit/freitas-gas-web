@@ -208,12 +208,10 @@ const SalesDashboard = ({
                 <CardContent className="h-full">
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart
-                      data={salesIndicators.totalPerMonth.map(item => ({
-                        month: getMonthName(item.month),
-                        total: item.total,
-                      }))}>
+                      data={[{ month: getMonthName(new Date().getMonth() + 1), total: salesIndicators.totalSales }]}
+                    >
                       <XAxis dataKey="month" />
-                      <YAxis />
+                      <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
                       <Tooltip formatter={(value) => Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} />
                       <Bar dataKey="total" fill="#28A745" />
                     </BarChart>
@@ -233,7 +231,7 @@ const SalesDashboard = ({
                         dataKey="createdAt" 
                         tickFormatter={(date) => dayjs(date).format('DD/MM/YYYY')}
                       />
-                      <YAxis />
+                      <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
                       <Tooltip 
                         formatter={(value) => value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         labelFormatter={(label) => dayjs(label).format('DD/MM/YYYY')}
@@ -251,14 +249,23 @@ const SalesDashboard = ({
                 </CardHeader>
                 <CardContent className="h-full">
                   <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={expenseIndicators?.totalPerMonth} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <LineChart 
+                      data={expenseIndicators?.totalPerDay.map(item => ({
+                        date: new Date(item.createdAt).toLocaleDateString('pt-BR'),
+                        total: item.total,
+                      }))}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
                       <XAxis 
-                        dataKey="month" 
-                        tickFormatter={(month, index) => index === 0 || (index > 0 && month !== expenseIndicators?.totalPerMonth[index - 1].month) ? getMonthName(month) : ''} 
+                        dataKey="date"
+                        tickFormatter={(date) => date}
                       />
-                      <YAxis tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
+                      <YAxis 
+                        tickFormatter={(value) => formatCurrency(value)} 
+                        tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} 
+                      />
                       <Tooltip 
-                        formatter={(value: any) => (typeof value === "number" ? formatCurrency(value) : value)} 
+                        formatter={(value) => (typeof value === "number" ? formatCurrency(value) : value)} 
                       />
                       <Line type="monotone" dataKey="total" stroke="#FF6F61" strokeWidth={2} />
                     </LineChart>
@@ -285,7 +292,7 @@ const SalesDashboard = ({
                             cx="50%"
                             cy="50%"
                             outerRadius={60}
-                            label
+                            label={({ percent }) => `${(percent * 100).toFixed(2)}%`} // Formatação do rótulo para mostrar a porcentagem
                           >
                             {expenseProportion.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={['#28A745', '#FF6F61', '#17A2B8'][index % 3]} />
@@ -311,7 +318,7 @@ const SalesDashboard = ({
                   <BarChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
-                    <YAxis />
+                    <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
                     <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
                     <Legend />
                     <Bar dataKey="totalSales" fill="#36A2EB" name="Receita" />

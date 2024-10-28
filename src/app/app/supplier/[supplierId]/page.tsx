@@ -84,7 +84,12 @@ const DebtsPage = () => {
               ) : (
                 debts.map((debt) => (
                   <TableRow key={debt.id}>
-                    <TableCell>{debt.amount}</TableCell>
+                    <TableCell>
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                      }).format(Number(debt.amount) / 100)}
+                    </TableCell>
                     <TableCell>{new Date(debt.dueDate).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Checkbox checked={debt.paid} disabled />

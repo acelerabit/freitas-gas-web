@@ -10,6 +10,7 @@ import { EditCustomerDialog } from "./edit-customer-dialog";
 import { DeleteCustomerDialog } from "./delete-customer-dialog";
 import CreateCustomerDialog from "./create-customer-dialog";
 import { fetchApi } from "@/services/fetchApi";
+import { formatCurrency } from "@/utils/formatCurrent";
 
 export interface Customer {
   id: string;
@@ -109,7 +110,7 @@ export function TableCustomers() {
                     <TableCell>{customer.district}</TableCell>
                     <TableCell>{customer.city}</TableCell>
                     <TableCell>{customer.state}</TableCell>
-                    <TableCell>{customer.creditBalance ?? 0}</TableCell>
+                    <TableCell>{formatCurrency(customer.creditBalance ?? 0)}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
