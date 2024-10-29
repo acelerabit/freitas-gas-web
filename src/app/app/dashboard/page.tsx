@@ -52,24 +52,27 @@ export default function CardsStats() {
     totalExpenses: [],
   });
   const [grossProfit, setGrossProfit] = useState<number>(0);
-  const [loadingGrossProfit, setLoadingGrossProfit] = useState(true); 
+  const [loadingGrossProfit, setLoadingGrossProfit] = useState(true);
+  const [totalFiado, setTotalFiado] = useState<{ total: number }>({ total: 0 });
+  const [loadingTotalFiado, setLoadingTotalFiado] = useState(true);
 
   async function getSalesIndicators() {
     setLoadingSalesIndicators(true);
     const fetchUrl = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sales/indicators`);
-
+  
     if (startDate) {
       fetchUrl.searchParams.append("startDate", startDate);
     }
-
+  
     if (endDate) {
-      fetchUrl.searchParams.append("endDate", endDate);
+      const adjustedEndDate = new Date(endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      fetchUrl.searchParams.append("endDate", adjustedEndDate.toISOString());
     }
-
+  
     if (deliverymanId) {
       fetchUrl.searchParams.append("deliverymanId", deliverymanId);
     }
-
     const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
     if (!response.ok) {
       console.log(response);
@@ -77,12 +80,12 @@ export default function CardsStats() {
       setLoadingSalesIndicators(false);
       return;
     }
-
+  
     const data = await response.json();
     const totalSales = data?.totalSales || 0;
     const totalPerDay = data?.totalPerDay || [];
     const totalPerMonth = data?.totalPerMonth || [];
-
+  
     setSalesIndicators({ totalSales, totalPerDay, totalPerMonth });
     setLoadingSalesIndicators(false);
   }
@@ -104,131 +107,177 @@ export default function CardsStats() {
   async function getAverageSales() {
     setLoadingAverages(true);
     const fetchUrl = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sales/average-sales`);
-
+  
     if (startDate) {
       fetchUrl.searchParams.append("startDate", startDate);
     }
-
+  
     if (endDate) {
-      fetchUrl.searchParams.append("endDate", endDate);
+      const adjustedEndDate = new Date(endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      fetchUrl.searchParams.append("endDate", adjustedEndDate.toISOString());
     }
-
+  
     if (deliverymanId) {
       fetchUrl.searchParams.append("deliverymanId", deliverymanId);
     }
-
+  
     const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
     if (!response.ok) {
       setLoadingAverages(false);
       return;
     }
-
+  
     const averageData = await response.json();
     setAverageDailySales(averageData.averageDailySales || 0);
     setAverageMonthlySales(averageData.averageMonthlySales || 0);
     setLoadingAverages(false);
   }
+  
   async function getExpenseIndicators() {
     setLoadingExpenseIndicators(true);
     const fetchUrl = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions/expenses/indicators`);
-
+  
     if (startDate) {
       fetchUrl.searchParams.append("startDate", startDate);
     }
-
+  
     if (endDate) {
-      fetchUrl.searchParams.append("endDate", endDate);
+      const adjustedEndDate = new Date(endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      fetchUrl.searchParams.append("endDate", adjustedEndDate.toISOString());
     }
-
+  
     if (deliverymanId) {
       fetchUrl.searchParams.append("deliverymanId", deliverymanId);
     }
-
+  
     const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
     if (!response.ok) {
       setLoadingExpenseIndicators(false);
       return;
     }
-
+  
     const data = await response.json();
     setExpenseIndicators(data);
     setLoadingExpenseIndicators(false);
   }
+  
   async function getExpenseProportion() {
     setLoadingExpenseProportion(true);
     const fetchUrl = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions/expenses/proportion-by-category`);
-
+  
     if (startDate) {
       fetchUrl.searchParams.append("startDate", startDate);
     }
-
+  
     if (endDate) {
-      fetchUrl.searchParams.append("endDate", endDate);
+      const adjustedEndDate = new Date(endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      fetchUrl.searchParams.append("endDate", adjustedEndDate.toISOString());
     }
-
+  
     if (deliverymanId) {
       fetchUrl.searchParams.append("deliverymanId", deliverymanId);
     }
-
+  
     const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
     if (!response.ok) {
       setLoadingExpenseProportion(false);
       return;
     }
-
+  
     const proportionData = await response.json();
     setExpenseProportion(proportionData);
     setLoadingExpenseProportion(false);
   }
+  
   async function getSalesVsExpenses() {
     const fetchUrl = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions/expenses/sales-vs-expenses`);
-
+  
     if (startDate) {
       fetchUrl.searchParams.append("startDate", startDate);
     }
-
+  
     if (endDate) {
-      fetchUrl.searchParams.append("endDate", endDate);
+      const adjustedEndDate = new Date(endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      fetchUrl.searchParams.append("endDate", adjustedEndDate.toISOString());
     }
-
+  
     if (deliverymanId) {
       fetchUrl.searchParams.append("deliverymanId", deliverymanId);
     }
-
+  
     const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
     if (!response.ok) {
       console.log("Erro ao buscar dados de vendas vs despesas");
       return;
     }
-
+  
     const data = await response.json();
     setSalesVsExpenses(data);
   }
+  
   async function getGrossProfit() {
     setLoadingGrossProfit(true);
     const fetchUrl = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions/gross-profit`);
-
+  
     if (startDate) {
       fetchUrl.searchParams.append("startDate", startDate);
     }
-
+  
     if (endDate) {
-      fetchUrl.searchParams.append("endDate", endDate);
+      const adjustedEndDate = new Date(endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      fetchUrl.searchParams.append("endDate", adjustedEndDate.toISOString());
     }
-
+  
     if (deliverymanId) {
       fetchUrl.searchParams.append("deliverymanId", deliverymanId);
     }
-
+  
     const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
     if (!response.ok) {
       setLoadingGrossProfit(false);
       return;
     }
-
+  
     const data = await response.json();
     setGrossProfit(data);
     setLoadingGrossProfit(false);
+  }
+  async function getTotalFiado() {
+    setLoadingTotalFiado(true);
+    const fetchUrl = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sales/total-fiado`);
+    
+    const adjustedEndDate = new Date(endDate);
+    adjustedEndDate.setHours(23, 59, 59, 999);
+    
+    fetchUrl.searchParams.append("paymentMethod", "FIADO");
+    if (startDate) {
+      fetchUrl.searchParams.append("startDate", startDate);
+    }
+    if (endDate) {
+      fetchUrl.searchParams.append("endDate", adjustedEndDate.toISOString());
+    }
+    if (deliverymanId) {
+      fetchUrl.searchParams.append("deliverymanId", deliverymanId);
+    }
+    
+    const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
+    if (!response.ok) {
+      console.log("Erro ao buscar total fiado");
+      setLoadingTotalFiado(false);
+      return;
+    }
+
+    const data = await response.json();
+    if (data && typeof data.total === 'number') {
+      setTotalFiado({ total: data.total });
+    } else {
+      setTotalFiado({ total: 0 });
+    }
   }
 
   useEffect(() => {
@@ -242,6 +291,7 @@ export default function CardsStats() {
     getExpenseProportion();
     getSalesVsExpenses();
     getGrossProfit();
+    getTotalFiado();
   }, [startDate, endDate, deliverymanId]);
 
   return (
@@ -269,6 +319,7 @@ export default function CardsStats() {
         averageDailySales={averageDailySales}
         averageMonthlySales={averageMonthlySales}
         loadingGrossProfit={loadingGrossProfit}
+        totalFiado={totalFiado}
       />
     </main>
   );

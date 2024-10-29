@@ -40,6 +40,9 @@ interface SalesVsExpenses {
   totalSales: { year: number; month: number; total: number }[];
   totalExpenses: { year: number; month: number; total: number }[];
 }
+interface TotalFiado {
+  total: number;
+}
 
 interface SalesDashboardProps {
   salesIndicators: SalesIndicators | null;
@@ -53,6 +56,7 @@ interface SalesDashboardProps {
   salesVsExpenses: SalesVsExpenses;
   grossProfit: number | null;
   loadingGrossProfit: boolean;
+  totalFiado: TotalFiado | null;
 }
 
 const SalesDashboard = ({
@@ -66,7 +70,8 @@ const SalesDashboard = ({
   expenseProportion,
   loadingExpenseProportion,
   grossProfit,
-  loadingGrossProfit
+  loadingGrossProfit,
+  totalFiado
 }: SalesDashboardProps) => {
   const getMonthName = (month: number) => {
     const months = [
@@ -85,7 +90,7 @@ const SalesDashboard = ({
   const data = salesVsExpenses.totalSales.map((sale, index) => ({
     month: `${getMonthName(sale.month)} ${sale.year}`,
     totalSales: sale.total,
-    totalExpenses: (salesVsExpenses.totalExpenses[index]?.total / 100).toFixed(2) || 0, 
+    totalExpenses: (salesVsExpenses.totalExpenses[index]?.total || 0),
   }));
   const totalSales = salesIndicators?.totalSales || 0;
   const totalExpenses = expenseIndicators?.totalExpenses || 0;
@@ -162,6 +167,19 @@ const SalesDashboard = ({
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Card de Vendas a Receber */}
+              <Card className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg h-full">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-lg font-semibold">Vendas a Receber</CardTitle>
+                  <CurrencyDollarIcon className="w-6 h-6" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-3xl font-bold">
+                  {totalFiado ? formatCurrency(totalFiado.total) : formatCurrency(0)}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {/* Gráfico de Total de Vendas por Dia */}
@@ -193,8 +211,8 @@ const SalesDashboard = ({
                         }
                         tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }}
                       />
-                      <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
-                      <Tooltip formatter={(value: number) => formatCurrency(value)} labelFormatter={(label) => dayjs(label).format("DD/MM/YYYY")} />
+                      <YAxis tickFormatter={(value) => formatCurrency(value / 100)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
+                      <Tooltip formatter={(value: number) => formatCurrency(value / 100)} labelFormatter={(label) => dayjs(label).format("DD/MM/YYYY")} />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -292,13 +310,13 @@ const SalesDashboard = ({
                             cx="50%"
                             cy="50%"
                             outerRadius={60}
-                            label={({ percent }) => `${(percent * 100).toFixed(2)}%`} // Formatação do rótulo para mostrar a porcentagem
+                            label={({ percent }) => `${(percent * 100)}%`}
                           >
                             {expenseProportion.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={['#28A745', '#FF6F61', '#17A2B8'][index % 3]} />
                             ))}
                           </Pie>
-                          <Tooltip formatter={(value: any) => `${value}%`} />
+                          <Tooltip formatter={(value: any) => `${value * 100}%`} />
                         </PieChart>
                       </ResponsiveContainer>
                     ) : (
@@ -319,7 +337,7 @@ const SalesDashboard = ({
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
-                    <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
+                    <Tooltip formatter={(value) => `R$ ${value}`} />
                     <Legend />
                     <Bar dataKey="totalSales" fill="#36A2EB" name="Receita" />
                     <Bar dataKey="totalExpenses" fill="#FF6384" name="Despesa" />
