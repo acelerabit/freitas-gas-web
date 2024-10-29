@@ -40,6 +40,9 @@ interface SalesVsExpenses {
   totalSales: { year: number; month: number; total: number }[];
   totalExpenses: { year: number; month: number; total: number }[];
 }
+interface TotalFiado {
+  total: number;
+}
 
 interface SalesDashboardProps {
   salesIndicators: SalesIndicators | null;
@@ -53,6 +56,7 @@ interface SalesDashboardProps {
   salesVsExpenses: SalesVsExpenses;
   grossProfit: number | null;
   loadingGrossProfit: boolean;
+  totalFiado: TotalFiado | null;
 }
 
 const SalesDashboard = ({
@@ -66,7 +70,8 @@ const SalesDashboard = ({
   expenseProportion,
   loadingExpenseProportion,
   grossProfit,
-  loadingGrossProfit
+  loadingGrossProfit,
+  totalFiado
 }: SalesDashboardProps) => {
   const getMonthName = (month: number) => {
     const months = [
@@ -166,6 +171,18 @@ const SalesDashboard = ({
                   </div>
                 </CardContent>
               </Card>
+              {/* Card de Vendas a Receber */}
+              <Card className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg h-full">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-lg font-semibold">Vendas a Receber</CardTitle>
+                  <CurrencyDollarIcon className="w-6 h-6" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-3xl font-bold">
+                  {totalFiado ? formatCurrency(totalFiado.total) : formatCurrency(0)}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {/* Gráfico de Total de Vendas por Dia */}
@@ -197,8 +214,8 @@ const SalesDashboard = ({
                         }
                         tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }}
                       />
-                      <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
-                      <Tooltip formatter={(value: number) => formatCurrency(value)} labelFormatter={(label) => dayjs(label).format("DD/MM/YYYY")} />
+                      <YAxis tickFormatter={(value) => formatCurrency(value / 100)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
+                      <Tooltip formatter={(value: number) => formatCurrency(value / 100)} labelFormatter={(label) => dayjs(label).format("DD/MM/YYYY")} />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -338,5 +355,4 @@ const SalesDashboard = ({
     </>
   );
 };
-
 export default SalesDashboard;
