@@ -103,6 +103,9 @@ export function AddTransactionDialog({
     { key: "oficina mecânica", value: "oficina mecânica" },
     { key: "outros", value: "outros" },
   ]);
+  const [incomeTypeOptions, setIncomeTypeOptions] = useState([
+    { key: "outros", value: "outros" },
+  ]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -183,8 +186,43 @@ export function AddTransactionDialog({
     setExpenseTypeOptions(expenseTypesUpdate);
   }
 
+  async function getIncomeTypes() {
+    const response = await fetchApi(`/transactions/income/types`);
+
+    if (!response.ok) {
+      const respError = await response.json();
+
+      toast.error(respError.error, {
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+      return;
+    }
+
+    const data = await response.json();
+
+    const otherIncomeTypes = data.map(
+      (incomeType: { id: string; name: string }) => {
+        return {
+          key: incomeType.name,
+          value: incomeType.name,
+        };
+      }
+    );
+
+    const incomeTypesUpdate: any = [
+      ...otherIncomeTypes,
+      ...incomeTypeOptions,
+    ];
+
+    setIncomeTypeOptions(incomeTypesUpdate);
+  }
+
   useEffect(() => {
     getExpenseTypes();
+    getIncomeTypes()
   }, []);
 
   if (!user) {
@@ -192,6 +230,9 @@ export function AddTransactionDialog({
   }
 
   const expenseTypeWatch = form.watch("type");
+  const categoryWatch = form.watch("category");
+
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -238,18 +279,25 @@ export function AddTransactionDialog({
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de despesa</FormLabel>
+                  <FormLabel>Tipo de movimentação</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value ?? ""}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo de despesa" />
+                        <SelectValue placeholder="Selecione o tipo de movimentação" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {expenseTypeOptions.map((expenseType) => (
+                      {categoryWatch === 'INCOME'? incomeTypeOptions.map((incomeType) => (
+                        <SelectItem
+                          key={incomeType.key}
+                          value={incomeType.key}
+                        >
+                          {incomeType.value}
+                        </SelectItem>
+                      )) : expenseTypeOptions.map((expenseType) => (
                         <SelectItem
                           key={expenseType.key}
                           value={expenseType.key}

@@ -86,7 +86,7 @@ export function SaleDialogForm({
   const [formData, setFormData] = useState({
     customerId: "",
     deliverymanId: user?.id || "",
-    products: [{ type: "", status: "", price: 0, quantity: 1 }],
+    products: [{ type: "", status: "EMPTY", price: 0, quantity: 1 }],
     paymentMethod: "",
   });
 
@@ -170,7 +170,7 @@ export function SaleDialogForm({
       ...prevData,
       products: [
         ...prevData.products,
-        { type: "", status: "", price: 0, quantity: 1 },
+        { type: "", status: "EMPTY", price: 0, quantity: 1 },
       ],
     }));
   };
@@ -251,6 +251,7 @@ export function SaleDialogForm({
                   render={({ field }) => (
                     <Select
                       {...field}
+                      defaultValue="EMPTY"
                       onValueChange={(value) =>
                         handleTypeSaleSelect(value, index)
                       }

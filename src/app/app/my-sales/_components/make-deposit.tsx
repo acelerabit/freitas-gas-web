@@ -127,13 +127,13 @@ export function MakeDeposit() {
           <CardTitle>{user?.name}</CardTitle>
           <CardDescription>{user?.email}</CardDescription>
         </CardHeader>
-        <Button onClick={onOpenChange}>Fazer depósito</Button>
+        <Button onClick={onOpenChange}>Informar depósito</Button>
     </Card>
 
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Fazer depósito para empresa</DialogTitle>
+          <DialogTitle>Informar depósito para empresa</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>

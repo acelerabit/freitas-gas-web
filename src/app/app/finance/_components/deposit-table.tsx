@@ -30,7 +30,7 @@ interface User {
   accountAmount: number;
 }
 
-interface Expense {
+interface Deposit {
   id: string,
       transactionType: string,
       category: string,
@@ -38,18 +38,22 @@ interface Expense {
       amount: number,
       description: string,
       createdAt: string,
+      user?: {
+        id: string,
+        name: string
+      }
 }
 
-export function TableDeliverymanTransactions() {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+export function TableDeposits() {
+  const [deposits, setDeposits] = useState<Deposit[]>([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
   const {user, loadingUser} = useUser()
 
-  async function fetchExpensesDeliveryman() {
+  async function fetchDeposits() {
     const fetchUsersUrl = new URL(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions/expenses/deliveryman/${user?.id}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions/deposits`
     );
 
     fetchUsersUrl.searchParams.set("page", String(page));
@@ -64,8 +68,7 @@ export function TableDeliverymanTransactions() {
     }
 
     const data = await response.json();
-
-    setExpenses(data);
+    setDeposits(data);
   }
 
   
@@ -79,7 +82,7 @@ export function TableDeliverymanTransactions() {
   }
 
   useEffect(() => {
-    fetchExpensesDeliveryman();
+    fetchDeposits();
   }, [page]);
 
 
@@ -90,37 +93,34 @@ export function TableDeliverymanTransactions() {
   return (
     <Card className="col-span-2">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-lg font-semibold">Despesas</CardTitle>
+        <CardTitle className="text-lg font-semibold">Depósitos</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Table>
-          <TableCaption>Listagem de todas as despesas</TableCaption>
+          <TableCaption>Listagem de todas os depósitos</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead>Categoria</TableHead>
               <TableHead>Valor</TableHead>
-              <TableHead>Descrição</TableHead>
               <TableHead>Data</TableHead>
+              <TableHead>Entregador</TableHead>
+
 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {expenses &&
-              expenses.map((expense) => (
-                <TableRow key={expense.id}>
-                  <TableCell className="font-medium truncate">
-                  {expense.customCategory}
-                  </TableCell>
-                  <TableCell className="font-medium truncate">
-                    {fCurrencyIntlBRL(expense.amount / 100)}
-                  </TableCell>
-                  <TableCell className="font-medium truncate">
-                  {expense.description}
-                  </TableCell>
-                  <TableCell className="font-medium truncate">
-                    {formatDateWithHours(expense.createdAt)}
-                  </TableCell>
+            {deposits &&
+              deposits.map((deposit) => (
+                <TableRow key={deposit.id}>
                   
+                  <TableCell className="font-medium truncate">
+                    {fCurrencyIntlBRL(deposit.amount / 100)}
+                  </TableCell>
+                  <TableCell className="font-medium truncate">
+                    {formatDateWithHours(deposit.createdAt)}
+                  </TableCell>
+                  <TableCell className="font-medium truncate">
+                    {deposit?.user?.name}
+                  </TableCell>
                 </TableRow>
               ))}
           </TableBody>
@@ -135,7 +135,7 @@ export function TableDeliverymanTransactions() {
           </Button>
           <Button
             className="disabled:cursor-not-allowed"
-            disabled={expenses.length < itemsPerPage}
+            disabled={deposits.length < itemsPerPage}
             onClick={nextPage}
           >
             Next

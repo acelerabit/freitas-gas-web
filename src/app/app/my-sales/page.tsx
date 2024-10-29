@@ -10,6 +10,7 @@ import { Total } from "./_components/total";
 import { TableDeliverymanTransactions } from "./_components/table-deliveryman-transactions";
 import { TableSalesLastSevenDays } from "./_components/table-sales-last-seven-days";
 import { MakeDeposit } from "./_components/make-deposit";
+import { TableDeliverymanDeposits } from "./_components/table-deliveryman-deposits";
 
 export default function MySales() {
   return (
@@ -36,6 +37,9 @@ export default function MySales() {
         <TableSalesLastSevenDays />
 
         <TableDeliverymanTransactions />
+
+        <TableDeliverymanDeposits />
+
       </div>
     </main>
   );

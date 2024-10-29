@@ -22,7 +22,7 @@ import { toast } from "sonner";
 
 import useModal from "@/hooks/use-modal";
 import { fCurrencyIntlBRL } from "@/utils/formatNumber";
-import { formatToUTC, formatToUTCDate } from "@/utils/formatDate";
+import { formatDateWithHours, formatToUTC, formatToUTCDate } from "@/utils/formatDate";
 import { SearchTransactions } from "./search-transaction";
 import { DataTable } from "./data-table-transactions";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -82,6 +82,15 @@ export type TransactionCategory = {
   SALE: 'SALE',
   EXPENSE: 'EXPENSE',
   CUSTOM: 'CUSTOM'
+};
+
+const transactionCategorySymbol = {
+  INCOME: "+",
+  WITHDRAW: "-",
+  DEPOSIT: "-",
+  SALE: "+",
+  EXPENSE: "-",
+  TRANSFER: '-'
 };
 
 export interface Transaction {
@@ -164,6 +173,9 @@ export default function TableTransaction() {
           </Button>
         );
       },
+      cell: ({ row }) => {
+        return <p>{transactionCategoryLabels[row.original.category]}</p>;
+      },
     },
     {
       accessorKey: "customCategory",
@@ -232,7 +244,7 @@ export default function TableTransaction() {
         );
       },
       cell: ({ row }) => {
-        return <p>{fCurrencyIntlBRL(row.original.amount / 100)}</p>;
+        return <p>{fCurrencyIntlBRL(row.original.amount / 100)} {transactionCategorySymbol[row.original.category as keyof typeof transactionCategorySymbol]}</p>;
       },
     },
     {
@@ -262,8 +274,7 @@ export default function TableTransaction() {
         );
       },
       cell: ({ row }) => {
-        const value = new Date(row.original.createdAt);
-        const formatted = new Intl.DateTimeFormat("pt-br").format(value);
+        const formatted = formatDateWithHours(row.original.createdAt);
 
         return <div>{formatted}</div>;
       },
@@ -386,8 +397,8 @@ export default function TableTransaction() {
     const transactionsList = data.map((item: any) => ({
       id: item._id,
       amount: item._props.amount,
-      transactionType: transactionTypeLabels[item._props.transactionType],
-      category: transactionCategoryLabels[item._props.category],
+      transactionType: item._props.transactionType,
+      category: item._props.category,
       userId: item._props.userId,
       customCategory: item._props.customCategory || "-",
       description: item._props.description || "-",
