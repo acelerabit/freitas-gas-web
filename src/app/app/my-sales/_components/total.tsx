@@ -12,6 +12,8 @@ export function Total() {
   const [expensesToday, setExpensesToday] = useState(0)
   const [revenuesToday, setRevenuesToday] = useState(0)
   const [accountAmount, setAccountAmount] = useState(0)
+  const [moneyToday, setMoneyToday] = useState(0)
+
 
 
   async function getAccountAmount() {
@@ -61,10 +63,26 @@ export function Total() {
     setRevenuesToday(data);
   }
 
+  async function getMoneyToday() {
+
+    const response = await fetchApi(
+      `/sales/money-sale-total-today/${user?.id}`
+    );
+
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+
+    setMoneyToday(data);
+  }
+
   useEffect(() => {
     getExpensesToday()
     getRevenuesToday()
     getAccountAmount()
+    getMoneyToday()
   }, [])
 
   if(loadingUser) {
@@ -86,7 +104,20 @@ export function Total() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Total de receitas do dia</CardTitle>
+          <CardTitle>Receitas em dinheiro do dia</CardTitle>
+          <CardDescription>Receitas em dinheito recebidas no dia de hoje</CardDescription>
+
+        </CardHeader>
+
+        <CardContent>
+        <h1>{fCurrencyIntlBRL(moneyToday / 100)}</h1>
+
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Receitas do dia</CardTitle>
           <CardDescription>Receitas recebidas no dia de hoje</CardDescription>
 
         </CardHeader>
@@ -99,7 +130,7 @@ export function Total() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Total de despesas do dia</CardTitle>
+          <CardTitle>Despesas do dia</CardTitle>
           <CardDescription>Despesas ocorridas no dia de hoje</CardDescription>
 
         </CardHeader>
