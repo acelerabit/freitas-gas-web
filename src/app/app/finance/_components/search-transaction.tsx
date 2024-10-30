@@ -32,7 +32,7 @@ export function SearchTransactions({ handleFilterTransactions }: SearchTransacti
       <div className="w-[480px] flex items-center gap-2 ">
         <Input
           type="search"
-          placeholder="Buscar transação..."
+          placeholder="Buscar movimentação..."
           className="w-full"
           {...register("filter")}
         />

@@ -162,10 +162,10 @@ export function TableTransactions() {
   return (
     <>
       <Table className="min-w-full">
-        <TableCaption>Listagem de todas as transações</TableCaption>
+        <TableCaption>Listagem de todas as movimentações</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Tipo de Transação</TableHead>
+            <TableHead>Tipo de Movimentação</TableHead>
             <TableHead>Categoria</TableHead>
             <TableHead>Usuário</TableHead>
             <TableHead>Categoria customizada</TableHead>
@@ -185,7 +185,7 @@ export function TableTransactions() {
           ) : transactions.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="text-center">
-                Nenhuma transação encontrada.
+                Nenhuma movimentação encontrada.
               </TableCell>
             </TableRow>
           ) : (

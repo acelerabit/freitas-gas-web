@@ -105,7 +105,7 @@ export function MakeDeposit() {
       return;
     }
 
-    toast.success("Transação cadastrada com sucesso", {
+    toast.success("Movimentação cadastrada com sucesso", {
       action: {
         label: "Undo",
         onClick: () => console.log("Undo"),

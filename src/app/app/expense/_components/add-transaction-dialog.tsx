@@ -146,7 +146,7 @@ export function AddTransactionDialog({
       return;
     }
 
-    toast.success("Transação cadastrada com sucesso", {
+    toast.success("Movimentação cadastrada com sucesso", {
       action: {
         label: "Undo",
         onClick: () => console.log("Undo"),
@@ -271,37 +271,7 @@ export function AddTransactionDialog({
                 </FormItem>
               )}
             />
-            {/* <FormField
-              control={form.control}
-              name="transactionType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tipo de transação</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo de transação" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {transactionTypeOptions.map((transactionOption) => (
-                        <SelectItem
-                          key={transactionOption.key}
-                          value={transactionOption.key}
-                        >
-                          {transactionOption.value}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
+          
 
             {expenseTypeWatch === "outros" && (
               <FormField
@@ -356,7 +326,7 @@ export function AddTransactionDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição da transação</FormLabel>
+                  <FormLabel>Descrição da movimentação</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="descrição"

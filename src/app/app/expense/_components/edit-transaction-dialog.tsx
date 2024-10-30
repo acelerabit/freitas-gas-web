@@ -351,7 +351,7 @@ export function UpdateTransactionDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição da transação</FormLabel>
+                  <FormLabel>Descrição da movimentação</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="descrição"

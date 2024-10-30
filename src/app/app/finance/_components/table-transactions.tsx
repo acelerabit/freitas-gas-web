@@ -26,6 +26,7 @@ import { formatDateWithHours, formatToUTC, formatToUTCDate } from "@/utils/forma
 import { SearchTransactions } from "./search-transaction";
 import { DataTable } from "./data-table-transactions";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ConfirmDelete } from "./confirm-delete";
 
 const transactionTypeLabels: { [key: string]: string } = {
   ENTRY: "Entrada",
@@ -51,10 +52,6 @@ const categories = [
   {
     name: "Saida",
     value: "WITHDRAW",
-  },
-  {
-    name: "Depósito",
-    value: "DEPOSIT",
   },
   {
     name: "Venda",
@@ -133,6 +130,8 @@ export default function TableTransaction() {
   const itemsPerPage = 10;
   const [filter, setFilter] = useState("");
   const { user, loadingUser } = useUser();
+
+  const {isOpen: confirmDeleteOpen, onOpenChange: confirmDeleteOnOpenChange} = useModal()
 
   const handleSort = (sortField: SortType, direction: "desc" | "asc") => {
     setOrderByField(sortField);
@@ -303,7 +302,7 @@ export default function TableTransaction() {
                   Ver detalhes
                 </Link>
               </DropdownMenuItem> */}
-              <DropdownMenuItem asChild>
+              {/* <DropdownMenuItem asChild>
                 <Button
                   className="w-full cursor-pointer"
                   onClick={() => {
@@ -313,7 +312,7 @@ export default function TableTransaction() {
                 >
                   Editar
                 </Button>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuSeparator />
 
               <DropdownMenuItem asChild>
@@ -322,7 +321,7 @@ export default function TableTransaction() {
                   className="w-full cursor-pointer"
                   onClick={() => {
                     setTransactionId(row.original.id);
-                    // setDeleteTransactionOpen(true);
+                    confirmDeleteOnOpenChange()
                   }}
                 >
                   Deletar
@@ -473,6 +472,8 @@ export default function TableTransaction() {
           previousPage={previousPage}
         />
       </div>
+
+      <ConfirmDelete transactionId={transactionId} open={confirmDeleteOpen} onOpenChange={confirmDeleteOnOpenChange} />
     </div>
   );
 }
