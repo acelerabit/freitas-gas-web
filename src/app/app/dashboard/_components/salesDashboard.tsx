@@ -19,7 +19,8 @@ import {
   Pie,
   Cell,
   CartesianGrid,
-  Legend
+  Legend,
+  Label 
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import dayjs from "dayjs";
@@ -313,7 +314,7 @@ const SalesDashboard = ({
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold">Proporção de Despesas por Categoria</CardTitle>
                   </CardHeader>
-                  <CardContent className="h-full flex items-center justify-center">
+                  <CardContent className="h-full flex flex-col items-center justify-center">
                     {expenseProportion && expenseProportion.length > 0 ? (
                       <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
@@ -335,6 +336,21 @@ const SalesDashboard = ({
                       </ResponsiveContainer>
                     ) : (
                       <div>No data available</div>
+                    )}
+                    {expenseProportion && expenseProportion.length > 0 && (
+                      <div className="flex flex-col items-center mt-4">
+                        {expenseProportion.map((entry, index) => (
+                          <div key={index} className="flex items-center">
+                            <div
+                              className="w-4 h-4 mr-2"
+                              style={{ backgroundColor: ['#28A745', '#FF6F61', '#17A2B8'][index % 3] }}
+                            />
+                            <span className="text-sm">
+                              {entry.category}: {(entry.percentage * 100).toFixed(2)}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </CardContent>
                 </Card>

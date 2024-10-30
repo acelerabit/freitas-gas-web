@@ -143,7 +143,7 @@ export function MainSidebar({ children }: { children: ReactNode }) {
           </div>
         </div>
       </div>
-      <div className="flex flex-1 flex-col overflow-auto">
+      <div className="flex flex-1 flex-col">
         <header className="flex h-14 sm:h-16 justify-between items-center gap-2 sm:gap-4 border-b bg-gray-100/40 px-4 sm:px-6 dark:bg-gray-800/40">
           <Sheet>
             <SheetTrigger asChild>

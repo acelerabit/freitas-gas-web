@@ -188,15 +188,19 @@ export default function TableSale() {
             Método de pagamento
             <ArrowUpDown className="ml-2 h-4 w-4" />
             {orderByField === "paymentMethod" && (
-              <span className="text-[8px]">
-                {/* {column.getIsSorted() && column.getIsSorted()} */}
-                {orderDirection}
-              </span>
+              <span className="text-[8px]">{orderDirection}</span>
             )}
           </Button>
         );
       },
-    },
+      cell: ({ row }) => {
+        const paymentMethod = row.original.paymentMethod === "FIADO" 
+          ? "VENDA A RECEBER" 
+          : row.original.paymentMethod;
+        
+        return <p>{paymentMethod}</p>;
+      },
+    },    
     {
       accessorKey: "customer",
       header: ({ column }) => {

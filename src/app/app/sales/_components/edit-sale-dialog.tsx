@@ -445,7 +445,7 @@ export function UpdateSaleDialog({
                     Cartão de crédito
                   </SelectItem>
                   <SelectItem value="PIX">Pix</SelectItem>
-                  <SelectItem value="FIADO">Venda à receber</SelectItem>
+                  <SelectItem value="FIADO">Venda a receber</SelectItem>
                   <SelectItem value="TRANSFERENCIA">Transferência</SelectItem>
                 </SelectContent>
               </Select>
