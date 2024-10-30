@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useUser } from "@/contexts/user-context"
 import LoadingAnimation from "../../_components/loading-page"
@@ -38,6 +39,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { disablePastDates, handleDateAndTimeFormat } from "@/utils/formatDate"
+import { SaleDialogForm } from "../../sales/_components/saleDialogForm"
 
 
 const formSchema = z
@@ -58,6 +60,7 @@ export function MakeDeposit() {
   const {user, loadingUser} = useUser()
 
   const {isOpen, onOpenChange} = useModal()
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -113,21 +116,47 @@ export function MakeDeposit() {
     });
 
     window.location.reload();
-  }
+  };
+
+  const handleFormSubmit = async (data: any) => {
+    const response = await fetchApi("/sales", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const respError = await response.json();
+      toast.error(respError.message);
+      return;
+    }
+
+    toast.success("Venda cadastrada com sucesso!");
+    window.location.reload();
+  };
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
 
   if(loadingUser) {
     return <LoadingAnimation />
   }
 
-  console.log(form.formState.errors)
   return (
     <>
-    <Card className="p-4 flex flex-row items-center justify-between">
-        <CardHeader>
-          <CardTitle>{user?.name}</CardTitle>
-          <CardDescription>{user?.email}</CardDescription>
-        </CardHeader>
-        <Button onClick={onOpenChange}>Informar depósito</Button>
+    <Card className="p-4 flex flex-col items-center justify-between">
+      <CardHeader className="mb-2 text-center">
+        <CardTitle>{user?.name}</CardTitle>
+        <CardDescription>{user?.email}</CardDescription>
+      </CardHeader>
+      <Button onClick={onOpenChange} className="w-full sm:w-auto mb-4">
+        Informar depósito
+      </Button>
+      <Button onClick={() => setIsDialogOpen(true)} className="w-full sm:w-auto">
+        Cadastrar Venda
+      </Button>
     </Card>
 
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -261,6 +290,11 @@ export function MakeDeposit() {
         </Form>
       </DialogContent>
     </Dialog>
+    <SaleDialogForm
+        isOpen={isDialogOpen}
+        onClose={handleCloseDialog}
+        onSubmit={handleFormSubmit}
+    />
     </>
 
   )

@@ -89,14 +89,12 @@ export function Total() {
     return <LoadingAnimation />
   }
   return (
-    <div className="flex items-center gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 p-4">
       <Card>
         <CardHeader>
           <CardTitle>Saldo do entregador</CardTitle>
           <CardDescription>Saldo na conta do entregador</CardDescription>
-
         </CardHeader>
-
         <CardContent>
           <h1>{fCurrencyIntlBRL(accountAmount / 100)}</h1>
         </CardContent>
@@ -105,13 +103,10 @@ export function Total() {
       <Card>
         <CardHeader>
           <CardTitle>Receitas em dinheiro do dia</CardTitle>
-          <CardDescription>Receitas em dinheito recebidas no dia de hoje</CardDescription>
-
+          <CardDescription>Receitas em dinheiro recebidas no dia de hoje</CardDescription>
         </CardHeader>
-
         <CardContent>
-        <h1>{fCurrencyIntlBRL(moneyToday / 100)}</h1>
-
+          <h1>{fCurrencyIntlBRL(moneyToday / 100)}</h1>
         </CardContent>
       </Card>
 
@@ -119,12 +114,9 @@ export function Total() {
         <CardHeader>
           <CardTitle>Receitas do dia</CardTitle>
           <CardDescription>Receitas recebidas no dia de hoje</CardDescription>
-
         </CardHeader>
-
         <CardContent>
-        <h1>{fCurrencyIntlBRL(revenuesToday / 100)}</h1>
-
+          <h1>{fCurrencyIntlBRL(revenuesToday / 100)}</h1>
         </CardContent>
       </Card>
 
@@ -132,11 +124,9 @@ export function Total() {
         <CardHeader>
           <CardTitle>Despesas do dia</CardTitle>
           <CardDescription>Despesas ocorridas no dia de hoje</CardDescription>
-
         </CardHeader>
-
         <CardContent>
-        <h1>{fCurrencyIntlBRL(expensesToday / 100)}</h1>
+          <h1>{fCurrencyIntlBRL(expensesToday / 100)}</h1>
         </CardContent>
       </Card>
     </div>

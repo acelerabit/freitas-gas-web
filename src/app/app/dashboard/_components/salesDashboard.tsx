@@ -247,18 +247,35 @@ const SalesDashboard = ({
                 </CardHeader>
                 <CardContent className="h-full">
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={expenseIndicators?.totalPerDay} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                      <XAxis 
-                        dataKey="createdAt" 
-                        tickFormatter={(date) => dayjs(date).format('DD/MM/YYYY')}
+                    <LineChart
+                      data={expenseIndicators?.totalPerDay}
+                      margin={{ top: 5, right: 10, left: 10, bottom: 0 }}
+                    >
+                      <Line
+                        type="monotone"
+                        strokeWidth={2}
+                        dataKey="total"
+                        name="Total"
+                        stroke="#17A2B8"
+                        activeDot={{
+                          r: 6,
+                          style: { fill: "var(--theme-primary)", opacity: 0.25 },
+                        }}
                       />
-                      <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
-                      <Tooltip 
-                        formatter={(value) => value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        labelFormatter={(label) => dayjs(label).format('DD/MM/YYYY')}
+                      <XAxis
+                        dataKey="createdAt"
+                        tickFormatter={(tick) => dayjs(tick).format("DD/MM/YYYY")}
+                        tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }}
                       />
-                      <Bar dataKey="total" fill="#17A2B8" />
-                    </BarChart>
+                      <Tooltip
+                        formatter={(value: number) => formatCurrency(value)}
+                        labelFormatter={(label) => dayjs(label).format("DD/MM/YYYY")}
+                      />
+                      <YAxis
+                        tickFormatter={(value) => formatCurrency(value)}
+                        tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }}
+                      />
+                    </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
@@ -268,28 +285,22 @@ const SalesDashboard = ({
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">Despesas por Mês</CardTitle>
                 </CardHeader>
-                <CardContent className="h-full">
+                <CardContent className="h-full flex items-center justify-center">
                   <ResponsiveContainer width="100%" height={300}>
-                    <LineChart 
-                      data={expenseIndicators?.totalPerDay.map(item => ({
-                        date: new Date(item.createdAt).toLocaleDateString('pt-BR'),
-                        total: item.total,
-                      }))}
+                    <BarChart
+                      data={[{ label: "Total", total: expenseIndicators?.totalExpenses }]}
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
-                      <XAxis 
-                        dataKey="date"
-                        tickFormatter={(date) => date}
-                      />
+                      <XAxis dataKey="label" />
                       <YAxis 
                         tickFormatter={(value) => formatCurrency(value)} 
                         tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} 
                       />
                       <Tooltip 
-                        formatter={(value) => (typeof value === "number" ? formatCurrency(value) : value)} 
+                        formatter={(value) => Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} 
                       />
-                      <Line type="monotone" dataKey="total" stroke="#FF6F61" strokeWidth={2} />
-                    </LineChart>
+                      <Bar dataKey="total" fill="#FF6F61" />
+                    </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>

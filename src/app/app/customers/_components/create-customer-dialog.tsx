@@ -110,7 +110,7 @@ const CreateCustomerDialog: React.FC<CreateCustomerDialogProps> = ({ onCreate })
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Cadastrar Cliente</Button>
+        <Button className="w-21 sm:w-auto p-2 text-center">Cadastrar Cliente</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
