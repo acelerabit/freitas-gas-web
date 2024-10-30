@@ -71,7 +71,6 @@ export function TableNotificationsUnread() {
     <Card className="col-span-2">
       <CardContent className="space-y-4">
         <Table>
-          <TableCaption>Listagem de todas as notificações</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Mensagem</TableHead>
@@ -97,14 +96,14 @@ export function TableNotificationsUnread() {
             disabled={page === 1}
             onClick={previousPage}
           >
-            Previous
+            Anterior
           </Button>
           <Button
             className="disabled:cursor-not-allowed"
             disabled={notifications.length < itemsPerPage}
             onClick={nextPage}
           >
-            Next
+            Próxima
           </Button>
         </div>
       </CardContent>

@@ -75,7 +75,6 @@ export function TableCustomers() {
       <CardContent className="space-y-4">
         <div className="overflow-x-auto max-w-full">
           <Table className="min-w-full">
-            <TableCaption>Listagem de todos os clientes</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>

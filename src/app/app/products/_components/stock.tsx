@@ -85,7 +85,6 @@ export function Stock() {
 
       <CardContent className="space-y-4">
         <Table>
-          <TableCaption>Listagem de todos os produtos vendidos em comodato</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
@@ -130,14 +129,14 @@ export function Stock() {
             disabled={page === 1}
             onClick={previousPage}
           >
-            Previous
+            Anterior
           </Button>
           <Button
             className="disabled:cursor-not-allowed"
             disabled={sales.length < itemsPerPage}
             onClick={nextPage}
           >
-            Next
+            Próxima
           </Button>
         </div>
       </CardContent>

@@ -78,7 +78,6 @@ export function TableCollects() {
       </CardHeader>
       <CardContent className="space-y-4">
         <Table>
-          <TableCaption>Listagem de todas as coletas</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Cliente</TableHead>
@@ -110,14 +109,14 @@ export function TableCollects() {
             disabled={page === 1}
             onClick={previousPage}
           >
-            Previous
+            Anterior
           </Button>
           <Button
             className="disabled:cursor-not-allowed"
             disabled={collects.length < itemsPerPage}
             onClick={nextPage}
           >
-            Next
+            Próxima
           </Button>
         </div>
       </CardContent>

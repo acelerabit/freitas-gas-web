@@ -162,7 +162,6 @@ export function TableUsers() {
       </CardHeader>
       <CardContent className="space-y-4">
         <Table>
-          <TableCaption>Listagem de todos os usuários</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
@@ -225,14 +224,14 @@ export function TableUsers() {
             disabled={page === 1}
             onClick={previousPage}
           >
-            Previous
+            Anterior
           </Button>
           <Button
             className="disabled:cursor-not-allowed"
             disabled={users.length < itemsPerPage}
             onClick={nextPage}
           >
-            Next
+            Próxima
           </Button>
         </div>
       </CardContent>

@@ -136,7 +136,6 @@ export function TableSalesLastSevenDays() {
           </div>
         </div>
       <Table>
-          <TableCaption>Listagem de todas as despesas</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Cliente</TableHead>
@@ -176,14 +175,14 @@ export function TableSalesLastSevenDays() {
             disabled={page === 1}
             onClick={previousPage}
           >
-            Previous
+            Anterior
           </Button>
           <Button
             className="disabled:cursor-not-allowed"
             disabled={sales.length < itemsPerPage}
             onClick={nextPage}
           >
-            Next
+            Próxima
           </Button>
         </div>
       </CardContent>

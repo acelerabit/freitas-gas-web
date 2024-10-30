@@ -151,11 +151,11 @@ export function MakeDeposit() {
         <CardTitle>{user?.name}</CardTitle>
         <CardDescription>{user?.email}</CardDescription>
       </CardHeader>
+      <Button onClick={() => setIsDialogOpen(true)} className="w-full sm:w-auto">
+        Cadastrar venda
+      </Button>
       <Button onClick={onOpenChange} className="w-full sm:w-auto mb-4">
         Informar depósito
-      </Button>
-      <Button onClick={() => setIsDialogOpen(true)} className="w-full sm:w-auto">
-        Cadastrar Venda
       </Button>
     </Card>
 

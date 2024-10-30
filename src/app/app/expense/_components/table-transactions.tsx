@@ -162,7 +162,6 @@ export function TableTransactions() {
   return (
     <>
       <Table className="min-w-full">
-        <TableCaption>Listagem de todas as movimentações</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Tipo de Movimentação</TableHead>

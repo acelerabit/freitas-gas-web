@@ -94,7 +94,6 @@ export function TableDeliverymanTransactions() {
       </CardHeader>
       <CardContent className="space-y-4">
         <Table>
-          <TableCaption>Listagem de todas as despesas</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Categoria</TableHead>
@@ -131,14 +130,14 @@ export function TableDeliverymanTransactions() {
             disabled={page === 1}
             onClick={previousPage}
           >
-            Previous
+            Anterior
           </Button>
           <Button
             className="disabled:cursor-not-allowed"
             disabled={expenses.length < itemsPerPage}
             onClick={nextPage}
           >
-            Next
+            Próxima
           </Button>
         </div>
       </CardContent>

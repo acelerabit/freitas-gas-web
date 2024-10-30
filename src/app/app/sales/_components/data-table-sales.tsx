@@ -64,7 +64,7 @@ export function DataTable<TData, TValue>({
         <DropdownMenu>
           <DropdownMenuTrigger asChild className="w-28 mt-[-4.5rem]">
             <Button variant="outline" className="ml-auto">
-              Columns
+              Colunas
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -146,7 +146,7 @@ export function DataTable<TData, TValue>({
           disabled={page === 1}
           onClick={previousPage}
         >
-          Previous
+          Anterior
         </Button>
         <Button
           variant="outline"
@@ -155,7 +155,7 @@ export function DataTable<TData, TValue>({
           disabled={data.length < itemsPerPage}
           onClick={nextPage}
         >
-          Next
+          Próxima
         </Button>
       </div>
     </div>

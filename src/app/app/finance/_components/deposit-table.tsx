@@ -97,7 +97,6 @@ export function TableDeposits() {
       </CardHeader>
       <CardContent className="space-y-4">
         <Table>
-          <TableCaption>Listagem de todas os depósitos</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Valor</TableHead>
@@ -131,14 +130,14 @@ export function TableDeposits() {
             disabled={page === 1}
             onClick={previousPage}
           >
-            Previous
+            Anterior
           </Button>
           <Button
             className="disabled:cursor-not-allowed"
             disabled={deposits.length < itemsPerPage}
             onClick={nextPage}
           >
-            Next
+            Próxima
           </Button>
         </div>
       </CardContent>
