@@ -151,13 +151,16 @@ export function MakeDeposit() {
         <CardTitle>{user?.name}</CardTitle>
         <CardDescription>{user?.email}</CardDescription>
       </CardHeader>
-      <Button onClick={() => setIsDialogOpen(true)} className="w-full sm:w-auto mb-4">
-        Cadastrar venda
-      </Button>
-      <Button onClick={onOpenChange} className="w-full sm:w-auto">
-        Informar depósito
-      </Button>
+      <div className="flex flex-col space-y-4">
+        <Button onClick={onOpenChange} className="w-full sm:w-auto">
+          Cadastrar Venda
+        </Button>
+        <Button onClick={() => setIsDialogOpen(true)} className="sm:w-auto">
+          Informar depósito
+        </Button>
+      </div>
     </Card>
+
 
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
