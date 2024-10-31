@@ -15,7 +15,7 @@ import { TableDeliverymanDeposits } from "./_components/table-deliveryman-deposi
 export default function MySales() {
   return (
     <main className="p-8 flex flex-col">
-      <h1 className="text-4xl font-semibold">Minhas vendas</h1>
+      <h1 className="text-4xl font-semibold">Meu painel</h1>
 
       <Breadcrumb className="my-4">
         <BreadcrumbList>

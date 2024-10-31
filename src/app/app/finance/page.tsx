@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CompanyBalance } from "./_components/company-balance";
 import { TransferTransactionDialog } from "./_components/transfer-transaction-dialog";
 import { TableDeposits } from "./_components/deposit-table";
+import { TableCustomersWithDebts } from "./_components/customer-table";
 
 export default function Finance() {
   const { isOpen, onOpenChange } = useModal();
@@ -48,6 +49,9 @@ export default function Finance() {
         </div>
         <TableTransaction />
         <TableDeposits />
+        <div className="mt-10">
+          <TableCustomersWithDebts />
+        </div>
       </div>
 
       <AddTransactionDialog open={isOpen} onOpenChange={onOpenChange} />

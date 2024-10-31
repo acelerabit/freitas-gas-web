@@ -264,7 +264,6 @@ export function ProductList() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Table>
-            <TableCaption>Listagem de preços</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Produto / Tipo</TableHead>
