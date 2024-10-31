@@ -14,8 +14,8 @@ import { TableDeliverymanDeposits } from "./_components/table-deliveryman-deposi
 
 export default function MySales() {
   return (
-    <main className="p-8 flex flex-col">
-      <h1 className="text-4xl font-semibold">Meu painel</h1>
+    <main className="p-4 md:p-8 flex flex-col">
+      <h1 className="text-3xl md:text-4xl font-semibold">Meu painel</h1>
 
       <Breadcrumb className="my-4">
         <BreadcrumbList>
@@ -24,12 +24,12 @@ export default function MySales() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>minhas vendas</BreadcrumbPage>
+            <BreadcrumbPage>meu painel</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         <MakeDeposit />
         
         <Total />
@@ -39,7 +39,6 @@ export default function MySales() {
         <TableDeliverymanTransactions />
 
         <TableDeliverymanDeposits />
-
       </div>
     </main>
   );
