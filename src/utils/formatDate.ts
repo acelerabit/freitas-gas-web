@@ -39,7 +39,7 @@ export function formatDateWithHours(date: string) {
     second: '2-digit',
   }).format(dateFormat);
 
-  return `${dateDay} ás ${dateTime}`;
+  return `${dateDay} às ${dateTime}`;
 }
 
 export const handleDateAndTimeFormat = (selectedDate: Date, time: string) => {

@@ -241,7 +241,6 @@ export default function TableSale() {
           <p>
             {row.original.products.map((product, index) => (
               <p key={index}>
-                {product.type} {`(x${product.quantity})`} -{" "}
                 {
                   saleTypesMapper[
                     product.typeSale as "FULL" | "EMPTY" | "COMODATO"

@@ -31,17 +31,18 @@ interface User {
 }
 
 interface Deposit {
-  id: string,
-      transactionType: string,
-      category: string,
-      customCategory: string,
-      amount: number,
-      description: string,
-      createdAt: string,
-      user?: {
-        id: string,
-        name: string
-      }
+  id: string;
+  transactionType: string;
+  category: string;
+  customCategory: string;
+  amount: number;
+  description: string;
+  createdAt: string;
+  user?: {
+    id: string;
+    name: string;
+  };
+  bank: string;
 }
 
 export function TableDeposits() {
@@ -49,7 +50,7 @@ export function TableDeposits() {
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
-  const {user, loadingUser} = useUser()
+  const { user, loadingUser } = useUser();
 
   async function fetchDeposits() {
     const fetchUsersUrl = new URL(
@@ -71,8 +72,6 @@ export function TableDeposits() {
     setDeposits(data);
   }
 
-  
-
   function nextPage() {
     setPage((currentPage) => currentPage + 1);
   }
@@ -85,9 +84,8 @@ export function TableDeposits() {
     fetchDeposits();
   }, [page]);
 
-
-  if(loadingUser) {
-    return <LoadingAnimation />
+  if (loadingUser) {
+    return <LoadingAnimation />;
   }
 
   return (
@@ -99,18 +97,20 @@ export function TableDeposits() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Banco</TableHead>
+
               <TableHead>Valor</TableHead>
               <TableHead>Data</TableHead>
               <TableHead>Entregador</TableHead>
-
-
             </TableRow>
           </TableHeader>
           <TableBody>
             {deposits &&
               deposits.map((deposit) => (
                 <TableRow key={deposit.id}>
-                  
+                  <TableCell className="font-medium truncate">
+                    {deposit.bank}
+                  </TableCell>
                   <TableCell className="font-medium truncate">
                     {fCurrencyIntlBRL(deposit.amount / 100)}
                   </TableCell>
