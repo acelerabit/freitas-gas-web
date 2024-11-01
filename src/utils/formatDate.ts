@@ -36,7 +36,6 @@ export function formatDateWithHours(date: string) {
   const dateTime = new Intl.DateTimeFormat('pt-br', {
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',
   }).format(dateFormat);
 
   return `${dateDay} às ${dateTime}`;
