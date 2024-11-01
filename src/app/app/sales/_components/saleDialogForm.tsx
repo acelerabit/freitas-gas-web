@@ -127,10 +127,10 @@ export function SaleDialogForm({
   }, []);
 
   const handleProductSelect = (type: string, index: number) => {
-    // const selectedProduct = products[index];
-    const selectedProduct = products.find(product => product.type === type);
-
     let  currentProduct = formData.products[index]
+
+    const selectedProduct = products.find(product => product.type === type && product.status === currentProduct.status);
+
 
     if (selectedProduct) {
       const updatedProducts = [...formData.products];

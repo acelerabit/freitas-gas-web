@@ -243,7 +243,7 @@ export default function TableTransaction() {
         );
       },
       cell: ({ row }) => {
-        return <p>{transactionCategorySymbol[row.original.category as keyof typeof transactionCategorySymbol]} {fCurrencyIntlBRL(row.original.amount / 100)} </p>;
+        return <p className="min-w-32">{transactionCategorySymbol[row.original.category as keyof typeof transactionCategorySymbol]} {fCurrencyIntlBRL(row.original.amount / 100)} </p>;
       },
     },
     {

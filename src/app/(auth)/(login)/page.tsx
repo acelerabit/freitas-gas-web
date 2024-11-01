@@ -53,8 +53,9 @@ export default function Login() {
         onClick: () => console.log("Undo"),
       },
     });
-    window.location.href =
-      process.env.NEXT_PUBLIC_BASE_URL_AFTER_LOGIN ?? "/app";
+
+    // window.location.href =
+    //   process.env.NEXT_PUBLIC_BASE_URL_AFTER_LOGIN ?? "/app";
   }
 
   function loginWithGoogle() {

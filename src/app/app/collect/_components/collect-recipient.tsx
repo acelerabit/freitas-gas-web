@@ -223,7 +223,7 @@ export function CollectRecipientDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Cadastrar Nova despesa</DialogTitle>
+          <DialogTitle>Cadastrar vasilhame</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
