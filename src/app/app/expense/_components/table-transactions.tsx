@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import { fetchApi } from "@/services/fetchApi";
-import { formatDate } from "@/utils/formatDate";
+import { formatDate, formatDateWithHours } from "@/utils/formatDate";
 import { formatCurrency } from "@/utils/formatCurrent";
 import { EllipsisVertical } from "lucide-react";
 import useModal from "@/hooks/use-modal";
@@ -170,7 +170,7 @@ export function TableTransactions() {
             <TableHead>Categoria customizada</TableHead>
             <TableHead>Valor</TableHead>
             <TableHead>Descrição</TableHead>
-            <TableHead>Data de criação</TableHead>
+            <TableHead>Data</TableHead>
             <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -198,7 +198,7 @@ export function TableTransactions() {
                 <TableCell>{transaction.customCategory}</TableCell>
                 <TableCell>{fCurrencyIntlBRL(transaction.amount / 100)}</TableCell>
                 <TableCell>{transaction.description}</TableCell>
-                <TableCell>{formatDate(transaction.createdAt)}</TableCell>
+                <TableCell>{formatDateWithHours(transaction.createdAt)}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

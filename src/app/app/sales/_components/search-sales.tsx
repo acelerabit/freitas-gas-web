@@ -33,7 +33,7 @@ export function SearchSales({ handleFilterSales }: SearchSalesProps) {
       <div className="w-[480px] flex items-center gap-2 ">
         <Input
           type="search"
-          placeholder="Buscar venda..."
+          placeholder="Buscar venda por cliente ou entregador"
           // value={searchTerm}
           // onChange={handleSearch}
           className="w-full"

@@ -25,7 +25,7 @@ import useModal from "@/hooks/use-modal";
 import { UpdateSaleDialog } from "./edit-sale-dialog";
 import { DeleteSaleDialog } from "./delete-sale-dialog";
 import { fCurrencyIntlBRL } from "@/utils/formatNumber";
-import { formatToUTC, formatToUTCDate } from "@/utils/formatDate";
+import { formatDateWithHours, formatToUTC, formatToUTCDate } from "@/utils/formatDate";
 
 interface Product {
   id: string;
@@ -297,7 +297,7 @@ export default function TableSale() {
               )
             }
           >
-            Criado em
+            Data
             <ArrowUpDown className="ml-2 h-4 w-4" />
             {orderByField === "createdAt" && (
               <span className="text-[8px]">{orderDirection}</span>
@@ -306,11 +306,7 @@ export default function TableSale() {
         );
       },
       cell: ({ row }) => {
-        const value = new Date(row.original.createdAt);
-        const formatted = new Intl.DateTimeFormat("pt-br", {
-          dateStyle: "short",
-          timeStyle: "short",
-        }).format(value);
+        const formatted = formatDateWithHours(row.original.createdAt);
 
         return <div>{formatted}</div>;
       },

@@ -19,39 +19,44 @@ import { fCurrencyIntlBRL } from "@/utils/formatNumber";
 import { useEffect, useState } from "react";
 import LoadingAnimation from "../../_components/loading-page";
 
-
 interface Product {
-  id: string,
-          type: string,
-          price: number,
-          quantity: number,
-          status: string,
-          productId: string,
-          salePrice: number,
-          typeSale: string,
+  id: string;
+  type: string;
+  price: number;
+  quantity: number;
+  status: string;
+  productId: string;
+  salePrice: number;
+  typeSale: string;
 }
 
 interface Sale {
-  id: string,
-      customer: {
-        id: string,
-        name: string
-      },
-      deliveryman: {
-        id: string;
-        name: string;
-      },
-      products: Product[],
-      paymentMethod: string,
-      total: number,
-      saleType: string,
-      createdAt: string,
+  id: string;
+  customer: {
+    id: string;
+    name: string;
+  };
+  deliveryman: {
+    id: string;
+    name: string;
+  };
+  products: Product[];
+  paymentMethod: string;
+  total: number;
+  saleType: string;
+  createdAt: string;
 }
 
 interface DateFilter {
   startDate: Date | null;
   endDate: Date | null;
 }
+
+const saleTypesMapper = {
+  FULL: "Vasilhame + gás",
+  EMPTY: "Troca de gás",
+  COMODATO: "Comodato",
+};
 
 export function TableSalesLastSevenDays() {
   const [sales, setSales] = useState<Sale[]>([]);
@@ -62,7 +67,7 @@ export function TableSalesLastSevenDays() {
   });
   const itemsPerPage = 10;
 
-  const {user, loadingUser} = useUser()
+  const { user, loadingUser } = useUser();
 
   async function fetchSalesDeliveryman() {
     const fetchSalesUrl = new URL(
@@ -109,19 +114,17 @@ export function TableSalesLastSevenDays() {
     fetchSalesDeliveryman();
   }, [page, dateFilter]);
 
-
-  if(loadingUser) {
-    return <LoadingAnimation />
+  if (loadingUser) {
+    return <LoadingAnimation />;
   }
 
   return (
     <Card className="col-span-2">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg font-semibold">Suas vendas</CardTitle>
-        
       </CardHeader>
       <CardContent className="space-y-4">
-      <div className="w-full flex items-center gap-2">
+        <div className="w-full flex items-center gap-2">
           <div className="w-full md:max-w-xs my-4">
             <Datepicker
               containerClassName="relative border rounded-md border-zinc-300"
@@ -135,11 +138,13 @@ export function TableSalesLastSevenDays() {
             />
           </div>
         </div>
-      <Table>
+        <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Cliente</TableHead>
               <TableHead>Produtos</TableHead>
+              <TableHead>Tipo de venda</TableHead>
+              <TableHead>Forma de pagamento</TableHead>
               <TableHead>Valor</TableHead>
               <TableHead>Data</TableHead>
             </TableRow>
@@ -152,11 +157,30 @@ export function TableSalesLastSevenDays() {
                     {sale.customer.name}
                   </TableCell>
                   <TableCell className="font-medium truncate">
-                  {sale.products.map((product, index) => (
-              <p key={index}>
-                {product.type} {`(x${product.quantity})`}
-              </p>
-            ))}
+                    {sale.products.map((product, index) => (
+                      <p key={index}>
+                        {product.type} {`(x${product.quantity})`}
+                      </p>
+                    ))}
+                  </TableCell>
+
+                  <TableCell>
+                    <p>
+                      {sale.products.map((product, index) => (
+                        <p key={index}>
+                          {
+                            saleTypesMapper[
+                              product.typeSale as "FULL" | "EMPTY" | "COMODATO"
+                            ]
+                          }
+                        </p>
+                      ))}
+                    </p>
+                  </TableCell>
+                  <TableCell>
+                    {sale.paymentMethod === "FIADO"
+                      ? "VENDA A RECEBER"
+                      : sale.paymentMethod}
                   </TableCell>
                   <TableCell className="font-medium truncate">
                     {fCurrencyIntlBRL(sale.total / 100)}
@@ -164,7 +188,6 @@ export function TableSalesLastSevenDays() {
                   <TableCell className="font-medium truncate">
                     {formatDateWithHours(sale.createdAt)}
                   </TableCell>
-                  
                 </TableRow>
               ))}
           </TableBody>

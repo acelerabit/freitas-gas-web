@@ -96,11 +96,6 @@ export function AddTransactionDialog({
   const { user, loadingUser } = useUser();
 
   const [expenseTypeOptions, setExpenseTypeOptions] = useState([
-    {
-      key: "combustível",
-      value: "combustível",
-    },
-    { key: "oficina mecânica", value: "oficina mecânica" },
     { key: "outros", value: "outros" },
   ]);
   const [incomeTypeOptions, setIncomeTypeOptions] = useState([
