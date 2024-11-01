@@ -48,7 +48,7 @@ const formSchema = z
       required_error: "A data do depósito é obrigatória",
     }),
     time: z.string().min(1, "O horário é obrigatório"),
-    bank: z.string().min(1, "A data é obrigatória"),
+    bank: z.string().min(1, "A data é obrigatória").optional().nullable(),
     amount: z.coerce
       .number()
       .min(0, "insira um numero maior ou igual a 0")

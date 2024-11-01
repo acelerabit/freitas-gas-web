@@ -178,6 +178,12 @@ export function SaleDialogForm({
     }));
   };
   const onSubmitHandler = (data: any) => {
+    if(!formData.paymentMethod) {
+      toast.error("Método de pagamento deve estar preenchido")
+      return
+    }
+
+    
     const saleData = {
       ...formData,
       ...data,
