@@ -109,7 +109,7 @@ export function UpdateUserForm({ user }: UpdateUserFormProps) {
             <FormItem>
               <FormLabel>Nome</FormLabel>
               <FormControl>
-                <Input placeholder="username" {...field} />
+                <Input placeholder="nome" {...field} />
               </FormControl>
               <FormDescription>
                 Insira seu nome

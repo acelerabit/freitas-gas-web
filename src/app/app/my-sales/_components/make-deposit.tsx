@@ -40,6 +40,7 @@ import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { disablePastDates, handleDateAndTimeFormat } from "@/utils/formatDate"
 import { SaleDialogForm } from "../../sales/_components/saleDialogForm"
+import { AddTransactionDialog } from "../../expense/_components/add-transaction-dialog";
 
 
 const formSchema = z
@@ -61,6 +62,7 @@ export function MakeDeposit() {
 
   const {isOpen, onOpenChange} = useModal()
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -139,6 +141,13 @@ export function MakeDeposit() {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
   };
+  const handleOpenAddTransactionDialog = () => {
+    setIsAddTransactionDialogOpen(true);
+  };
+
+  const handleCloseAddTransactionDialog = () => {
+    setIsAddTransactionDialogOpen(false);
+  };
 
   if(loadingUser) {
     return <LoadingAnimation />
@@ -153,10 +162,13 @@ export function MakeDeposit() {
       </CardHeader>
       <div className="flex flex-col space-y-4">
         <Button onClick={() => setIsDialogOpen(true)} className="w-full sm:w-auto">
-          Cadastrar Venda
+          CADASTRAR VENDA
         </Button>
         <Button onClick={onOpenChange} className="sm:w-auto">
-          Informar depósito
+          INFORMAR DEPÓSITO
+        </Button>
+        <Button onClick={handleOpenAddTransactionDialog} className="sm:w-auto">
+          CADASTRAR DESPESA
         </Button>
       </div>
     </Card>
@@ -297,6 +309,10 @@ export function MakeDeposit() {
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
         onSubmit={handleFormSubmit}
+    />
+    <AddTransactionDialog
+      open={isAddTransactionDialogOpen}
+      onOpenChange={handleCloseAddTransactionDialog}
     />
     </>
 

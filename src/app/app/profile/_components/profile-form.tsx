@@ -88,9 +88,9 @@ export function ProfileForm() {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Nome</FormLabel>
               <FormControl>
-                <Input placeholder="username" {...field} />
+                <Input placeholder="nome" {...field} />
               </FormControl>
               
               <FormMessage />
