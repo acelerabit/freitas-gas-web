@@ -16,7 +16,12 @@ import LoadingAnimation from "../../_components/loading-page";
 interface SupplierDebt {
   supplierId: string;
   supplierName: string;
-  totalDebt: number;
+  debts: {
+    id: string;
+    amount: number;
+    dueDate: string;
+    paid: boolean;
+  }[];
 }
 
 export function TableSuppliersWithDebts() {
@@ -47,16 +52,10 @@ export function TableSuppliersWithDebts() {
     const suppliersWithDebts = data.map((supplier: any) => ({
       supplierId: supplier._id,
       supplierName: supplier.props.name,
-      totalDebt: supplier._debts
-        .filter((debt: any) => !debt.paid)
-        .reduce((total: number, debt: any) => total + debt.amount, 0),
+      debts: supplier._debts.filter((debt: any) => !debt.paid),
     }));
 
-    const filteredSuppliers = suppliersWithDebts.filter(
-      (supplier: { totalDebt: number; }) => supplier.totalDebt > 0
-    );
-
-    setSuppliers(filteredSuppliers);
+    setSuppliers(suppliersWithDebts);
     setLoading(false);
   }
 
@@ -87,20 +86,29 @@ export function TableSuppliersWithDebts() {
             <TableRow>
               <TableHead>Fornecedor</TableHead>
               <TableHead>Valor a Pagar</TableHead>
+              <TableHead>Data de Vencimento</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {suppliers &&
-              suppliers.map((supplier) => (
-                <TableRow key={supplier.supplierId}>
+            {suppliers.map((supplier) =>
+              supplier.debts.map((debt) => (
+                <TableRow key={debt.id}>
                   <TableCell className="font-medium truncate">
                     {supplier.supplierName}
                   </TableCell>
                   <TableCell className="font-medium truncate">
-                    {fCurrencyIntlBRL(supplier.totalDebt)}
+                    {fCurrencyIntlBRL(debt.amount / 100)}
+                  </TableCell>
+                  <TableCell
+                    className={`font-medium truncate ${
+                      new Date(debt.dueDate) < new Date() ? "text-red-500" : ""
+                    }`}
+                  >
+                    {new Date(debt.dueDate).toLocaleDateString("pt-BR")}
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+            )}
           </TableBody>
         </Table>
         <div className="w-full flex gap-2 items-center justify-end">
