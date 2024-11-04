@@ -376,7 +376,7 @@ const SalesDashboard = ({
               {/* Gráfico de Receita x Despesa */}
               <Card className="h-auto">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Despesas e Vendas Totais</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Vendas X Despesas</CardTitle>
                 </CardHeader>
                 <CardContent className="h-full flex items-center justify-center">
                   <ResponsiveContainer width="100%" height={300}>
