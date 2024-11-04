@@ -88,15 +88,36 @@ const SalesDashboard = ({
       currency: "BRL",
     });
   };
-  const data = salesVsExpenses.totalSales.map((sale, index) => {
-    const totalExpenses = salesVsExpenses.totalExpenses[index]?.total || 0;
+
+  const monthlyData = salesIndicators?.totalPerMonth.reduce((acc, entry) => {
+    const monthYear = `${getMonthName(entry.month)} ${entry.year}`;
   
-    return {
-      month: `${getMonthName(sale.month)} ${sale.year}`,
-      totalSales: sale.total,
-      totalExpenses: totalExpenses,
-    };
-  });
+    if (!acc[monthYear]) {
+      acc[monthYear] = { month: monthYear, total: 0 };
+    }
+    acc[monthYear].total += Number(entry.total);
+  
+    return acc;
+  }, {} as { [key: string]: { month: string; total: number } }) || {};
+  
+  const monthlyDataArray = Object.values(monthlyData);
+
+  const monthlyExpensesData = expenseIndicators?.totalPerMonth.reduce((acc, entry) => {
+    const monthYear = `${getMonthName(entry.month)} ${entry.year}`;
+    if (!acc[monthYear]) {
+      acc[monthYear] = { month: monthYear, total: 0 };
+    }
+    acc[monthYear].total += entry.total;
+    return acc;
+  }, {} as { [key: string]: { month: string; total: number } }) || {};
+  
+  const monthlyExpensesDataArray = Object.values(monthlyExpensesData);  
+
+  const totalSale = salesVsExpenses.totalSales.reduce((acc, sale) => acc + sale.total, 0);
+  const totalExpense = salesVsExpenses.totalExpenses.reduce((acc, expense) => acc + expense.total, 0);
+
+  const totalData = [{ label: "Total", totalSale, totalExpense }];
+
   const totalSales = salesIndicators?.totalSales || 0;
   const totalExpenses = expenseIndicators?.totalExpenses || 0;
 
@@ -111,7 +132,7 @@ const SalesDashboard = ({
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Card de Total de Vendass */}
+              {/* Card de Total de Vendas */}
               <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-lg font-semibold">Total de Vendas</CardTitle>
@@ -229,12 +250,13 @@ const SalesDashboard = ({
                 </CardHeader>
                 <CardContent className="h-full">
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart
-                      data={[{ month: getMonthName(new Date().getMonth() + 1), total: salesIndicators.totalSales }]}
-                    >
+                    <BarChart data={monthlyDataArray}>
                       <XAxis dataKey="month" />
-                      <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
-                      <Tooltip formatter={(value) => Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} />
+                      <YAxis
+                        tickFormatter={(value) => formatCurrency(value)}
+                        tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }}
+                      />
+                      <Tooltip formatter={(value: number) => formatCurrency(value)} />
                       <Bar dataKey="total" fill="#28A745" />
                     </BarChart>
                   </ResponsiveContainer>
@@ -288,18 +310,13 @@ const SalesDashboard = ({
                 </CardHeader>
                 <CardContent className="h-full flex items-center justify-center">
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart
-                      data={[{ label: "Total", total: expenseIndicators?.totalExpenses }]}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <XAxis dataKey="label" />
+                    <BarChart data={monthlyExpensesDataArray} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <XAxis dataKey="month" />
                       <YAxis 
                         tickFormatter={(value) => formatCurrency(value)} 
                         tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} 
                       />
-                      <Tooltip 
-                        formatter={(value) => Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} 
-                      />
+                      <Tooltip formatter={(value: number) => formatCurrency(value)} />
                       <Bar dataKey="total" fill="#FF6F61" />
                     </BarChart>
                   </ResponsiveContainer>
@@ -357,22 +374,23 @@ const SalesDashboard = ({
               )}
 
               {/* Gráfico de Receita x Despesa */}
-              <Card className="h-auto mt-4">
+              <Card className="h-auto">
                 <CardHeader>
-                  <CardTitle>Vendas vs Despesas</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Despesas e Vendas Totais</CardTitle>
                 </CardHeader>
-                <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={data}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} />
-                    <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
-                    <Legend />
-                    <Bar dataKey="totalSales" fill="#36A2EB" name="Receita" />
-                    <Bar dataKey="totalExpenses" fill="#FF6384" name="Despesa" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <CardContent className="h-full flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={totalData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <XAxis dataKey="label" />
+                      <YAxis 
+                        tickFormatter={(value) => formatCurrency(value)} 
+                        tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }} 
+                      />
+                      <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                      <Bar dataKey="totalSale" fill="#28A745" name="Total de Vendas" />
+                      <Bar dataKey="totalExpense" fill="#FF6F61" name="Total de Despesas" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </div>
