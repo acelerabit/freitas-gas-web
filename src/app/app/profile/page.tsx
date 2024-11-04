@@ -33,7 +33,7 @@ export default function Profile() {
 
     if (!response.ok) {
       const respError = await response.json();
-      toast.error(respError.error,{
+      toast.error(respError.error, {
         action: {
           label: "Undo",
           onClick: () => console.log("Undo"),
@@ -42,7 +42,7 @@ export default function Profile() {
       return;
     }
 
-    toast.success("E-mail enviado com sucesso",{
+    toast.success("E-mail enviado com sucesso", {
       action: {
         label: "Undo",
         onClick: () => console.log("Undo"),
@@ -54,19 +54,18 @@ export default function Profile() {
     return <LoadingAnimation />;
   }
 
-
   return (
     <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
       <div className="grid w-full max-w-6xl gap-2">
-        <h1 className="text-3xl font-semibold">Settings</h1>
+        <h1 className="text-3xl font-semibold">Configurações</h1>
       </div>
       <Tabs defaultValue="account">
         <TabsList>
           <TabsTrigger value="account" className="w-full">
-            Account
+            Conta
           </TabsTrigger>
           <TabsTrigger value="password" className="w-full ">
-            Password
+            Senha
           </TabsTrigger>
         </TabsList>
 
@@ -76,7 +75,7 @@ export default function Profile() {
               <CardHeader>
                 <CardTitle>Imagem</CardTitle>
                 <CardDescription>
-                  Get one image to your profile image.
+                  Obtenha uma imagem para sua foto de perfil.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -85,9 +84,9 @@ export default function Profile() {
             </Card>
             <Card x-chunk="dashboard-04-chunk-1">
               <CardHeader>
-                <CardTitle>Information</CardTitle>
+                <CardTitle>Informações</CardTitle>
                 <CardDescription>
-                  Used to identify you in the app.
+                  Usada para identificá-lo no aplicativo.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -96,9 +95,9 @@ export default function Profile() {
             </Card>
             <Card x-chunk="dashboard-04-chunk-2">
               <CardHeader>
-                <CardTitle>Notifications</CardTitle>
+                <CardTitle>Notificações</CardTitle>
                 <CardDescription>
-                  Show if you is enable to receive notifications.
+                  Mostrar se você está habilitado a receber notificações.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -110,15 +109,16 @@ export default function Profile() {
         <TabsContent value="password">
           <Card>
             <CardHeader>
-              <CardTitle>Forgot your password?</CardTitle>
+              <CardTitle>Esqueseu sua senha?</CardTitle>
               <CardDescription>
-                Click here to receive your password recovery code via email.
+                Clique aqui para receber o código de recuperação de senha por
+                e-mail.
               </CardDescription>
             </CardHeader>
             {/* <CardContent className="space-y-2"></CardContent> */}
             <CardFooter>
               <Button onClick={sendRedefinePasswordEmail}>
-                Send code
+                Enviar código
                 <Send className="ml-2 h-4 w-4" />
               </Button>
             </CardFooter>

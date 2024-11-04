@@ -12,7 +12,7 @@ export function LogoutDropdownItem() {
   }
   return (
     <DropdownMenuItem className="cursor-pointer" onClick={logout}>
-      Logout
+      Sair
     </DropdownMenuItem>
   );
 }

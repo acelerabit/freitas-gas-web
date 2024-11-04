@@ -24,10 +24,10 @@ export function DropdownSettings() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer">
-          <Link href="/app/profile">Settings</Link>
+          <Link href="/app/profile">Configurações</Link>
         </DropdownMenuItem>
         <LogoutDropdownItem />
       </DropdownMenuContent>

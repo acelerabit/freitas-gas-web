@@ -12,11 +12,13 @@ import { Button } from "@/components/ui/button";
 import useModal from "@/hooks/use-modal";
 import { TableSuppliers } from "./_components/table-suppliers";
 import CreateSupplierDialog from "./_components/create-supplier-dialog";
+import { OnlyRolesCanAccess } from "../_components/only-who-can-access";
 
 export default function Finance() {
   const { isOpen, onOpenChange } = useModal();
 
   return (
+    <OnlyRolesCanAccess rolesCanAccess={["ADMIN"]}>
     <main className="p-8 flex flex-col">
       <h1 className="text-4xl font-semibold">Fornecedores</h1>
 
@@ -43,5 +45,6 @@ export default function Finance() {
 
       <CreateSupplierDialog open={isOpen} onOpenChange={onOpenChange} />
     </main>
+    </OnlyRolesCanAccess>
   );
 }

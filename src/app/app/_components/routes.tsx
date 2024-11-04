@@ -84,11 +84,6 @@ export const routes = (user: User) => {
           href: "/app/profile"
         },
         {
-          title: 'Despesas',
-          icon: <Barcode className="h-4 w-4" />,
-          href: "/app/expense"
-        },
-        {
           title: 'Meu painel',
           icon: <HandCoins className="h-4 w-4" />,
           href: "/app/my-sales"

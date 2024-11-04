@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import NextAuthSessionProvider from "@/contexts/session-context";
 import { CookiesProvider } from "next-client-cookies/server";
 import { UserProvider } from "@/contexts/user-context";
+import { NotificationProvider } from "@/contexts/notification-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,10 +24,10 @@ export default function RootLayout({
       <NextAuthSessionProvider>
         <CookiesProvider>
           <UserProvider>
-
-            <body className={inter.className}>{children}</body>
-            <Toaster position="top-right" />
-
+            <NotificationProvider>
+              <body className={inter.className}>{children}</body>
+              <Toaster position="top-right" />
+            </NotificationProvider>
           </UserProvider>
         </CookiesProvider>
       </NextAuthSessionProvider>

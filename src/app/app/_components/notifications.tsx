@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useNotification } from "@/contexts/notification-context";
 import { useUser } from "@/contexts/user-context";
 import { fetchApi } from "@/services/fetchApi";
 import { formatDate } from "@/utils/formatDate";
@@ -21,80 +22,82 @@ interface Message {
 
 export function Notifications() {
   const { loadingUser, user } = useUser();
-  const [messages, setMessages] = useState<Message[]>([]);
+  // const [messages, setMessages] = useState<Message[]>([]);
 
-  async function getNotifications() {
-    const response = await fetchApi(`/notifications/${user?.id}`);
+  const {messages} = useNotification()
+
+  // async function getNotifications() {
+  //   const response = await fetchApi(`/notifications/${user?.id}`);
 
 
-    if (!response.ok) {
-      const respError = await response.json();
-      toast.error(respError.error,{
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
-      });
-      return;
-    }
+  //   if (!response.ok) {
+  //     const respError = await response.json();
+  //     toast.error(respError.error,{
+  //       action: {
+  //         label: "Undo",
+  //         onClick: () => console.log("Undo"),
+  //       },
+  //     });
+  //     return;
+  //   }
 
-    const data = await response.json();
+  //   const data = await response.json();
 
-    setMessages(data.notifications);
-  }
+  //   setMessages(data.notifications);
+  // }
 
-  async function markAsRead(id: string) {
-    const response = await fetchApi(`/notifications/read/${id}`);
+  // async function markAsRead(id: string) {
+  //   const response = await fetchApi(`/notifications/read/${id}`);
 
-    if (!response.ok) {
-      const respError = await response.json();
-      toast.error(respError.error,{
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
-      });
-      return;
-    }
+  //   if (!response.ok) {
+  //     const respError = await response.json();
+  //     toast.error(respError.error,{
+  //       action: {
+  //         label: "Undo",
+  //         onClick: () => console.log("Undo"),
+  //       },
+  //     });
+  //     return;
+  //   }
 
-    const messagesUpdated = messages.filter((message) => message.id !== id);
-    setMessages(messagesUpdated);
-  }
+  //   const messagesUpdated = messages.filter((message) => message.id !== id);
+  //   setMessages(messagesUpdated);
+  // }
 
-  async function markAllAsRead() {
-    const response = await fetchApi(`/notifications/readAll/${user?.id}`);
+  // async function markAllAsRead() {
+  //   const response = await fetchApi(`/notifications/readAll/${user?.id}`);
 
-    if (!response.ok) {
-      const respError = await response.json();
-      toast.error(respError.error,{
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
-      });
-      return;
-    }
+  //   if (!response.ok) {
+  //     const respError = await response.json();
+  //     toast.error(respError.error,{
+  //       action: {
+  //         label: "Undo",
+  //         onClick: () => console.log("Undo"),
+  //       },
+  //     });
+  //     return;
+  //   }
 
-    setMessages([]);
-  }
+  //   setMessages([]);
+  // }
 
-  const socket = io(process.env.NEXT_PUBLIC_API_BASE_URL ?? "", {
-    autoConnect: false,
-  });
+  // const socket = io(process.env.NEXT_PUBLIC_API_BASE_URL ?? "", {
+  //   autoConnect: false,
+  // });
 
-  useEffect(() => {
-    if (!user?.id) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (!user?.id) {
+  //     return;
+  //   }
 
-    (socket.auth = {
-      userId: user?.id,
-    }),
-      socket.connect();
-    socket.on("notify", (message: Message) => {
-      setMessages((state) => [...state, message]);
-    });
-  }, [user]);
+  //   (socket.auth = {
+  //     userId: user?.id,
+  //   }),
+  //     socket.connect();
+  //   socket.on("notify", (message: Message) => {
+  //     setMessages((state) => [...state, message]);
+  //   });
+  // }, [user]);
 
   // useEffect(() => {
   //   if (!user?.id) {

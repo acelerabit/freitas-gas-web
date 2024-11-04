@@ -92,9 +92,7 @@ export function ProfileForm() {
               <FormControl>
                 <Input placeholder="username" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
+              
               <FormMessage />
             </FormItem>
           )}
@@ -109,14 +107,12 @@ export function ProfileForm() {
               <FormControl>
                 <Input placeholder="email" {...field} />
               </FormControl>
-              <FormDescription>
-                This is your public display email.
-              </FormDescription>
+              
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Enviar</Button>
       </form>
     </Form>
   );

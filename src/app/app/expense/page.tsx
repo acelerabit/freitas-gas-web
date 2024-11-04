@@ -13,10 +13,12 @@ import useModal from "@/hooks/use-modal";
 import { AddTransactionDialog } from "./_components/add-transaction-dialog";
 import { TableTransactions } from "./_components/table-transactions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OnlyRolesCanAccess } from "../_components/only-who-can-access";
 
 export default function Finance() {
   const { isOpen, onOpenChange } = useModal();
   return (
+    <OnlyRolesCanAccess rolesCanAccess={["ADMIN"]}>
     <main className="p-8 flex flex-col">
       <h1 className="text-4xl font-semibold">Despesas</h1>
 
@@ -44,5 +46,7 @@ export default function Finance() {
 
       <AddTransactionDialog open={isOpen} onOpenChange={onOpenChange} />
     </main>
+    </OnlyRolesCanAccess>
+
   );
 }

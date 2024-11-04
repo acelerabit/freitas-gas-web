@@ -5,9 +5,11 @@ import Link from "next/link";
 import { TableSales } from "./_components/table-sales";
 import TableSale from "./_components/table-sale";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { OnlyRolesCanAccess } from "../_components/only-who-can-access";
 
 export default function SalesPage() {
   return (
+    <OnlyRolesCanAccess rolesCanAccess={["ADMIN"]}>
     <main className="p-8 flex flex-col">
       <h1 className="text-4xl font-semibold">Vendas</h1>
 
@@ -27,5 +29,6 @@ export default function SalesPage() {
         <TableSales />
       </div>
     </main>
+    </OnlyRolesCanAccess>
   );
 }

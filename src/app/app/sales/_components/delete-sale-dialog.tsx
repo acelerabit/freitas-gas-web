@@ -43,6 +43,8 @@ export function DeleteSaleDialog({
     toast.success("Venda deletada com sucesso.");
     setIsDeleting(false);
     onOpenChange();
+
+    window.location.reload()
   };
 
   return (
