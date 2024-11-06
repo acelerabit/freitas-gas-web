@@ -84,6 +84,7 @@ export function CollectRecipientDialog({
 
   const [products, setProducts] = useState<ProductType[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [quantityCustomerHave, setQuantityCustomerHave] = useState(0)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -110,7 +111,6 @@ export function CollectRecipientDialog({
       quantity: values.quantity,
     };
 
-    console.log(requestData);
 
     const response = await fetchApi(`/collect`, {
       method: "POST",
@@ -138,6 +138,35 @@ export function CollectRecipientDialog({
     });
 
     window.location.reload();
+  }
+
+  async function getQuantityByCustomer() {
+    const product = products.find(
+      (product) =>
+        product.type === productWatch && product.status === "COMODATO"
+    );
+
+    if (!product) {
+      return;
+    }
+
+    const response = await fetchApi(`/collect/customer/${customerWatch}/product/${product.id}`);
+
+    if (!response.ok) {
+      const respError = await response.json();
+
+      toast.error(respError.error, {
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+
+      return;
+    }
+    const data = await response.json()
+
+    setQuantityCustomerHave(data.comodatoQuantity)
   }
 
   useEffect(() => {
@@ -176,6 +205,16 @@ export function CollectRecipientDialog({
     fetchData();
   }, []);
 
+  const customerWatch = form.watch('customerId')
+  const productWatch = form.watch('productId')
+
+
+  useEffect(() => {
+    if(customerWatch && productWatch) {
+      getQuantityByCustomer()
+    }
+  }, [customerWatch, productWatch])
+
   if (!user) {
     return;
   }
@@ -184,7 +223,7 @@ export function CollectRecipientDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Cadastrar Nova despesa</DialogTitle>
+          <DialogTitle>Cadastrar vasilhame</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -238,6 +277,10 @@ export function CollectRecipientDialog({
               )}
             />
 
+            {quantityCustomerHave > 0 && (
+              <p>Esse cliente tem {quantityCustomerHave} {quantityCustomerHave > 1 ? 'itens' : 'item'} desse tipo em comodato</p>
+            )}
+
             <FormField
               control={form.control}
               name="quantity"
@@ -245,7 +288,7 @@ export function CollectRecipientDialog({
                 <FormItem>
                   <FormLabel>Quantidade</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input type="number" {...field} disabled={quantityCustomerHave <= 0} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
