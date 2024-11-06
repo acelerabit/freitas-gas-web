@@ -19,14 +19,14 @@ export function ListBankAccounts() {
   return (
     <>
       {bankAccounts.map((bankAccount) => (
-        <Card>
+        <Card key={bankAccount.id}>
           <CardHeader>
             <CardTitle>{bankAccount.bank}</CardTitle>
           </CardHeader>
 
           <CardContent>
-            {bankAccount.paymentsAssociated.map((payment) => (
-              <p>{payment}</p>
+            {bankAccount.paymentsAssociated.map((payment, index) => (
+              <p key={index}>{payment}</p>
             ))}
           </CardContent>
         </Card>
