@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -25,6 +23,7 @@ import { fetchApi } from "@/services/fetchApi";
 import EditSupplierDialog from "./edit-supplier-dialog";
 import { DeleteSupplierDialog } from "./delete-supplier";
 import Link from "next/link";
+import { fCurrencyIntlBRL } from "@/utils/formatNumber";
 
 export interface Supplier {
   id: string;
@@ -33,7 +32,7 @@ export interface Supplier {
   phone: string;
   createdAt: Date;
   updatedAt: Date;
-  totalUnpaidDebts: number;
+  totalUnpaidDebts: number; // Continua sendo number
 }
 
 export function TableSuppliers() {
@@ -69,8 +68,10 @@ export function TableSuppliers() {
           updatedAt: supplier.props.updatedAt,
           totalUnpaidDebts: supplier._debts
             .filter((debt: any) => !debt.paid)
-            .reduce((total: number, debt: any) => total + debt.amount, 0)
-            .toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+            .reduce(
+              (total: number, debt: any) => total + debt.amount / 100,
+              0
+            ),
         }))
       );
     } catch (error) {
@@ -128,7 +129,9 @@ export function TableSuppliers() {
                     <TableCell>{supplier.name}</TableCell>
                     <TableCell>{supplier.email}</TableCell>
                     <TableCell>{supplier.phone}</TableCell>
-                    <TableCell>{supplier.totalUnpaidDebts}</TableCell>
+                    <TableCell>
+                      {fCurrencyIntlBRL(supplier.totalUnpaidDebts)}
+                    </TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
