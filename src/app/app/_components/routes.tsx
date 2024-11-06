@@ -1,4 +1,4 @@
-import { BaggageClaim, BarChart, Barcode, BookText, Cylinder, FileCheck, FileClock, HandCoins, Handshake, Landmark, Megaphone, SquareGanttChart, SquareUserRound, Users, Wallet } from 'lucide-react';
+import { BaggageClaim, BarChart, Barcode, BookText, Cylinder, FileCheck, FileClock, HandCoins, Handshake, Landmark, LandmarkIcon, Megaphone, SquareGanttChart, SquareUserRound, Users, Wallet } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface Route {
@@ -73,6 +73,11 @@ export const routes = (user: User) => {
           title: 'Notificações',
           icon: <Megaphone className="h-4 w-4" />,
           href: "/app/notifications"
+        },
+        {
+          title: 'Contas',
+          icon: <LandmarkIcon className="h-4 w-4" />,
+          href: "/app/bank-accounts"
         },
       ];
       break;
