@@ -64,6 +64,8 @@ export default function CardsStats() {
   const [loadingGrossProfit, setLoadingGrossProfit] = useState(true);
   const [totalFiado, setTotalFiado] = useState<{ total: number }>({ total: 0 });
   const [loadingTotalFiado, setLoadingTotalFiado] = useState(true);
+  const [paymentMethodTotals, setPaymentMethodTotals] = useState<{ [key: string]: number }>({});
+  const [loadingPaymentMethodTotals, setLoadingPaymentMethodTotals] = useState(true);
 
   async function getSalesIndicators() {
     setLoadingSalesIndicators(true);
@@ -304,6 +306,35 @@ export default function CardsStats() {
       setTotalFiado({ total: 0 });
     }
   }
+  async function getTotalByPaymentMethod() {
+    setLoadingPaymentMethodTotals(true);
+    const fetchUrl = new URL(`${process.env.NEXT_PUBLIC_API_BASE_URL}/sales/total-by-payment-method`);
+
+    if (startDate) {
+      fetchUrl.searchParams.append("startDate", startDate);
+    }
+
+    if (endDate) {
+      const adjustedEndDate = new Date(endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      fetchUrl.searchParams.append("endDate", adjustedEndDate.toISOString());
+    }
+
+    if (deliverymanId) {
+      fetchUrl.searchParams.append("deliverymanId", deliverymanId);
+    }
+
+    const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
+    if (!response.ok) {
+      console.log("Erro ao buscar totais por método de pagamento");
+      setLoadingPaymentMethodTotals(false);
+      return;
+    }
+
+    const data = await response.json();
+    setPaymentMethodTotals(data);
+    setLoadingPaymentMethodTotals(false);
+  }
 
   useEffect(() => {
     getUsers();
@@ -317,6 +348,7 @@ export default function CardsStats() {
     getSalesVsExpenses();
     getGrossProfit();
     getTotalFiado();
+    getTotalByPaymentMethod();
   }, [startDate, endDate, deliverymanId]);
 
   return (
@@ -346,6 +378,7 @@ export default function CardsStats() {
           averageMonthlySales={averageMonthlySales}
           loadingGrossProfit={loadingGrossProfit}
           totalFiado={totalFiado}
+          paymentMethodTotals={paymentMethodTotals}
         />
       </main>
     </OnlyRolesCanAccess>
