@@ -25,6 +25,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import dayjs from "dayjs";
 import { CurrencyDollarIcon } from "@heroicons/react/24/outline";
+import { fCurrencyIntlBRL } from "@/utils/formatNumber";
 
 interface SalesIndicators {
   totalSales: number;
@@ -58,6 +59,7 @@ interface SalesDashboardProps {
   grossProfit: number | null;
   loadingGrossProfit: boolean;
   totalFiado: TotalFiado | null;
+  paymentMethodTotals: { [key: string]: number } | null;
 }
 
 const SalesDashboard = ({
@@ -72,7 +74,8 @@ const SalesDashboard = ({
   loadingExpenseProportion,
   grossProfit,
   loadingGrossProfit,
-  totalFiado
+  totalFiado,
+  paymentMethodTotals
 }: SalesDashboardProps) => {
   const getMonthName = (month: number) => {
     const months = [
@@ -123,6 +126,18 @@ const SalesDashboard = ({
 
   const gross = totalSales - totalExpenses;
   const isProfitPositive = gross > 0;
+
+  const chartData = paymentMethodTotals
+    ? Object.entries(paymentMethodTotals).map(([key, value]) => {
+        const numericValue = parseFloat(value.toString());
+        const formattedValue = numericValue % 1 === 0 ? numericValue : numericValue.toString();
+        return {
+          name: key,
+          value: numericValue,
+          formattedValue: formattedValue,
+        };
+      })
+    : [];
 
   return (
     <>
@@ -207,6 +222,48 @@ const SalesDashboard = ({
               </Card>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <Card className="h-auto">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">Totais por Método de Pagamento</CardTitle>
+                </CardHeader>
+                <CardContent className="h-full">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        dataKey="value"
+                        nameKey="name"
+                        outerRadius={100}
+                        innerRadius={60}
+                        label={({ value }: any) => {
+                          const formattedValue = value.toFixed(2).replace('.', ',');
+                          return `R$ ${formattedValue}`;
+                        }}
+                      >
+                        {chartData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={["#FF7300", "#0088FE", "#00C49F", "#FFBB28", "#FF8042"][index % 5]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: number) => {
+                          const formattedValue = value.toFixed(2).replace('.', ',');
+                          return `R$ ${formattedValue}`;
+                        }} 
+                      />
+                      <Legend 
+                        verticalAlign="top"
+                        height={36} 
+                        layout="horizontal" 
+                        iconSize={15} 
+                        formatter={(value: string) => value}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
               {/* Gráfico de Total de Vendas por Dia */}
               <Card className="h-auto">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
