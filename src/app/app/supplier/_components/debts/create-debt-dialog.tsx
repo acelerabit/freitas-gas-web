@@ -209,7 +209,7 @@ const CreateDebtDialog: React.FC<CreateDebtDialogProps> = ({
               <SelectContent>
                 {accountOptions.map((account) => {
                   return (
-                    <SelectItem value={account.id}>{account.value}</SelectItem>
+                    <SelectItem key={account.id} value={account.id}>{account.value}</SelectItem>
                   );
                 })}
               </SelectContent>
