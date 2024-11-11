@@ -22,7 +22,6 @@ export default function Products() {
   const { isOpen, onOpenChange } = useModal();
 
   return (
-    <OnlyRolesCanAccess rolesCanAccess={["ADMIN"]}>
       <main className="p-8 flex flex-col">
         <h1 className="text-4xl font-semibold">Estoque</h1>
 
@@ -55,6 +54,5 @@ export default function Products() {
 
         <AddProductDialog open={isOpen} onOpenChange={onOpenChange} />
       </main>
-    </OnlyRolesCanAccess>
   );
 }

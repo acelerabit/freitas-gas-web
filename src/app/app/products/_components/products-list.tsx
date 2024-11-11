@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useUser } from "@/contexts/user-context";
 
 type BottleStatus = "FULL" | "EMPTY" | "COMODATO";
 
@@ -55,6 +56,7 @@ const statusPriority: { [key: string]: number } = {
 };
 
 export function ProductList() {
+  const { user, loadingUser } = useUser();
   const [stock, setStock] = useState<Stock | null>(null);
   const [productType, setProductType] = useState<ProductType | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -228,23 +230,19 @@ export function ProductList() {
                   </>
                 ))}
               </div>
-              <div className="mt-4 space-x-4">
-                <Button
-                  onClick={() => selectCurrentProductIncrease(group.type)}
-                >
-                  Adicionar items
-                </Button>
-                <Button
-                  onClick={() => selectCurrentProductDecrease(group.type)}
-                >
-                  Remover items
-                </Button>
-                <Button
-                  onClick={() => selectCurrentProductTransfer(group.type)}
-                >
-                  Transferir
-                </Button>
-              </div>
+              {user?.role === "ADMIN" && (
+                <div className="mt-4 space-x-4">
+                  <Button onClick={() => selectCurrentProductIncrease(group.type)}>
+                    Adicionar items
+                  </Button>
+                  <Button onClick={() => selectCurrentProductDecrease(group.type)}>
+                    Remover items
+                  </Button>
+                  <Button onClick={() => selectCurrentProductTransfer(group.type)}>
+                    Transferir
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
@@ -256,9 +254,11 @@ export function ProductList() {
             <CardTitle className="flex justify-between items-center">
               <p>Preços</p>
 
-              <Button onClick={() => onOpenChangeUpdate()} variant="ghost">
-                <Pencil />
-              </Button>
+              {user?.role === "ADMIN" && (
+                <Button onClick={() => onOpenChangeUpdate()} variant="ghost">
+                  <Pencil />
+                </Button>
+              )}
             </CardTitle>
           </CardHeader>
         </CardHeader>

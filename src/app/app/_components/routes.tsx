@@ -94,6 +94,11 @@ export const routes = (user: User) => {
           href: "/app/my-sales"
         },
         {
+          title: 'Estoque',
+          icon: <SquareGanttChart className="h-4 w-4" />,
+          href: "/app/products"
+        },
+        {
           title: 'Coletar vasilhame',
           icon: <Cylinder className="h-4 w-4" />,
           href: "/app/collect"

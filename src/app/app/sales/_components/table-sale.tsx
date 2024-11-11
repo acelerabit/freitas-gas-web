@@ -95,9 +95,9 @@ export default function TableSale() {
   const [saleSelectType, setSaleSelectType] = useState("");
   const [saleId, setSaleId] = useState("");
   const [dateFilter, setDateFilter] = useState<DateFilter>({
-    startDate: null,
-    endDate: null,
-  });
+    startDate: new Date(new Date().setHours(0, 0, 0, 0)),
+    endDate: new Date(new Date().setHours(23, 59, 59, 999)),
+  });  
 
   const [orderByField, setOrderByField] = useState<SortType>("createdAt");
   const [orderDirection, setOrderDirection] = useState<"desc" | "asc">("desc");
