@@ -11,6 +11,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { ListBankAccounts } from "./_components/list-bank-accounts";
+import { Button } from "@/components/ui/button";
+import { CreateBankAccountDialog } from "./_components/create-bank-account-dialog";
 
 export default function BankAccounts() {
   const { isOpen, onOpenChange } = useModal();
@@ -32,10 +34,15 @@ export default function BankAccounts() {
       </Breadcrumb>
 
       <div className="w-full space-y-4">
+        <div className="w-full flex items-center justify-end mb-4">
+          <Button onClick={onOpenChange}> Cadastrar conta bancária</Button>
+        </div>
         <div className="mt-8">
           <ListBankAccounts />
         </div>
       </div>
+
+      <CreateBankAccountDialog open={isOpen} onOpenChange={onOpenChange} />
     </main>
   );
 }
