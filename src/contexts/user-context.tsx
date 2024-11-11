@@ -74,7 +74,7 @@ export function UserProvider({ children }: UserProviderProps) {
     if (status === "authenticated" && data.user) {
       getUser();
     }
-  }, [status]);
+  }, [status, data?.user]);
 
   return (
     <UserContext.Provider value={{ user, loadingUser }}>
