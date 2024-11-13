@@ -17,6 +17,7 @@ import { formatDateWithHours } from "@/utils/formatDate";
 import { fCurrencyIntlBRL } from "@/utils/formatNumber";
 import { useEffect, useState } from "react";
 import LoadingAnimation from "../../_components/loading-page";
+import Datepicker from "react-tailwindcss-datepicker";
 
 const transactionCategoryLabels: { [key: string]: string } = {
   DEPOSIT: "Depósito",
@@ -44,10 +45,18 @@ interface Deposit {
   };
   bank: string;
 }
+interface DateFilter {
+  startDate: Date | null;
+  endDate: Date | null;
+}
 
 export function TableDeposits() {
   const [deposits, setDeposits] = useState<Deposit[]>([]);
   const [page, setPage] = useState(1);
+  const [dateFilter, setDateFilter] = useState<DateFilter>({
+    startDate: new Date(new Date().setHours(0, 0, 0, 0)),
+    endDate: new Date(new Date().setHours(23, 59, 59, 999)),
+  });
   const itemsPerPage = 10;
 
   const { user, loadingUser } = useUser();
@@ -59,6 +68,23 @@ export function TableDeposits() {
 
     fetchUsersUrl.searchParams.set("page", String(page));
     fetchUsersUrl.searchParams.set("itemsPerPage", String(itemsPerPage));
+
+    if (dateFilter.startDate) {
+      fetchUsersUrl.searchParams.set(
+        "startDate",
+        dateFilter.startDate.toISOString().split("T")[0]
+      );
+    }
+  
+    if (dateFilter.endDate) {
+      const endDateWithTime = new Date(dateFilter.endDate);
+      endDateWithTime.setHours(23, 59, 59);
+      
+      fetchUsersUrl.searchParams.set(
+        "endDate",
+        endDateWithTime.toISOString().split("T")[0]
+      );
+    }
 
     const response = await fetchApi(
       `${fetchUsersUrl.pathname}${fetchUsersUrl.search}`
@@ -79,10 +105,21 @@ export function TableDeposits() {
   function previousPage() {
     setPage((currentPage) => currentPage - 1);
   }
+  const handleValueChange = (value: DateFilter | null) => {
+    if (value) {
+      setDateFilter({
+        startDate: value.startDate ? new Date(value.startDate) : null,
+        endDate: value.endDate ? new Date(value.endDate) : null,
+      });
+    } else {
+      setDateFilter({ startDate: null, endDate: null });
+    }
+  };
 
   useEffect(() => {
     fetchDeposits();
-  }, [page]);
+  }, [page, dateFilter]);
+  console.log(dateFilter);
 
   if (loadingUser) {
     return <LoadingAnimation />;
@@ -94,6 +131,20 @@ export function TableDeposits() {
         <CardTitle className="text-lg font-semibold">Depósitos</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="w-full flex items-center gap-2">
+          <div className="w-full md:max-w-xs my-4">
+            <Datepicker
+              containerClassName="relative border rounded-md border-zinc-300"
+              popoverDirection="down"
+              primaryColor="blue"
+              showShortcuts={true}
+              placeholder="DD/MM/YYYY ~ DD/MM/YYYY"
+              displayFormat="DD/MM/YYYY"
+              value={dateFilter}
+              onChange={handleValueChange}
+            />
+          </div>
+        </div>
         <Table>
           <TableHeader>
             <TableRow>

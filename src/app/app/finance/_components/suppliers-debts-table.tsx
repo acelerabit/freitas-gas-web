@@ -21,7 +21,7 @@ interface SupplierDebt {
     amount: number;
     dueDate: string;
     paid: boolean;
-  }[];
+  }[]; 
 }
 
 export function TableSuppliersWithDebts() {
@@ -75,6 +75,8 @@ export function TableSuppliersWithDebts() {
     return <LoadingAnimation />;
   }
 
+  const today = new Date();
+
   return (
     <Card className="col-span-2 mt-4">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -91,23 +93,31 @@ export function TableSuppliersWithDebts() {
           </TableHeader>
           <TableBody>
             {suppliers.map((supplier) =>
-              supplier.debts.map((debt) => (
-                <TableRow key={debt.id}>
-                  <TableCell className="font-medium truncate">
-                    {supplier.supplierName}
-                  </TableCell>
-                  <TableCell className="font-medium truncate">
-                    {fCurrencyIntlBRL(debt.amount / 100)}
-                  </TableCell>
-                  <TableCell
-                    className={`font-medium truncate ${
-                      new Date(debt.dueDate) < new Date() ? "text-red-500" : ""
-                    }`}
+              supplier.debts.map((debt) => {
+                const dueDate = new Date(debt.dueDate);
+                const isDueOrToday = dueDate <= today;
+
+                return (
+                  <TableRow
+                    key={debt.id}
+                    className={isDueOrToday ? "bg-orange-200" : ""}
                   >
-                    {new Date(debt.dueDate).toLocaleDateString("pt-BR")}
-                  </TableCell>
-                </TableRow>
-              ))
+                    <TableCell className="font-medium truncate">
+                      {supplier.supplierName}
+                    </TableCell>
+                    <TableCell className="font-medium truncate">
+                      {fCurrencyIntlBRL(debt.amount / 100)}
+                    </TableCell>
+                    <TableCell
+                      className={`font-medium truncate ${
+                        isDueOrToday ? "text-orange-600" : ""
+                      }`}
+                    >
+                      {dueDate.toLocaleDateString("pt-BR")}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>

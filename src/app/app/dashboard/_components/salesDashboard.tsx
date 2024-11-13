@@ -248,9 +248,10 @@ const SalesDashboard = ({
                         ))}
                       </Pie>
                       <Tooltip 
-                        formatter={(value: number) => {
+                        formatter={(value: number, name: string) => {
                           const formattedValue = value.toFixed(2).replace('.', ',');
-                          return `R$ ${formattedValue}`;
+                          const formattedName = name === 'FIADO' ? 'A RECEBER' : name;
+                          return [`R$ ${formattedValue}`, formattedName];
                         }} 
                       />
                       <Legend 
@@ -258,7 +259,7 @@ const SalesDashboard = ({
                         height={36} 
                         layout="horizontal" 
                         iconSize={15} 
-                        formatter={(value: string) => value}
+                        formatter={(value: string) => value === 'FIADO' ? 'A RECEBER' : value}
                       />
                     </PieChart>
                   </ResponsiveContainer>

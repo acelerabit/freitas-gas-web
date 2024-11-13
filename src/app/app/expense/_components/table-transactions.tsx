@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Datepicker from "react-tailwindcss-datepicker";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -37,6 +38,10 @@ interface Transaction {
   createdAt: string;
   updatedAt: string;
 }
+interface DateFilter {
+  startDate: Date | null;
+  endDate: Date | null;
+}
 
 const transactionTypeLabels: { [key: string]: string } = {
   ENTRY: "Entrada",
@@ -61,6 +66,10 @@ export function TableTransactions() {
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [dateFilter, setDateFilter] = useState<DateFilter>({
+      startDate: new Date(new Date().setHours(0, 0, 0, 0)),
+      endDate: new Date(new Date().setHours(23, 59, 59, 999)),
+    });
 
   const { isOpen, onOpenChange } = useModal();
   const { isOpen: isOpenModalUpdate, onOpenChange: onOpenChangeModalUpdate } =
@@ -68,22 +77,40 @@ export function TableTransactions() {
 
   async function getTransactions() {
     setLoadingTransactions(true);
+      
     const fetchTransactionsUrl = new URL(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/transactions/expenses`
     );
-
+      
     fetchTransactionsUrl.searchParams.set("page", String(page));
     fetchTransactionsUrl.searchParams.set("itemsPerPage", String(itemsPerPage));
-
+      
+    if (dateFilter.startDate) {
+      fetchTransactionsUrl.searchParams.set(
+        "startDate",
+        dateFilter.startDate.toISOString().split("T")[0]
+      );
+    }
+  
+    if (dateFilter.endDate) {
+      const endDateWithTime = new Date(dateFilter.endDate);
+      endDateWithTime.setHours(23, 59, 59);
+      
+      fetchTransactionsUrl.searchParams.set(
+        "endDate",
+        endDateWithTime.toISOString().split("T")[0]
+      );
+    }
+      
     const response = await fetchApi(
       `${fetchTransactionsUrl.pathname}${fetchTransactionsUrl.search}`
     );
-
+      
     if (!response.ok) {
       setLoadingTransactions(false);
       return;
     }
-
+      
     const data = await response.json();
     const transactionsList = data.map((item: any) => ({
       _id: item._id,
@@ -95,10 +122,17 @@ export function TableTransactions() {
       description: item._props.description || "-",
       createdAt: item._props.createdAt || "",
     }));
-
+      
     setTransactions(transactionsList);
     setLoadingTransactions(false);
-  }
+  }    
+  const handleValueChange = (value: DateFilter | null) => {
+    if (value === null) {
+      setDateFilter({ startDate: null, endDate: null });
+    } else {
+      setDateFilter(value);
+    }
+  };
 
   async function getUsersAll() {
     setLoadingUsers(true);
@@ -131,7 +165,7 @@ export function TableTransactions() {
   useEffect(() => {
     getUsersAll();
     getTransactions();
-  }, [page]);
+  }, [page, dateFilter]);
 
   function nextPage() {
     setPage((currentPage) => currentPage + 1);
@@ -161,6 +195,22 @@ export function TableTransactions() {
 
   return (
     <>
+      <div>
+        <div className="w-full flex items-center gap-2">
+          <div className="w-full md:max-w-xs my-4">
+            <Datepicker
+              containerClassName="relative border rounded-md border-zinc-300"
+              popoverDirection="down"
+              primaryColor="blue"
+              showShortcuts={true}
+              placeholder="DD/MM/YYYY ~ DD/MM/YYYY"
+              displayFormat="DD/MM/YYYY"
+              value={dateFilter}
+              onChange={handleValueChange}
+            />
+          </div>
+        </div>
+      </div>
       <Table className="min-w-full">
         <TableHeader>
           <TableRow>
