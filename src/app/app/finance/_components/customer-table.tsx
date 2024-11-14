@@ -13,18 +13,26 @@ import { useEffect, useState } from "react";
 import { fetchApi } from "@/services/fetchApi";
 import { fCurrencyIntlBRL } from "@/utils/formatNumber";
 import LoadingAnimation from "../../_components/loading-page";
+import { Checkbox } from "@/components/ui/checkbox";
+import useModal from "@/hooks/use-modal";
+import { MarkAsPaid } from "./mark-as-paid-dialog";
 
 interface CustomerDebt {
+  id: string;
   customerId: string;
   customerName: string;
   totalDebt: number;
+  paid: boolean | null;
 }
 
 export function TableCustomersWithDebts() {
-  const [customers, setCustomers] = useState<CustomerDebt[]>([]);
+  const [debts, setDebts] = useState<CustomerDebt[]>([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
   const [loading, setLoading] = useState(true);
+  const [selectedDebt, setSelectedDebt] = useState("");
+
+  const { isOpen, onOpenChange } = useModal();
 
   async function fetchCustomersWithDebts() {
     setLoading(true);
@@ -45,7 +53,7 @@ export function TableCustomersWithDebts() {
     }
 
     const data = await response.json();
-    setCustomers(data);
+    setDebts(data);
     setLoading(false);
   }
 
@@ -57,6 +65,12 @@ export function TableCustomersWithDebts() {
     setPage((currentPage) => currentPage - 1);
   }
 
+  function handleSelectDebt(id: string) {
+    setSelectedDebt(id);
+
+    onOpenChange();
+  }
+
   useEffect(() => {
     fetchCustomersWithDebts();
   }, [page]);
@@ -66,49 +80,69 @@ export function TableCustomersWithDebts() {
   }
 
   return (
-    <Card className="col-span-2 mt-4">
+    <>
+      <Card className="col-span-2 mt-4">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-lg font-semibold">Clientes com Dívidas</CardTitle>
+          <CardTitle className="text-lg font-semibold">
+            Clientes com Dívidas
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-            <Table>
+          <Table>
             <TableHeader>
-                <TableRow>
+              <TableRow>
                 <TableHead>Cliente</TableHead>
                 <TableHead>Valor a Receber</TableHead>
-                </TableRow>
+                <TableHead>Situação</TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
-                {customers &&
-                customers.map((customer) => (
-                    <TableRow key={customer.customerId}>
+              {debts &&
+                debts.map((debt) => (
+                  <TableRow key={debt.customerId}>
                     <TableCell className="font-medium truncate">
-                        {customer.customerName}
+                      {debt.customerName}
                     </TableCell>
                     <TableCell className="font-medium truncate">
-                        {fCurrencyIntlBRL(customer.totalDebt)}
+                      {fCurrencyIntlBRL(debt.totalDebt)}
                     </TableCell>
-                    </TableRow>
+                    <TableCell className="font-medium truncate">
+                      {debt.paid ? (
+                        <Checkbox checked disabled />
+                      ) : (
+                        <Button onClick={() => handleSelectDebt(debt.id)}>
+                          Marcar como pago
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
                 ))}
             </TableBody>
-            </Table>
-            <div className="w-full flex gap-2 items-center justify-end">
+          </Table>
+          <div className="w-full flex gap-2 items-center justify-end">
             <Button
-                className="disabled:cursor-not-allowed"
-                disabled={page === 1}
-                onClick={previousPage}
+              className="disabled:cursor-not-allowed"
+              disabled={page === 1}
+              onClick={previousPage}
             >
-                Anterior
+              Anterior
             </Button>
             <Button
-                className="disabled:cursor-not-allowed"
-                disabled={customers.length < itemsPerPage}
-                onClick={nextPage}
+              className="disabled:cursor-not-allowed"
+              disabled={debts.length < itemsPerPage}
+              onClick={nextPage}
             >
-                Próxima
+              Próxima
             </Button>
-            </div>
+          </div>
         </CardContent>
-    </Card>
+      </Card>
+
+      <MarkAsPaid
+        open={isOpen}
+        onOpenChange={onOpenChange}
+        debtId={selectedDebt}
+      />
+    </>
   );
 }

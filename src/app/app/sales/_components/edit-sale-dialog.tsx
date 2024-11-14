@@ -22,6 +22,23 @@ import { z } from "zod";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { CurrencyInput } from "react-currency-mask";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { format, formatISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 interface Customer {
   id: string;
@@ -104,7 +121,9 @@ export function UpdateSaleDialog({
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [saleProducts, setSaleProducts] = useState<SaleProduct[]>([]);
-  const { control, handleSubmit, setValue, watch, formState } = useForm();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+
+  const { control, handleSubmit, setValue } = useForm();
 
   async function getSale() {
     const response = await fetchApi(`/sales/${saleId}`);
@@ -116,6 +135,8 @@ export function UpdateSaleDialog({
     }
 
     const data = await response.json();
+
+    setSelectedDate(data.createdAt ? new Date(data.createdAt) : undefined);
 
     setValue("customerId", data?.customer?.id);
     setValue("deliverymanId", data?.deliveryman?.id);
@@ -181,11 +202,19 @@ export function UpdateSaleDialog({
   }
 
   const onSubmit = async (values: any) => {
+    if (!selectedDate) {
+      toast.error("Alguma data deve ser selecionada");
+      return;
+    }
+
+    const formattedDate = formatISO(selectedDate);
+
     const requestData = {
       customerId: values.customerId,
       // deliverymanId: values.deliverymanId,
       paymentMethod: values.paymentMethod,
       products: saleProducts,
+      createdAt: formattedDate
     };
 
     // console.log(saleProducts)
@@ -451,6 +480,36 @@ export function UpdateSaleDialog({
               </Select>
             )}
           />
+          <div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={`text-left font-normal ${
+                    !selectedDate ? "text-muted-foreground" : ""
+                  }`}
+                >
+                  {selectedDate ? (
+                    format(selectedDate, "dd 'de' MMMM 'de' yyyy", {
+                      locale: ptBR,
+                    })
+                  ) : (
+                    <span>Escolha uma data</span>
+                  )}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  locale={ptBR}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
           <DialogFooter>
             <Button type="submit" className="w-full sm:w-auto">
               Salvar

@@ -32,6 +32,7 @@ import {
 import { useUser } from "@/contexts/user-context";
 import { fetchApi } from "@/services/fetchApi";
 import { toast } from "sonner";
+import { Label } from "@/components/ui/label";
 
 type TransactionCategory = "DEPOSIT" | "SALE" | "EXPENSE" | "CUSTOM";
 
@@ -102,6 +103,11 @@ export function AddTransactionDialog({
 }: AddTransactionDialogProps) {
   const { user, loadingUser } = useUser();
 
+  const [selected, setSelected] = useState("caixa");
+  const [accountOptions, setAccountOptions] = useState<
+    { id: string; value: string }[]
+  >([]);
+
   const [expenseTypeOptions, setExpenseTypeOptions] = useState([
     { key: "outros", value: "outros" },
   ]);
@@ -115,6 +121,15 @@ export function AddTransactionDialog({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if(!selected) {
+      toast.error('Selecionar a conta é obrigatório', {
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+    }
+    
     const requestData = {
       transactionType: "EXIT",
       category: values.category,
@@ -122,6 +137,7 @@ export function AddTransactionDialog({
       description: values.description,
       amount: values.amount,
       userId: user?.id,
+      bankAccountId: selected !== "caixa" ? selected : null,
     };
 
     const response = await fetchApi(`/transactions`, {
@@ -185,8 +201,33 @@ export function AddTransactionDialog({
     setExpenseTypeOptions(expenseTypesUpdate);
   }
 
+  async function fetchBankAccounts() {
+    const response = await fetchApi(`/bank-account`);
+
+    if (!response.ok) {
+      const respError = await response.json();
+      toast.error(respError.error);
+
+      return;
+    }
+
+    const data = await response.json();
+
+    const bankAccountOptions = data.map(
+      (bankAccount: { id: string; bank: string }) => {
+        return {
+          id: bankAccount.id,
+          value: bankAccount.bank,
+        };
+      }
+    );
+
+    setAccountOptions([...bankAccountOptions]);
+  }
+
   useEffect(() => {
     getExpenseTypes();
+    fetchBankAccounts();
   }, []);
 
   if (!user) {
@@ -266,7 +307,27 @@ export function AddTransactionDialog({
                 </FormItem>
               )}
             />
-          
+
+            <div>
+              <Label>Conta</Label>
+              <Select
+                value={selected}
+                onValueChange={(value) => setSelected(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Conta" />
+                </SelectTrigger>
+                <SelectContent>
+                  {accountOptions.map((account) => {
+                    return (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.value}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
 
             {expenseTypeWatch === "outros" && (
               <FormField
