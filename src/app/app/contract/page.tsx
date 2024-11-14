@@ -14,14 +14,23 @@ const ViewContract = () => {
   }
 
   return (
-    <div style={{ width: '100%', height: '100vh' }}>
-      <iframe
-        src="/Contrato_de_Comodato_Botijao_Gas.pdf"
-        width="100%"
-        height="100%"
-        title="Contrato de Comodato"
-        style={{ border: 'none' }}
-      />
+    <div className="w-full min-h-screen flex justify-center items-center">
+      <object
+        data="/Contrato_de_Comodato_Botijao_Gas.pdf"
+        type="application/pdf"
+        className="w-full h-[80vh] border-none"
+      >
+        <div className="text-center p-5">
+          <p>Clique aqui para baixar o contrato de comodato</p>
+          <a
+            href="/Contrato_de_Comodato_Botijao_Gas.pdf"
+            target="_blank"
+            className="inline-block py-3 px-6 text-lg text-white bg-blue-500 rounded-md cursor-pointer transition duration-300 hover:bg-blue-700 mt-5"
+          >
+            Baixar o PDF
+          </a>
+        </div>
+      </object>
     </div>
   );
 };
