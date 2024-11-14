@@ -103,7 +103,7 @@ export function AddTransactionDialog({
 }: AddTransactionDialogProps) {
   const { user, loadingUser } = useUser();
 
-  const [selected, setSelected] = useState("caixa");
+  const [selected, setSelected] = useState("");
   const [accountOptions, setAccountOptions] = useState<
     { id: string; value: string }[]
   >([]);
@@ -128,6 +128,8 @@ export function AddTransactionDialog({
           onClick: () => console.log("Undo"),
         },
       });
+
+      return 
     }
     
     const requestData = {

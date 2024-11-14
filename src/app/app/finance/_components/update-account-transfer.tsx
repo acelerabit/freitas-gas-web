@@ -62,8 +62,8 @@ export function UpdateAccountTransferDialog({
 }: TransferTransactionDialogProps) {
   const { user, loadingUser } = useUser();
 
-  const [selectedOrigin, setSelectedOrigin] = useState("caixa");
-  const [selectedDestination, setSelectedDestination] = useState("caixa");
+  const [selectedOrigin, setSelectedOrigin] = useState("");
+  const [selectedDestination, setSelectedDestination] = useState("");
 
   const [accountOptions, setAccountOptions] = useState<
     { id: string; value: string }[]
@@ -84,6 +84,8 @@ export function UpdateAccountTransferDialog({
           onClick: () => console.log("Undo"),
         },
       });
+
+      return
     }
 
     const requestData = {
