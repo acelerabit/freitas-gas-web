@@ -1,3 +1,4 @@
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import { BaggageClaim, BarChart, Barcode, BookText, Cylinder, FileCheck, FileClock, HandCoins, Handshake, Landmark, LandmarkIcon, Megaphone, SquareGanttChart, SquareUserRound, Users, Wallet } from 'lucide-react';
 import { ReactNode } from 'react';
 
@@ -5,6 +6,11 @@ interface Route {
   title: string;
   icon: ReactNode;
   href: string;
+  action?: () => void;
+  children?: {
+    title: string;
+    action: () => void;
+  }[];
 }
 
 interface User {
@@ -102,6 +108,20 @@ export const routes = (user: User) => {
           title: 'Coletar vasilhame',
           icon: <Cylinder className="h-4 w-4" />,
           href: "/app/collect"
+        },
+        {
+          title: 'Imprimir contrato de comodato',
+          icon: <DocumentTextIcon className="h-4 w-4" />,
+          href: "/app/contract",
+          action: () => {
+            const url = "/app/";
+            const printWindow = window.open(url, "_blank");
+            if (printWindow) {
+              printWindow.addEventListener('load', () => {
+                printWindow.print();
+              });
+            }
+          }
         },
       ];
       break;
