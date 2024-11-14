@@ -204,7 +204,7 @@ export function ProductList() {
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Object.values(stock ?? {}).map((group) => (
           <Card key={group.type}>
             <CardHeader>
@@ -222,8 +222,6 @@ export function ProductList() {
                   <>
                     <div key={product.id} className="py-2">
                       <p>Estado: {bottleStatusMapper[product.status]}</p>
-                      {/* <p>Tipo: {product.type}</p> */}
-                      {/* <p>Preço: {fCurrencyIntlBRL(product.price / 100)}</p> */}
                       <p>Quantidade: {product.quantity}</p>
                     </div>
                     <Separator />
@@ -250,17 +248,14 @@ export function ProductList() {
 
       <Card className="mt-6">
         <CardHeader>
-          <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              <p>Preços</p>
-
-              {user?.role === "ADMIN" && (
-                <Button onClick={() => onOpenChangeUpdate()} variant="ghost">
-                  <Pencil />
-                </Button>
-              )}
-            </CardTitle>
-          </CardHeader>
+          <CardTitle className="flex justify-between items-center">
+            <p>Preços</p>
+            {user?.role === "ADMIN" && (
+              <Button onClick={() => onOpenChangeUpdate()} variant="ghost">
+                <Pencil />
+              </Button>
+            )}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <Table>

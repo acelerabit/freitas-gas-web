@@ -72,54 +72,56 @@ export function TableCollects() {
   }
 
   return (
-    <Card className="col-span-2">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-lg font-semibold">Coletas realizadas</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Cliente</TableHead>
-              <TableHead>Quantitidade</TableHead>
-              <TableHead>Data</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {collects &&
-              collects.map((collect) => (
-                <TableRow key={collect.id}>
-                  <TableCell className="font-medium truncate">
-                    {collect.customer?.name}
-                  </TableCell>
-                  <TableCell className="font-medium truncate">
-                    {collect.quantity}
-                  </TableCell>
-                  <TableCell className="font-medium truncate">
+    <Card className="col-span-2 sm:col-span-1 w-full">
+  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <CardTitle className="text-lg font-semibold">Coletas realizadas</CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-4">
+    <div className="overflow-x-auto">
+      <Table className="min-w-full">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Cliente</TableHead>
+            <TableHead>Quantidade</TableHead>
+            <TableHead>Data</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {collects &&
+            collects.map((collect) => (
+              <TableRow key={collect.id}>
+                <TableCell className="font-medium truncate">
+                  {collect.customer?.name}
+                </TableCell>
+                <TableCell className="font-medium truncate">
+                  {collect.quantity}
+                </TableCell>
+                <TableCell className="font-medium truncate">
                   {formatDateWithHours(collect.createdAt)}
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+    </div>
+    <div className="w-full flex gap-2 items-center justify-end flex-wrap">
+      <Button
+        className="disabled:cursor-not-allowed"
+        disabled={page === 1}
+        onClick={previousPage}
+      >
+        Anterior
+      </Button>
+      <Button
+        className="disabled:cursor-not-allowed"
+        disabled={collects.length < itemsPerPage}
+        onClick={nextPage}
+      >
+        Próxima
+      </Button>
+    </div>
+  </CardContent>
+</Card>
 
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        <div className="w-full flex gap-2 items-center justify-end">
-          <Button
-            className="disabled:cursor-not-allowed"
-            disabled={page === 1}
-            onClick={previousPage}
-          >
-            Anterior
-          </Button>
-          <Button
-            className="disabled:cursor-not-allowed"
-            disabled={collects.length < itemsPerPage}
-            onClick={nextPage}
-          >
-            Próxima
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
