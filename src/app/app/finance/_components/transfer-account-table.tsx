@@ -22,6 +22,7 @@ import { EllipsisVertical } from "lucide-react";
 import useModal from "@/hooks/use-modal";
 import { ConfirmDeleteTransferAccount } from "./confirm-delete-transfer-account";
 import { UpdateAccountTransferDialog } from "./update-account-transfer";
+import { formatDateWithHours } from "@/utils/formatDate";
 
 interface Transfer {
   id: string;
@@ -131,6 +132,7 @@ export function TransferAccountTable() {
                 <TableHead>Conta de origem</TableHead>
                 <TableHead>Conta de destino</TableHead>
                 <TableHead>Valor</TableHead>
+                <TableHead>Data</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -145,6 +147,10 @@ export function TransferAccountTable() {
                   <TableCell className="font-medium truncate">
                     {fCurrencyIntlBRL(transfer.value / 100)}
                   </TableCell>
+                  <TableCell className="font-medium truncate">
+                    {formatDateWithHours(transfer.createdAt)}
+                  </TableCell>
+
                   <TableCell className="font-medium truncate">
                     <DropdownMenu>
                       <DropdownMenuTrigger>
