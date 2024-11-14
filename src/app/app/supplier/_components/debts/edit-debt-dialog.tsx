@@ -85,6 +85,7 @@ const EditDebtDialog: React.FC<EditDebtDialogProps> = ({ open, onOpenChange, deb
           </label>
           <label>
             Vencimento
+            
             <Input
               type="date"
               value={updatedDebt.dueDate}
