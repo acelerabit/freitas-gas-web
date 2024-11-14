@@ -62,8 +62,8 @@ export function TransferToAccountDialog({
 }: TransferTransactionDialogProps) {
   const { user, loadingUser } = useUser();
 
-  const [selectedOrigin, setSelectedOrigin] = useState("caixa");
-  const [selectedDestination, setSelectedDestination] = useState("caixa");
+  const [selectedOrigin, setSelectedOrigin] = useState("");
+  const [selectedDestination, setSelectedDestination] = useState("");
 
   const [accountOptions, setAccountOptions] = useState<
     { id: string; value: string }[]
@@ -77,13 +77,26 @@ export function TransferToAccountDialog({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!selectedOrigin && !selectedDestination) {
-      toast.error("Selecionar a conta é obrigatório", {
+    if (!selectedOrigin) {
+      toast.error("Selecionar a conta de origem é obrigatório", {
         action: {
           label: "Undo",
           onClick: () => console.log("Undo"),
         },
       });
+
+      return
+    }
+
+    if(!selectedDestination) {
+      toast.error("Selecionar a conta de destino é obrigatório", {
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+
+      return
     }
 
     const requestData = {

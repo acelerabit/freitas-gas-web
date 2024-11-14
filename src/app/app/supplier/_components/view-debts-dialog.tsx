@@ -40,7 +40,7 @@ const ViewDebtsDialog: React.FC<ViewDebtsDialogProps> = ({ supplierId }) => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Débitos do Fornecedor</DialogTitle>
+          <DialogTitle>Débitos com Fornecedor</DialogTitle>
         </DialogHeader>
         <div className="overflow-x-auto max-w-full">
           <Table>

@@ -58,7 +58,7 @@ const DebtsPage = () => {
   return (
     <Card className="col-span-2">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-lg font-semibold">Débitos do Fornecedor</CardTitle>
+        <CardTitle className="text-lg font-semibold">Débitos com Fornecedor</CardTitle>
         <Button onClick={() => setCreateDialogOpen(true)}>Cadastrar Débito</Button>
       </CardHeader>
       <CardContent className="space-y-4">
