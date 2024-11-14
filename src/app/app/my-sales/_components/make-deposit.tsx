@@ -77,7 +77,7 @@ export function MakeDeposit() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] =
     useState(false);
-  const [selected, setSelected] = useState("caixa");
+  const [selected, setSelected] = useState("");
   const [accountOptions, setAccountOptions] = useState<
     { id: string; value: string }[]
   >([]);
@@ -99,6 +99,8 @@ export function MakeDeposit() {
           onClick: () => console.log("Undo"),
         },
       });
+
+      return
     }
 
     if (!selected) {
@@ -108,6 +110,8 @@ export function MakeDeposit() {
           onClick: () => console.log("Undo"),
         },
       });
+
+      return
     }
 
     const bank = accountOptions.find(
