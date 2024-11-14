@@ -21,7 +21,7 @@ interface SupplierDebt {
     amount: number;
     dueDate: string;
     paid: boolean;
-  }[]; 
+  }[];
 }
 
 export function TableSuppliersWithDebts() {
@@ -76,6 +76,8 @@ export function TableSuppliersWithDebts() {
   }
 
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  console.log(suppliers);
 
   return (
     <Card className="col-span-2 mt-4">
@@ -95,7 +97,11 @@ export function TableSuppliersWithDebts() {
             {suppliers.map((supplier) =>
               supplier.debts.map((debt) => {
                 const dueDate = new Date(debt.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+
                 const isDueOrToday = dueDate <= today;
+
+                const formattedDueDate = dueDate.toLocaleDateString("pt-BR");
 
                 return (
                   <TableRow
@@ -109,11 +115,9 @@ export function TableSuppliersWithDebts() {
                       {fCurrencyIntlBRL(debt.amount / 100)}
                     </TableCell>
                     <TableCell
-                      className={`font-medium truncate ${
-                        isDueOrToday ? "text-orange-600" : ""
-                      }`}
+                      className={`font-medium truncate ${isDueOrToday ? "text-orange-600" : ""}`}
                     >
-                      {dueDate.toLocaleDateString("pt-BR")}
+                      {formattedDueDate}
                     </TableCell>
                   </TableRow>
                 );
