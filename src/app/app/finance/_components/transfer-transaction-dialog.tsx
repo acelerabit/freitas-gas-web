@@ -32,6 +32,7 @@ import {
 import { useUser } from "@/contexts/user-context";
 import { fetchApi } from "@/services/fetchApi";
 import { toast } from "sonner";
+import { Label } from "@/components/ui/label";
 
 interface TransferTransactionDialogProps {
   open: boolean;
@@ -43,28 +44,31 @@ interface User {
   name: string;
 }
 
-const formSchema = z.object({
-  userId: z.string().min(1, "Entregador é obrigatório"),
-  type: z.string().optional().nullable(),
-  customCategory: z.string().optional().nullable(),
-  description: z.string().optional().nullable(),
-  amount: z.coerce
-    .number()
-    .min(0, "insira um numero maior ou igual a 0")
-    .positive("O valor deve ser um inteiro positivo.")
-    .refine((val) => !isNaN(val), "insira um numero"),
-}).refine(
-  (data) => {
-    if (data.type === "OTHER") {
-      return !!data.customCategory;
+const formSchema = z
+  .object({
+    userId: z.string().min(1, "Entregador é obrigatório"),
+    type: z.string().optional().nullable(),
+    customCategory: z.string().optional().nullable(),
+    description: z.string().optional().nullable(),
+    amount: z.coerce
+      .number()
+      .min(0, "insira um numero maior ou igual a 0")
+      .positive("O valor deve ser um inteiro positivo.")
+      .refine((val) => !isNaN(val), "insira um numero"),
+  })
+  .refine(
+    (data) => {
+      if (data.type === "OTHER") {
+        return !!data.customCategory;
+      }
+      return true;
+    },
+    {
+      message:
+        "O campo categoria customizada é obrigatório quando o tipo é 'outros'",
+      path: ["customCategory"],
     }
-    return true;
-  },
-  {
-    message: "O campo categoria customizada é obrigatório quando o tipo é 'outros'",
-    path: ["customCategory"],
-  }
-);
+  );
 
 export function TransferTransactionDialog({
   open,
@@ -74,13 +78,12 @@ export function TransferTransactionDialog({
 
   const [deliverymans, setDeliverymans] = useState<User[]>([]);
   const [expenseTypeOptions, setExpenseTypeOptions] = useState([
-    {
-      key: "combustível",
-      value: "combustível",
-    },
-    { key: "oficina mecânica", value: "oficina mecânica" },
     { key: "outros", value: "outros" },
   ]);
+  const [selected, setSelected] = useState("caixa");
+  const [accountOptions, setAccountOptions] = useState<
+    { id: string; value: string }[]
+  >([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -90,12 +93,23 @@ export function TransferTransactionDialog({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!selected) {
+      toast.error("Selecionar a conta é obrigatório", {
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+    }
+
     const requestData = {
       transactionType: "TRANSFER",
       category: "TRANSFER",
       customCategory: values.customCategory ?? values.type,
       amount: values.amount,
-      description: values.description
+      description: values.description,
+      bankAccountId: selected !== "caixa" ? selected : null,
+      senderUserId: user?.id
     };
 
     const response = await fetchApi(`/transactions/transfer/${values.userId}`, {
@@ -179,9 +193,34 @@ export function TransferTransactionDialog({
     setExpenseTypeOptions(expenseTypesUpdate);
   }
 
+  async function fetchBankAccounts() {
+    const response = await fetchApi(`/bank-account`);
+
+    if (!response.ok) {
+      const respError = await response.json();
+      toast.error(respError.error);
+
+      return;
+    }
+
+    const data = await response.json();
+
+    const bankAccountOptions = data.map(
+      (bankAccount: { id: string; bank: string }) => {
+        return {
+          id: bankAccount.id,
+          value: bankAccount.bank,
+        };
+      }
+    );
+
+    setAccountOptions([...bankAccountOptions]);
+  }
+
   useEffect(() => {
     getDeliverymans();
     getExpenseTypes();
+    fetchBankAccounts();
   }, []);
 
   if (!user) {
@@ -258,6 +297,27 @@ export function TransferTransactionDialog({
               )}
             />
 
+            <div>
+              <Label>Conta</Label>
+              <Select
+                value={selected}
+                onValueChange={(value) => setSelected(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Conta" />
+                </SelectTrigger>
+                <SelectContent>
+                  {accountOptions.map((account) => {
+                    return (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.value}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
             {expenseTypeWatch === "outros" && (
               <FormField
                 control={form.control}
@@ -306,7 +366,7 @@ export function TransferTransactionDialog({
               )}
             />
 
-<FormField
+            <FormField
               control={form.control}
               name="description"
               render={({ field }) => (

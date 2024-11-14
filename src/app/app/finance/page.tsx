@@ -19,10 +19,14 @@ import { TableDeposits } from "./_components/deposit-table";
 import { TableCustomersWithDebts } from "./_components/customer-table";
 import { OnlyRolesCanAccess } from "../_components/only-who-can-access";
 import { TableSuppliersWithDebts } from "./_components/suppliers-debts-table";
+import { TransferToAccountDialog } from "./_components/tranfer-to-account-dialog";
+import { TransferAccountTable } from "./_components/transfer-account-table";
 
 export default function Finance() {
   const { isOpen, onOpenChange } = useModal();
   const { isOpen: isOpenTransfer, onOpenChange: onOpenChangeTransfer } = useModal();
+  const { isOpen: isOpenTransferAccount, onOpenChange: onOpenChangeTransferAccount } = useModal();
+
 
   return (
     <OnlyRolesCanAccess rolesCanAccess={["ADMIN"]}>
@@ -48,6 +52,8 @@ export default function Finance() {
           <div className="space-x-4">
             <Button onClick={onOpenChange}>Adicionar movimentação</Button>
             <Button onClick={onOpenChangeTransfer}>Fazer transferência</Button>
+            <Button onClick={onOpenChangeTransferAccount}>Fazer transferência entre contas</Button>
+
           </div>
         </div>
         <TableTransaction />
@@ -58,10 +64,15 @@ export default function Finance() {
         <div className="mt-10">
           <TableSuppliersWithDebts />
         </div>
+        <div className="mt-10">
+          <TransferAccountTable />
+        </div>
       </div>
 
       <AddTransactionDialog open={isOpen} onOpenChange={onOpenChange} />
       <TransferTransactionDialog open={isOpenTransfer} onOpenChange={onOpenChangeTransfer} />
+      <TransferToAccountDialog open={isOpenTransferAccount} onOpenChange={onOpenChangeTransferAccount} />
+
     </main>
     </OnlyRolesCanAccess>
   );

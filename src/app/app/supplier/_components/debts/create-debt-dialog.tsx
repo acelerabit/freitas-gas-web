@@ -135,7 +135,6 @@ const CreateDebtDialog: React.FC<CreateDebtDialogProps> = ({
 
     setAccountOptions([
       ...bankAccountOptions,
-      { id: "caixa", value: "Caixa" },
     ]);
   }
 

@@ -1,6 +1,3 @@
-
-
-
 "use client";
 
 import {
@@ -51,16 +48,26 @@ const TransactionCategorySchema = z.enum([
   "SALE",
   "EXPENSE",
   "CUSTOM",
-  "INCOME",
-  "WITHDRAW"
 ]);
+const TransactionTypeSchema = z.enum(["ENTRY", "EXIT", "TRANSFER"]);
+
+const transactionTypeOptions = [
+  {
+    key: "ENTRY",
+    value: "entrada",
+  },
+  { key: "EXIT", value: "saida" },
+  { key: "TRANSFER", value: "transferência" },
+];
 
 const transactionCategoryOptions = [
   {
-    key: "INCOME",
-    value: "entrada",
+    key: "DEPOSIT",
+    value: "depósito",
   },
-  { key: "WITHDRAW", value: "saida" },
+  { key: "SALE", value: "venda" },
+  { key: "EXPENSE", value: "despesa" },
+  { key: "CUSTOM", value: "outro" },
 ];
 
 const formSchema = z
@@ -90,7 +97,7 @@ const formSchema = z
     }
   );
 
-export function AddTransactionDialog({
+export function AddDeliverymanExpenseDialog({
   open,
   onOpenChange,
 }: AddTransactionDialogProps) {
@@ -99,40 +106,23 @@ export function AddTransactionDialog({
   const [expenseTypeOptions, setExpenseTypeOptions] = useState([
     { key: "outros", value: "outros" },
   ]);
-  const [incomeTypeOptions, setIncomeTypeOptions] = useState([
-    { key: "outros", value: "outros" },
-  ]);
-  const [selected, setSelected] = useState("caixa");
-  const [accountOptions, setAccountOptions] = useState<
-    { id: string; value: string }[]
-  >([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: 0,
-      category: "INCOME",
+      category: "EXPENSE",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if(!selected) {
-      toast.error('Selecionar a conta é obrigatório', {
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
-      });
-    }
-
     const requestData = {
-      transactionType: values.category === 'INCOME' ? 'ENTRY' : 'EXIT',
+      transactionType: "EXIT",
       category: values.category,
       customCategory: values.customCategory ?? values.type,
       description: values.description,
       amount: values.amount,
       userId: user?.id,
-      bankAccountId: selected !== "caixa" ? selected : null,
     };
 
     const response = await fetchApi(`/transactions`, {
@@ -196,69 +186,8 @@ export function AddTransactionDialog({
     setExpenseTypeOptions(expenseTypesUpdate);
   }
 
-  async function getIncomeTypes() {
-    const response = await fetchApi(`/transactions/income/types`);
-
-    if (!response.ok) {
-      const respError = await response.json();
-
-      toast.error(respError.error, {
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
-      });
-      return;
-    }
-
-    const data = await response.json();
-
-    const otherIncomeTypes = data.map(
-      (incomeType: { id: string; name: string }) => {
-        return {
-          key: incomeType.name,
-          value: incomeType.name,
-        };
-      }
-    );
-
-    const incomeTypesUpdate: any = [
-      ...otherIncomeTypes,
-      ...incomeTypeOptions,
-    ];
-
-    setIncomeTypeOptions(incomeTypesUpdate);
-  }
-
-  async function fetchBankAccounts() {
-    const response = await fetchApi(`/bank-account`);
-
-    if (!response.ok) {
-      const respError = await response.json();
-      toast.error(respError.error);
-
-      return;
-    }
-
-    const data = await response.json();
-
-    const bankAccountOptions = data.map(
-      (bankAccount: { id: string; bank: string }) => {
-        return {
-          id: bankAccount.id,
-          value: bankAccount.bank,
-        };
-      }
-    );
-
-    setAccountOptions([...bankAccountOptions]);
-  }
-
   useEffect(() => {
     getExpenseTypes();
-    getIncomeTypes()
-    fetchBankAccounts();
-
   }, []);
 
   if (!user) {
@@ -266,15 +195,12 @@ export function AddTransactionDialog({
   }
 
   const expenseTypeWatch = form.watch("type");
-  const categoryWatch = form.watch("category");
-
-
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Cadastrar nova movimentação</DialogTitle>
+          <DialogTitle>Cadastrar Nova despesa</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -288,10 +214,11 @@ export function AddTransactionDialog({
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo de movimentação" />
+                        <SelectValue placeholder="Selecione a categoria" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -315,25 +242,18 @@ export function AddTransactionDialog({
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de movimentação</FormLabel>
+                  <FormLabel>Tipo de despesa</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value ?? ""}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo de movimentação" />
+                        <SelectValue placeholder="Selecione o tipo de despesa" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categoryWatch === 'INCOME'? incomeTypeOptions.map((incomeType) => (
-                        <SelectItem
-                          key={incomeType.key}
-                          value={incomeType.key}
-                        >
-                          {incomeType.value}
-                        </SelectItem>
-                      )) : expenseTypeOptions.map((expenseType) => (
+                      {expenseTypeOptions.map((expenseType) => (
                         <SelectItem
                           key={expenseType.key}
                           value={expenseType.key}
@@ -347,28 +267,6 @@ export function AddTransactionDialog({
                 </FormItem>
               )}
             />
-
-<div>
-              <Label>Conta</Label>
-              <Select
-                value={selected}
-                onValueChange={(value) => setSelected(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Conta" />
-                </SelectTrigger>
-                <SelectContent>
-                  {accountOptions.map((account) => {
-                    return (
-                      <SelectItem key={account.id} value={account.id}>
-                        {account.value}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-            
 
             {expenseTypeWatch === "outros" && (
               <FormField
