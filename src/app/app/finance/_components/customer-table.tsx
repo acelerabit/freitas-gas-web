@@ -108,7 +108,10 @@ export function TableCustomersWithDebts() {
                     </TableCell>
                     <TableCell className="font-medium truncate">
                       {debt.paid ? (
-                        <Checkbox checked disabled />
+                        <div className="flex gap-2">
+                          <p className="text-green-800">PAGO</p>
+                          <Checkbox checked disabled />
+                        </div>
                       ) : (
                         <Button onClick={() => handleSelectDebt(debt.id)}>
                           Marcar como pago

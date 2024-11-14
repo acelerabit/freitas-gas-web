@@ -40,7 +40,7 @@ const paymentsMapper = {
 };
 
 const formSchema = z.object({
-  bank: z.string().min(1, 'O nome do banco é obrigatório'),
+  bank: z.string().min(1, {message: 'O nome do banco é obrigatório'}).refine(val => val.trim().length > 0, { message: 'O nome do banco é obrigatório' }),
 });
 
 export function CreateBankAccountDialog({
@@ -58,6 +58,9 @@ export function CreateBankAccountDialog({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      bank: ""
+    }
   });
 
   const { control } = form;

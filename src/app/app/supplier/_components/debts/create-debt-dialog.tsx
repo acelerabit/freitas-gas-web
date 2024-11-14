@@ -45,7 +45,7 @@ const CreateDebtDialog: React.FC<CreateDebtDialogProps> = ({
     paid: false,
   });
 
-  const [selected, setSelected] = useState("caixa");
+  const [selected, setSelected] = useState("");
   const [accountOptions, setAccountOptions] = useState<{id: string, value: string}[]>([]);
 
   const [errors, setErrors] = useState({

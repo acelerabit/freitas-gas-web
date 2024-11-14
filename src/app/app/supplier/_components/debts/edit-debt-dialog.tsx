@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
 import { fetchApi } from "@/services/fetchApi";
+import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface EditDebtDialogProps {
   open: boolean;
@@ -25,6 +27,9 @@ const EditDebtDialog: React.FC<EditDebtDialogProps> = ({ open, onOpenChange, deb
     dueDate: "",
     paid: false,
   });
+  const [selected, setSelected] = useState("");
+
+  const [accountOptions, setAccountOptions] = useState<{id: string, value: string}[]>([]);
 
   useEffect(() => {
     if (debt) {
@@ -37,6 +42,12 @@ const EditDebtDialog: React.FC<EditDebtDialogProps> = ({ open, onOpenChange, deb
   }, [debt]);
 
   async function handleUpdate() {
+    if(updatedDebt.paid && !selected) {
+      toast.error('Deve ser selecionada a conta associada ao pagamento desse débito.')
+
+      return
+    }
+    
     try {
       const response = await fetchApi(`/debts/${debt.id}`, {
         method: "PATCH",
@@ -44,6 +55,7 @@ const EditDebtDialog: React.FC<EditDebtDialogProps> = ({ open, onOpenChange, deb
           ...updatedDebt,
           amount: Number(updatedDebt.amount.replace(",", ".")) * 100, // Converte para centavos
           dueDate: new Date(updatedDebt.dueDate),
+          bankAccountId: selected !== "caixa" ? selected : null,
         }),
         headers: { "Content-Type": "application/json" },
       });
@@ -58,6 +70,36 @@ const EditDebtDialog: React.FC<EditDebtDialogProps> = ({ open, onOpenChange, deb
       console.error("Erro ao atualizar débito:", error);
     }
   }
+
+  async function fetchBankAccounts() {
+    const response = await fetchApi(`/bank-account`);
+
+    if (!response.ok) {
+      const respError = await response.json();
+      toast.error(respError.error);
+
+      return;
+    }
+
+    const data = await response.json();
+
+    const bankAccountOptions = data.map((bankAccount: {id: string, bank: string}) => {
+      return {
+        id: bankAccount.id,
+        value: bankAccount.bank,
+      };
+    });
+
+    setAccountOptions([
+      ...bankAccountOptions,
+    ]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      fetchBankAccounts();
+    }
+  }, [open]);
 
   const formatCurrency = (value: string) => {
     const parsedValue = parseFloat(value.replace(",", "."));
@@ -85,13 +127,31 @@ const EditDebtDialog: React.FC<EditDebtDialogProps> = ({ open, onOpenChange, deb
           </label>
           <label>
             Vencimento
-            
+
             <Input
               type="date"
               value={updatedDebt.dueDate}
               onChange={(e) => setUpdatedDebt({ ...updatedDebt, dueDate: e.target.value })}
             />
           </label>
+
+          {updatedDebt.paid && (
+            <Select
+              value={selected}
+              onValueChange={(value) => setSelected(value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Conta" />
+              </SelectTrigger>
+              <SelectContent>
+                {accountOptions.map((account) => {
+                  return (
+                    <SelectItem key={account.id} value={account.id}>{account.value}</SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          )}
           <div className="flex items-center">
             <Checkbox
               checked={updatedDebt.paid}
