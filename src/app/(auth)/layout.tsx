@@ -8,6 +8,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
   const { user, loadingUser } = useUser();
 
   if (!loadingUser && user) {
+    console.log(user, 'PRIVATE LAYOUT')
     if(user.role === 'ADMIN') {
       redirect("/app/dashboard");
     }
