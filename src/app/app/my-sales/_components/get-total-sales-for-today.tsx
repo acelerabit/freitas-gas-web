@@ -79,8 +79,8 @@ const GetTotalSalesForToday: React.FC = () => {
 
             return (
               <div key={paymentMethod} className={`p-4 rounded-lg shadow-md ${cardColor} flex flex-col items-center w-1/2 sm:w-1/4 md:w-1/6`}>
-                <h3 className="text-lg font-semibold text-white">{getPaymentMethodLabel(paymentMethod)}</h3>
-                <p className="text-xl font-bold text-white">{`R$ ${parseFloat(total).toFixed(2)}`}</p>
+                <h3 className="text-lg font-semibold text-white text-center">{getPaymentMethodLabel(paymentMethod)}</h3>
+                <p className="text-xl font-bold text-white text-center">{`R$ ${parseFloat(total).toFixed(2)}`}</p>
               </div>
             );
           })}
