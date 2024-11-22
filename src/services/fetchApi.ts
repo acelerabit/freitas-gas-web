@@ -16,5 +16,5 @@ export async function fetchApi(path: string, init?: RequestInit, noContentType?:
   } 
 
 
-  return fetch(url, { ...init, headers, credentials: 'include' }).catch(err => err)
+  return fetch(url, { ...init, headers, }).catch(err => err)
 }
