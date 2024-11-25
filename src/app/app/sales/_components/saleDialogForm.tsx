@@ -20,11 +20,12 @@ import {
 import { useState, useEffect } from "react";
 import { fetchApi } from "@/services/fetchApi";
 import { useUser } from "../../../../contexts/user-context";
-import { toast } from "react-hot-toast";
 import { FormLabel } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { CurrencyInput } from "react-currency-mask";
 import { Separator } from "@/components/ui/separator";
+import { Trash } from "lucide-react";
+import { toast } from "sonner";
 
 interface ProductType {
   id: string;
@@ -80,7 +81,7 @@ export function SaleDialogForm({
   onSubmit,
 }: SaleDialogFormProps) {
   const { user } = useUser();
-  const { control, handleSubmit, setValue } = useForm();
+  const { control, handleSubmit, setValue, formState } = useForm();
   const [products, setProducts] = useState<ProductType[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [formData, setFormData] = useState({
@@ -127,10 +128,12 @@ export function SaleDialogForm({
   }, []);
 
   const handleProductSelect = (type: string, index: number) => {
-    let  currentProduct = formData.products[index]
+    let currentProduct = formData.products[index];
 
-    const selectedProduct = products.find(product => product.type === type && product.status === currentProduct.status);
-
+    const selectedProduct = products.find(
+      (product) =>
+        product.type === type && product.status === currentProduct.status
+    );
 
     if (selectedProduct) {
       const updatedProducts = [...formData.products];
@@ -177,21 +180,62 @@ export function SaleDialogForm({
       ],
     }));
   };
-  const onSubmitHandler = (data: any) => {
-    if(!formData.paymentMethod) {
-      toast.error("Método de pagamento deve estar preenchido")
-      return
+  const onSubmitHandler = () => {
+    console.log(formData)
+
+
+    if (!formData.paymentMethod) {
+      toast.error("Método de pagamento deve estar preenchido");
+      return;
     }
 
-    
+    console.log(formData.products.some((product: any) => !product.type))
+
+    if(formData.products.some((product: any) => product.type == null || product.type === "")) {
+      console.log('error')
+      // toast.error("O tipo do produto deve ser selecionado");
+      toast.error("O tipo do produto deve ser selecionado",{
+        action: {
+          label: "Undo",
+          onClick: () => console.log("Undo"),
+        },
+      });
+      // alert('O tipo do produto deve ser selecionado')
+      return;
+    }
+
+    if(formData.products.some((product: any) => !product.status)) {
+      toast.error("O tipo de venda deve ser selecionado");
+      return;
+    }
+
+    if (formData.products.some((product: any) => product.price == null || product.price < 0)) {
+      toast.error("O preço deve ser um valor válido.");
+      return;
+    }
+
+    if (formData.products.some((product: any) => product.quantity == null || product.quantity < 0)) {
+      toast.error("A quantidade deve ser um valor válido.");
+      return;
+    }
+
     const saleData = {
       ...formData,
-      ...data,
+      // ...data,
       deliverymanId: user?.id || "",
     };
 
     onSubmit(saleData);
   };
+
+  function removeProduct(index: number) {
+    setFormData((prev) => ({
+      ...prev,
+      products: prev.products.filter((_, i) => i !== index),
+    }));
+  }
+
+  // console.log(formState.errors)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -202,11 +246,12 @@ export function SaleDialogForm({
         <form
           onSubmit={handleSubmit(onSubmitHandler)}
           className="space-y-4 w-full"
+          noValidate
         >
           <Controller
             name="customerId"
             control={control}
-            rules={{ required: 'Selecione um cliente' }}
+            rules={{ required: "Selecione um cliente" }}
             render={({ field, fieldState }) => (
               <>
                 <Select
@@ -228,7 +273,9 @@ export function SaleDialogForm({
                   </SelectContent>
                 </Select>
                 {fieldState?.error && (
-                  <p style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+                  <p
+                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                  >
                     {fieldState?.error?.message}
                   </p>
                 )}
@@ -237,137 +284,188 @@ export function SaleDialogForm({
           />
           {formData.products.map((product, index) => (
             <div key={index} className="space-y-4">
-              <Controller
-                name={`products[${index}].id`}
-                control={control}
-                rules={{ required: 'Selecione um produto' }}
-                render={({ field, fieldState }) => (
-                  <>
-                    <Select
-                      {...field}
-                      onValueChange={(value) => {
-                        console.log("Selected Product:", value);
-                        handleProductSelect(value, index);
-                        field.onChange(value);
-                      }}                      
-                    >
-                      <SelectTrigger className={fieldState?.error ? 'border-red-500' : ''}>
-                        <SelectValue placeholder="Selecione um produto" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {productTypesMapper.map((product) => (
-                          <SelectItem key={product.key} value={product.key}>
-                            {product.value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {fieldState?.error && (
-                      <p style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
-                        {fieldState?.error?.message}
-                      </p>
+              <div className="flex gap-2  items-start">
+                <div className="flex-1 space-y-4">
+                  <Controller
+                    name={`products[${index}].id`}
+                    control={control}
+                    // rules={{ required: "Selecione um produto" }}
+                    render={({ field, fieldState }) => (
+                      <>
+                        <Select
+                          {...field}
+                          onValueChange={(value) => {
+                            console.log("Selected Product:", value);
+                            handleProductSelect(value, index);
+                            field.onChange(value);
+                          }}
+                          value={field.value || ""}
+                        >
+                          <SelectTrigger
+                            className={
+                              fieldState?.error ? "border-red-500" : ""
+                            }
+                          >
+                            <SelectValue placeholder="Selecione um produto" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {productTypesMapper.map((product) => (
+                              <SelectItem key={product.key} value={product.key}>
+                                {product.value}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {fieldState?.error && (
+                          <p
+                            style={{
+                              color: "red",
+                              fontSize: "12px",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {fieldState?.error?.message}
+                          </p>
+                        )}
+                      </>
                     )}
-                  </>
-                )}
-              />
+                  />
 
-              <Controller
-                name={`products[${index}].status`}
-                control={control}
-                rules={{ required: 'Selecione um tipo de venda' }}
-                render={({ field, fieldState }) => (
-                  <>
-                    <Select
-                      {...field}
-                      defaultValue="EMPTY"
-                      onValueChange={(value) => handleTypeSaleSelect(value, index)}
-                    >
-                      <SelectTrigger className={fieldState?.error ? 'border-red-500' : ''}>
-                        <SelectValue placeholder="Selecione um tipo de venda" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {bottleStatusMapper.map((bottle) => (
-                          <SelectItem key={bottle.key} value={bottle.key}>
-                            {bottle.value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {fieldState?.error && (
-                      <p style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
-                        {fieldState?.error?.message}
-                      </p>
+                  <Controller
+                    name={`products[${index}].status`}
+                    control={control}
+                    // rules={{ required: "Selecione um tipo de venda" }}
+                    render={({ field, fieldState }) => (
+                      <>
+                        <Select
+                          {...field}
+                          defaultValue="EMPTY"
+                          onValueChange={(value) =>
+                            handleTypeSaleSelect(value, index)
+                          }
+                        >
+                          <SelectTrigger
+                            className={
+                              fieldState?.error ? "border-red-500" : ""
+                            }
+                          >
+                            <SelectValue placeholder="Selecione um tipo de venda" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {bottleStatusMapper.map((bottle) => (
+                              <SelectItem key={bottle.key} value={bottle.key}>
+                                {bottle.value}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {fieldState?.error && (
+                          <p
+                            style={{
+                              color: "red",
+                              fontSize: "12px",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {fieldState?.error?.message}
+                          </p>
+                        )}
+                      </>
                     )}
-                  </>
-                )}
-              />
+                  />
 
-              <Controller
-                name={`products[${index}].price`}
-                control={control}
-                rules={{ required: 'Preço é obrigatório' }}
-                render={({ field, fieldState }) => (
-                  <>
-                    <div>
-                      <Label>Preço</Label>
+                  <Controller
+                    name={`products[${index}].price`}
+                    control={control}
+                    // rules={{ required: "Preço é obrigatório" }}
+                    render={({ field, fieldState }) => (
+                      <>
+                        <div>
+                          <Label>Preço</Label>
 
-                      <CurrencyInput
-                        value={field.value}
-                        onChangeValue={(_, value) => {
-                          const updatedProducts = [...formData.products];
-                          updatedProducts[index].price = parseFloat(String(value));
-                          setFormData((prev) => ({ ...prev, products: updatedProducts }));
-                          field.onChange(value);
-                        }}
-                        InputElement={
-                          <input
-                            type="text"
-                            id="currency"
-                            placeholder="R$ 0,00"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                          <CurrencyInput
+                            value={field.value}
+                            onChangeValue={(_, value) => {
+                              const updatedProducts = [...formData.products];
+                              updatedProducts[index].price = parseFloat(
+                                String(value)
+                              );
+                              setFormData((prev) => ({
+                                ...prev,
+                                products: updatedProducts,
+                              }));
+                              field.onChange(value);
+                            }}
+                            InputElement={
+                              <input
+                                type="text"
+                                id="currency"
+                                placeholder="R$ 0,00"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                              />
+                            }
                           />
-                        }
-                      />
-                      {fieldState?.error && (
-                        <p style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
-                          {fieldState?.error?.message}
-                        </p>
-                      )}
-                    </div>
-                  </>
-                )}
-              />
+                          {fieldState?.error && (
+                            <p
+                              style={{
+                                color: "red",
+                                fontSize: "12px",
+                                marginTop: "4px",
+                              }}
+                            >
+                              {fieldState?.error?.message}
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  />
 
-              <Controller
-                name={`products[${index}].quantity`}
-                control={control}
-                rules={{ required: 'Quantidade é obrigatória' }}
-                render={({ field, fieldState }) => (
-                  <>
-                    <div>
-                      <Label>Quantidade</Label>
-                      <Input
-                        placeholder="Quantidade"
-                        type="number"
-                        {...field}
-                        value={product.quantity}
-                        onChange={(e) => {
-                          const updatedProducts = [...formData.products];
-                          updatedProducts[index].quantity = parseInt(e.target.value, 10) || 1;
-                          setFormData((prev) => ({ ...prev, products: updatedProducts }));
-                          field.onChange(parseInt(e.target.value, 10) || 1);
-                        }}
-                      />
-                      {fieldState?.error && (
-                        <p style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
-                          {fieldState?.error?.message}
-                        </p>
-                      )}
-                    </div>
-                  </>
-                )}
-              />
+                  <Controller
+                    name={`products[${index}].quantity`}
+                    control={control}
+                    // rules={{ required: "Quantidade é obrigatória" }}
+                    render={({ field, fieldState }) => (
+                      <>
+                        <div>
+                          <Label>Quantidade</Label>
+                          <Input
+                            placeholder="Quantidade"
+                            type="number"
+                            {...field}
+                            value={product.quantity}
+                            onChange={(e) => {
+                              const updatedProducts = [...formData.products];
+                              updatedProducts[index].quantity =
+                                parseInt(e.target.value, 10) || 1;
+                              setFormData((prev) => ({
+                                ...prev,
+                                products: updatedProducts,
+                              }));
+                              field.onChange(parseInt(e.target.value, 10) || 1);
+                            }}
+                          />
+                          {fieldState?.error && (
+                            <p
+                              style={{
+                                color: "red",
+                                fontSize: "12px",
+                                marginTop: "4px",
+                              }}
+                            >
+                              {fieldState?.error?.message}
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  />
+                </div>
 
+                <Button variant="ghost" onClick={() => removeProduct(index)}>
+                  <Trash />
+                </Button>
+              </div>
               <Separator className="last:hidden" />
             </div>
           ))}
@@ -378,7 +476,7 @@ export function SaleDialogForm({
           <Controller
             name="paymentMethod"
             control={control}
-            rules={{ required: 'Selecione um método de pagamento' }}
+            rules={{ required: "Selecione um método de pagamento" }}
             render={({ field, fieldState }) => (
               <>
                 <Select
@@ -388,20 +486,26 @@ export function SaleDialogForm({
                     setFormData((prev) => ({ ...prev, paymentMethod: value }));
                   }}
                 >
-                  <SelectTrigger className={fieldState?.error ? 'border-red-500' : ''}>
+                  <SelectTrigger
+                    className={fieldState?.error ? "border-red-500" : ""}
+                  >
                     <SelectValue placeholder="Selecione um método de pagamento" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
                     <SelectItem value="CARTAO">Cartão de débito</SelectItem>
-                    <SelectItem value="CARTAO_CREDITO">Cartão de crédito</SelectItem>
+                    <SelectItem value="CARTAO_CREDITO">
+                      Cartão de crédito
+                    </SelectItem>
                     <SelectItem value="PIX">Pix</SelectItem>
                     <SelectItem value="FIADO">Venda a receber</SelectItem>
                     <SelectItem value="TRANSFERENCIA">Transferência</SelectItem>
                   </SelectContent>
                 </Select>
                 {fieldState?.error && (
-                  <p style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+                  <p
+                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                  >
                     {fieldState?.error?.message}
                   </p>
                 )}
