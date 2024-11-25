@@ -181,26 +181,25 @@ export function SaleDialogForm({
     }));
   };
   const onSubmitHandler = () => {
-    console.log(formData)
-
 
     if (!formData.paymentMethod) {
       toast.error("Método de pagamento deve estar preenchido");
       return;
     }
 
-    console.log(formData.products.some((product: any) => !product.type))
+    if(formData.products.length <= 0) {
+      toast.error("Produtos são necessários para consolidar a venda.");
+
+      return
+    }
 
     if(formData.products.some((product: any) => product.type == null || product.type === "")) {
-      console.log('error')
-      // toast.error("O tipo do produto deve ser selecionado");
       toast.error("O tipo do produto deve ser selecionado",{
         action: {
           label: "Undo",
           onClick: () => console.log("Undo"),
         },
       });
-      // alert('O tipo do produto deve ser selecionado')
       return;
     }
 
@@ -289,7 +288,6 @@ export function SaleDialogForm({
                   <Controller
                     name={`products[${index}].id`}
                     control={control}
-                    // rules={{ required: "Selecione um produto" }}
                     render={({ field, fieldState }) => (
                       <>
                         <Select
@@ -334,7 +332,6 @@ export function SaleDialogForm({
                   <Controller
                     name={`products[${index}].status`}
                     control={control}
-                    // rules={{ required: "Selecione um tipo de venda" }}
                     render={({ field, fieldState }) => (
                       <>
                         <Select
@@ -377,7 +374,6 @@ export function SaleDialogForm({
                   <Controller
                     name={`products[${index}].price`}
                     control={control}
-                    // rules={{ required: "Preço é obrigatório" }}
                     render={({ field, fieldState }) => (
                       <>
                         <div>
@@ -424,7 +420,6 @@ export function SaleDialogForm({
                   <Controller
                     name={`products[${index}].quantity`}
                     control={control}
-                    // rules={{ required: "Quantidade é obrigatória" }}
                     render={({ field, fieldState }) => (
                       <>
                         <div>
