@@ -229,14 +229,23 @@ export function ProductList() {
                 ))}
               </div>
               {user?.role === "ADMIN" && (
-                <div className="mt-4 space-x-4">
-                  <Button onClick={() => selectCurrentProductIncrease(group.type)}>
+                <div className="mt-4 flex flex-wrap justify-center gap-4 md:justify-start">
+                  <Button
+                    className="min-w-[140px] flex-shrink-0"
+                    onClick={() => selectCurrentProductIncrease(group.type)}
+                  >
                     Adicionar items
                   </Button>
-                  <Button onClick={() => selectCurrentProductDecrease(group.type)}>
+                  <Button
+                    className="min-w-[140px] flex-shrink-0"
+                    onClick={() => selectCurrentProductDecrease(group.type)}
+                  >
                     Remover items
                   </Button>
-                  <Button onClick={() => selectCurrentProductTransfer(group.type)}>
+                  <Button
+                    className="min-w-[140px] flex-shrink-0"
+                    onClick={() => selectCurrentProductTransfer(group.type)}
+                  >
                     Transferir
                   </Button>
                 </div>
