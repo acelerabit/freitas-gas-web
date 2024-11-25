@@ -194,13 +194,18 @@ export default function TableSale() {
         );
       },
       cell: ({ row }) => {
-        const paymentMethod = row.original.paymentMethod === "FIADO" 
-          ? "VENDA A RECEBER" 
-          : row.original.paymentMethod;
-        
+        const paymentMethod = {
+          CARTAO: "Cartão",
+          CARTAO_CREDITO: "Cartão de crédito",
+          DINHEIRO: "Dinheiro",
+          FIADO: "Venda a receber",
+          PIX: "Pix",
+          TRANSFERENCIA: "Transferência"
+        }[row.original.paymentMethod] || row.original.paymentMethod;
+    
         return <p>{paymentMethod}</p>;
       },
-    },    
+    },       
     {
       accessorKey: "customer",
       header: ({ column }) => {
