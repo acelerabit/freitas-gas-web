@@ -23,6 +23,7 @@ import useModal from "@/hooks/use-modal";
 import { ConfirmDeleteTransferAccount } from "./confirm-delete-transfer-account";
 import { UpdateAccountTransferDialog } from "./update-account-transfer";
 import { formatDateWithHours } from "@/utils/formatDate";
+import Datepicker from "react-tailwindcss-datepicker";
 
 interface Transfer {
   id: string;
@@ -37,6 +38,10 @@ interface Transfer {
   value: number;
   createdAt: string;
 }
+interface DateFilter {
+  startDate: Date | null;
+  endDate: Date | null;
+}
 
 export function TransferAccountTable() {
   const [transfers, setTransfers] = useState<Transfer[]>([]);
@@ -50,6 +55,10 @@ export function TransferAccountTable() {
 
   const { isOpen, onOpenChange } = useModal();
   const { isOpen: isOpenUpdate, onOpenChange: onOpenChangeUpdate } = useModal();
+  const [dateFilter, setDateFilter] = useState<DateFilter>({
+      startDate: new Date(new Date().setHours(0, 0, 0, 0)),
+      endDate: new Date(new Date().setHours(23, 59, 59, 999)),
+  });
 
   async function fetchTransfers() {
     setLoading(true);
@@ -60,6 +69,23 @@ export function TransferAccountTable() {
 
     fetchTransfersUrl.searchParams.set("page", String(page));
     fetchTransfersUrl.searchParams.set("itemsPerPage", String(itemsPerPage));
+
+    if (dateFilter.startDate) {
+      fetchTransfersUrl.searchParams.set(
+        "startDate",
+        dateFilter.startDate.toISOString().split("T")[0]
+      );
+    }
+  
+    if (dateFilter.endDate) {
+      const endDateWithTime = new Date(dateFilter.endDate);
+      endDateWithTime.setHours(23, 59, 59);
+      
+      fetchTransfersUrl.searchParams.set(
+        "endDate",
+        endDateWithTime.toISOString().split("T")[0]
+      );
+    }
 
     const response = await fetchApi(
       `${fetchTransfersUrl.pathname}${fetchTransfersUrl.search}`
@@ -107,11 +133,22 @@ export function TransferAccountTable() {
     onOpenChangeUpdate();
   }
 
+  const handleValueChange = (value: DateFilter | null) => {
+    if (value) {
+      setDateFilter({
+        startDate: value.startDate ? new Date(value.startDate) : null,
+        endDate: value.endDate ? new Date(value.endDate) : null,
+      });
+    } else {
+      setDateFilter({ startDate: null, endDate: null });
+    }
+  };
+
   useEffect(() => {
     if (page && itemsPerPage) {
       fetchTransfers();
     }
-  }, [page]);
+  }, [page, dateFilter]);
 
   if (loading) {
     return <LoadingAnimation />;
@@ -126,6 +163,20 @@ export function TransferAccountTable() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="w-full flex items-center gap-2">
+            <div className="w-full md:max-w-xs my-4">
+              <Datepicker
+                containerClassName="relative border rounded-md border-zinc-300"
+                popoverDirection="down"
+                primaryColor="blue"
+                showShortcuts={true}
+                placeholder="DD/MM/YYYY ~ DD/MM/YYYY"
+                displayFormat="DD/MM/YYYY"
+                value={dateFilter}
+                onChange={handleValueChange}
+              />
+            </div>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>

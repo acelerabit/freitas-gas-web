@@ -119,7 +119,6 @@ export function TableDeposits() {
   useEffect(() => {
     fetchDeposits();
   }, [page, dateFilter]);
-  console.log(dateFilter);
 
   if (loadingUser) {
     return <LoadingAnimation />;
