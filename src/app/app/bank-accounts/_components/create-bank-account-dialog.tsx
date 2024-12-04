@@ -52,6 +52,7 @@ export function CreateBankAccountDialog({
   const [paymentsAssociated, setPaymentsAssociated] = useState<string[]>([
     "CARTAO",
     "CARTAO_CREDITO",
+    "DINHEIRO",
     "PIX",
     "TRANSFERENCIA",
   ]);
@@ -112,7 +113,6 @@ export function CreateBankAccountDialog({
       "CARTAO",
       "CARTAO_CREDITO",
       "DINHEIRO",
-      "FIADO",
       "PIX",
       "TRANSFERENCIA",
     ]);

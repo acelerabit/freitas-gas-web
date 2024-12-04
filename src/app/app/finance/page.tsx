@@ -51,7 +51,7 @@ export default function Finance() {
         <div className="w-full flex items-center justify-end">
           <div className="space-x-4">
             <Button onClick={onOpenChange}>Adicionar movimentação</Button>
-            <Button onClick={onOpenChangeTransfer}>Fazer transferência</Button>
+            <Button onClick={onOpenChangeTransfer}>Fazer transferência para entregador</Button>
             <Button onClick={onOpenChangeTransferAccount}>Fazer transferência entre contas</Button>
 
           </div>
