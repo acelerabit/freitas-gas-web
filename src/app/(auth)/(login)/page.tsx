@@ -38,7 +38,7 @@ export default function Login() {
     if (result?.error) {
       toast.error("E-mail ou senha inválidas!",{
         action: {
-          label: "Undo",
+          label: "Ok",
           onClick: () => console.log("Undo"),
         },
       });
@@ -49,7 +49,7 @@ export default function Login() {
 
     toast.success("Login realizado com sucesso",{
       action: {
-        label: "Undo",
+        label: "Ok",
         onClick: () => console.log("Undo"),
       },
     });

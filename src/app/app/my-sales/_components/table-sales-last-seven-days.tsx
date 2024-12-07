@@ -135,6 +135,20 @@ export function TableSalesLastSevenDays() {
               displayFormat={"DD/MM/YYYY"}
               value={dateFilter}
               onChange={handleValueChange}
+              configs={{
+                shortcuts: {
+                  today: "Hoje",
+                  yesterday: "Ontem",
+                  past: (period) => `Últimos ${period} dias`,
+                  currentMonth: "Mês atual",
+                  pastMonth: "Último mês",
+                },
+                footer: {
+                  cancel: "Cancelar",
+                  apply: "Aplicar",
+                },
+              }}
+              i18n="pt-br"
             />
           </div>
         </div>
