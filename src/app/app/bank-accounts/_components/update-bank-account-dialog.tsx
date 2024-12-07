@@ -55,7 +55,6 @@ export function UpdateBankAccountDialog({
     "CARTAO",
     "CARTAO_CREDITO",
     "DINHEIRO",
-    "FIADO",
     "PIX",
     "TRANSFERENCIA",
   ]);
@@ -135,7 +134,6 @@ export function UpdateBankAccountDialog({
       "CARTAO",
       "CARTAO_CREDITO",
       "DINHEIRO",
-      "FIADO",
       "PIX",
       "TRANSFERENCIA",
     ]);
