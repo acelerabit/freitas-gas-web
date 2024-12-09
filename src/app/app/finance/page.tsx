@@ -48,10 +48,19 @@ export default function Finance() {
       <div className="space-y-2">
         <CompanyBalance />
 
-        <div className="w-full flex items-center justify-end">
+        <div
+          className="w-full flex items-center justify-center"
+          style={{
+            padding: "40px 0",
+            border: "1px solid #ddd",
+            borderRadius: "5px",
+            backgroundColor: "#efefef",
+            margin: "30px 0"
+          }}
+        >
           <div className="space-x-4">
             <Button onClick={onOpenChange}>Adicionar movimentação</Button>
-            <Button onClick={onOpenChangeTransfer}>Fazer transferência para entregador</Button>
+            <Button onClick={onOpenChangeTransfer}>Fazer transferência</Button>
             <Button onClick={onOpenChangeTransferAccount}>Fazer transferência entre contas</Button>
 
           </div>
