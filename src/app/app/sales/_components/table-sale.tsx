@@ -467,6 +467,7 @@ export default function TableSale() {
                 },
               }}
               i18n="pt-br"
+              readOnly
             />
           </div>
         </div>

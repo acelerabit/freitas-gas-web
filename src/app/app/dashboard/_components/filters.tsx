@@ -49,7 +49,8 @@ const Filters = ({
                   setStartDate(e.target.value);
                   getSalesIndicators();
                 }}
-                className="ml-2 p-2 border border-gray-300 rounded"
+                onKeyDown={(e) => e.preventDefault()}
+                className="ml-2 p-2 border border-gray-300 rounded cursor-pointer"
               />
             </label>
             <label htmlFor="endDate">
@@ -62,7 +63,8 @@ const Filters = ({
                   setEndDate(e.target.value);
                   getSalesIndicators();
                 }}
-                className="ml-2 p-2 border border-gray-300 rounded"
+                onKeyDown={(e) => e.preventDefault()}
+                className="ml-2 p-2 border border-gray-300 rounded cursor-pointer"
               />
             </label>
           </div>

@@ -149,6 +149,7 @@ export function TableSalesLastSevenDays() {
                 },
               }}
               i18n="pt-br"
+              readOnly
             />
           </div>
         </div>

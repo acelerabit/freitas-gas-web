@@ -188,6 +188,7 @@ export function TransferAccountTable() {
                   },
                 }}
                 i18n="pt-br"
+                readOnly
               />
             </div>
           </div>

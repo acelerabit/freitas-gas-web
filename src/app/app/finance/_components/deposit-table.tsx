@@ -131,7 +131,7 @@ export function TableDeposits() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="w-full flex items-center gap-2">
-          <div className="w-full md:max-w-xs my-4">
+          <div onKeyDown={(e) => e.preventDefault()} className="w-full md:max-w-xs my-4">
             <Datepicker
               containerClassName="relative border rounded-md border-zinc-300"
               popoverDirection="down"
@@ -155,6 +155,7 @@ export function TableDeposits() {
                 },
               }}
               i18n="pt-br"
+              readOnly
             />
           </div>
         </div>

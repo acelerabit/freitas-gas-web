@@ -471,6 +471,7 @@ export default function TableTransaction() {
                 },
               }}
               i18n="pt-br"
+              readOnly
             />
           </div>
           <Select value={category} onValueChange={(value) => setCategory(value)}>

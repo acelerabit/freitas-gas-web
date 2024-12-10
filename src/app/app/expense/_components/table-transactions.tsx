@@ -221,6 +221,7 @@ export function TableTransactions() {
                 },
               }}
               i18n="pt-br"
+              readOnly
             />
           </div>
         </div>
