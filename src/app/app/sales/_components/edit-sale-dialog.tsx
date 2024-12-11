@@ -39,6 +39,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { format, formatISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/contexts/user-context";
 
 interface Customer {
   id: string;
@@ -113,6 +114,12 @@ interface UpdateSaleDialogProps {
 //   }),
 // });
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
 export function UpdateSaleDialog({
   open,
   onOpenChange,
@@ -122,8 +129,12 @@ export function UpdateSaleDialog({
   const [products, setProducts] = useState<Product[]>([]);
   const [saleProducts, setSaleProducts] = useState<SaleProduct[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [deliverymanSelected, setDeliverymanSelected] = useState("");
+  const [deliverymanOptions, setDeliverymanOptions] = useState<User[]>([]);
 
   const { control, handleSubmit, setValue } = useForm();
+
+  const { user, loadingUser } = useUser();
 
   async function getSale() {
     const response = await fetchApi(`/sales/${saleId}`);
@@ -141,6 +152,8 @@ export function UpdateSaleDialog({
     setValue("customerId", data?.customer?.id);
     setValue("deliverymanId", data?.deliveryman?.id);
     setValue("paymentMethod", data.paymentMethod);
+
+    setDeliverymanSelected(data?.deliveryman?.id);
 
     if (data.products) {
       const saleProductsUpdated = data?.products.map((product: any) => {
@@ -211,13 +224,12 @@ export function UpdateSaleDialog({
 
     const requestData = {
       customerId: values.customerId,
-      // deliverymanId: values.deliverymanId,
+      deliverymanId: deliverymanSelected ?? null,
       paymentMethod: values.paymentMethod,
       products: saleProducts,
-      createdAt: formattedDate
+      createdAt: formattedDate,
     };
 
-    // console.log(saleProducts)
     const response = await fetchApi(`/sales/${saleId}`, {
       method: "PUT",
       body: JSON.stringify(requestData),
@@ -290,8 +302,39 @@ export function UpdateSaleDialog({
   }, []);
 
   useEffect(() => {
-    getSale();
-  }, [saleId]);
+    if (open) {
+      getSale();
+    }
+  }, [saleId, open, deliverymanOptions]);
+
+  async function getUsers() {
+    const response = await fetchApi(`/users/all`);
+
+    if (!response.ok) {
+      const respError = await response.json();
+      return;
+    }
+
+    const data = await response.json();
+
+    const usersFormatted = data.map((user: any) => ({
+      id: user._id,
+      name: user.props.name,
+      email: user.props.email,
+    }));
+
+    setDeliverymanOptions(usersFormatted);
+  }
+
+  useEffect(() => {
+    if (open) {
+      getUsers();
+    }
+  }, [open]);
+
+  if (loadingUser) {
+    return;
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -480,6 +523,27 @@ export function UpdateSaleDialog({
               </Select>
             )}
           />
+          {user?.role === "ADMIN" && (
+            <Select
+              value={deliverymanSelected}
+              onValueChange={(value) => {
+                setDeliverymanSelected(value);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um entregador" />
+              </SelectTrigger>
+              <SelectContent>
+                {deliverymanOptions.map((deliveryman) => {
+                  return (
+                    <SelectItem key={deliveryman.id} value={deliveryman.id}>
+                      {deliveryman.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          )}
           <div>
             <Popover>
               <PopoverTrigger asChild>
