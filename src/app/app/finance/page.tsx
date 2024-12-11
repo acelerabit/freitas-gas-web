@@ -21,6 +21,7 @@ import { OnlyRolesCanAccess } from "../_components/only-who-can-access";
 import { TableSuppliersWithDebts } from "./_components/suppliers-debts-table";
 import { TransferToAccountDialog } from "./_components/tranfer-to-account-dialog";
 import { TransferAccountTable } from "./_components/transfer-account-table";
+import { TableDeliverymenCashBalances } from "./_components/cash-balance-deliveryman";
 
 export default function Finance() {
   const { isOpen, onOpenChange } = useModal();
@@ -67,6 +68,9 @@ export default function Finance() {
         </div>
         <TableTransaction />
         <TableDeposits />
+        <div className="mt-10">
+          <TableDeliverymenCashBalances />
+        </div>
         <div className="mt-10">
           <TableCustomersWithDebts />
         </div>
