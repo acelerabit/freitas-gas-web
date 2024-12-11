@@ -75,6 +75,12 @@ const bottleStatusMapper = [
   { key: "COMODATO", value: "comodato" },
 ];
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
 export function SaleDialogForm({
   isOpen,
   onClose,
@@ -90,6 +96,8 @@ export function SaleDialogForm({
     products: [{ type: "", status: "EMPTY", price: 0, quantity: 1 }],
     paymentMethod: "",
   });
+  const [deliverymanSelected, setDeliverymanSelected] = useState("");
+  const [deliverymanOptions, setDeliverymanOptions] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -181,20 +189,23 @@ export function SaleDialogForm({
     }));
   };
   const onSubmitHandler = () => {
-
     if (!formData.paymentMethod) {
       toast.error("Método de pagamento deve estar preenchido");
       return;
     }
 
-    if(formData.products.length <= 0) {
+    if (formData.products.length <= 0) {
       toast.error("Produtos são necessários para consolidar a venda.");
 
-      return
+      return;
     }
 
-    if(formData.products.some((product: any) => product.type == null || product.type === "")) {
-      toast.error("O tipo do produto deve ser selecionado",{
+    if (
+      formData.products.some(
+        (product: any) => product.type == null || product.type === ""
+      )
+    ) {
+      toast.error("O tipo do produto deve ser selecionado", {
         action: {
           label: "Undo",
           onClick: () => console.log("Undo"),
@@ -203,25 +214,38 @@ export function SaleDialogForm({
       return;
     }
 
-    if(formData.products.some((product: any) => !product.status)) {
+    if (formData.products.some((product: any) => !product.status)) {
       toast.error("O tipo de venda deve ser selecionado");
       return;
     }
 
-    if (formData.products.some((product: any) => product.price == null || product.price < 0)) {
+    if (
+      formData.products.some(
+        (product: any) => product.price == null || product.price < 0
+      )
+    ) {
       toast.error("O preço deve ser um valor válido.");
       return;
     }
 
-    if (formData.products.some((product: any) => product.quantity == null || product.quantity < 0)) {
+    if (
+      formData.products.some(
+        (product: any) => product.quantity == null || product.quantity < 0
+      )
+    ) {
       toast.error("A quantidade deve ser um valor válido.");
+      return;
+    }
+
+    if (user?.role === "ADMIN" && !deliverymanSelected) {
+      toast.error("O entregador deve ser selecionado.");
       return;
     }
 
     const saleData = {
       ...formData,
       // ...data,
-      deliverymanId: user?.id || "",
+      deliverymanId: deliverymanSelected ? deliverymanSelected : user?.id,
     };
 
     onSubmit(saleData);
@@ -234,7 +258,30 @@ export function SaleDialogForm({
     }));
   }
 
-  // console.log(formState.errors)
+  async function getUsers() {
+    const response = await fetchApi(`/users/all`);
+
+    if (!response.ok) {
+      const respError = await response.json();
+      return;
+    }
+
+    const data = await response.json();
+
+    const usersFormatted = data.map((user: any) => ({
+      id: user._id,
+      name: user.props.name,
+      email: user.props.email,
+    }));
+
+    setDeliverymanOptions(usersFormatted);
+  }
+
+  useEffect(() => {
+    if (isOpen) {
+      getUsers();
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -507,6 +554,27 @@ export function SaleDialogForm({
               </>
             )}
           />
+          {user?.role === "ADMIN" && (
+            <Select
+              value={deliverymanSelected}
+              onValueChange={(value) => {
+                setDeliverymanSelected(value);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um entregador" />
+              </SelectTrigger>
+              <SelectContent>
+                {deliverymanOptions.map((deliveryman) => {
+                  return (
+                    <SelectItem key={deliveryman.id} value={deliveryman.id}>
+                      {deliveryman.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          )}
           <DialogFooter>
             <Button type="submit" className="w-full sm:w-auto">
               Salvar
