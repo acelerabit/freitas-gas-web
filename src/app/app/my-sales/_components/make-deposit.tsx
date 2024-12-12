@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { isBefore } from "date-fns";
 import {
   Card,
   CardContent,
@@ -332,7 +333,7 @@ export function MakeDeposit() {
                             selected={field.value}
                             onSelect={field.onChange}
                             locale={ptBR}
-                            disabled={disablePastDates}
+                            disabled={(date) => !isBefore(date, new Date())}
                             initialFocus
                           />
                         </PopoverContent>
