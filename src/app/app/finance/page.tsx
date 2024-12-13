@@ -22,71 +22,84 @@ import { TableSuppliersWithDebts } from "./_components/suppliers-debts-table";
 import { TransferToAccountDialog } from "./_components/tranfer-to-account-dialog";
 import { TransferAccountTable } from "./_components/transfer-account-table";
 import { TableDeliverymenCashBalances } from "./_components/cash-balance-deliveryman";
+import { TableCustomersTotalWithDebts } from "./_components/customer-table-total-debts";
 
 export default function Finance() {
   const { isOpen, onOpenChange } = useModal();
-  const { isOpen: isOpenTransfer, onOpenChange: onOpenChangeTransfer } = useModal();
-  const { isOpen: isOpenTransferAccount, onOpenChange: onOpenChangeTransferAccount } = useModal();
-
+  const { isOpen: isOpenTransfer, onOpenChange: onOpenChangeTransfer } =
+    useModal();
+  const {
+    isOpen: isOpenTransferAccount,
+    onOpenChange: onOpenChangeTransferAccount,
+  } = useModal();
 
   return (
     <OnlyRolesCanAccess rolesCanAccess={["ADMIN"]}>
-    <main className="p-8 flex flex-col">
-      <h1 className="text-4xl font-semibold">Financeiro</h1>
+      <main className="p-8 flex flex-col">
+        <h1 className="text-4xl font-semibold">Financeiro</h1>
 
-      <Breadcrumb className="my-4">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/app">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>financeiro</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+        <Breadcrumb className="my-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/app">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>financeiro</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-      <div className="space-y-2">
-        <CompanyBalance />
+        <div className="space-y-2">
+          <CompanyBalance />
 
-        <div
-          className="w-full flex items-center justify-center"
-          style={{
-            padding: "40px 0",
-            border: "1px solid #ddd",
-            borderRadius: "5px",
-            backgroundColor: "#efefef",
-            margin: "30px 0"
-          }}
-        >
-          <div className="space-x-4">
-            <Button onClick={onOpenChange}>Adicionar movimentação</Button>
-            <Button onClick={onOpenChangeTransfer}>Fazer transferência</Button>
-            <Button onClick={onOpenChangeTransferAccount}>Fazer transferência entre contas</Button>
-
+          <div
+            className="w-full flex items-center justify-center"
+            style={{
+              padding: "40px 0",
+              border: "1px solid #ddd",
+              borderRadius: "5px",
+              backgroundColor: "#efefef",
+              margin: "30px 0",
+            }}
+          >
+            <div className="space-x-4">
+              <Button onClick={onOpenChange}>Adicionar movimentação</Button>
+              <Button onClick={onOpenChangeTransfer}>
+                Fazer transferência
+              </Button>
+              <Button onClick={onOpenChangeTransferAccount}>
+                Fazer transferência entre contas
+              </Button>
+            </div>
+          </div>
+          <TableTransaction />
+          <TableDeposits />
+          <div className="mt-10">
+            <TableDeliverymenCashBalances />
+          </div>
+          <div className="mt-10">
+            {/* <TableCustomersWithDebts /> */}
+            <TableCustomersTotalWithDebts />
+          </div>
+          <div className="mt-10">
+            <TableSuppliersWithDebts />
+          </div>
+          <div className="mt-10">
+            <TransferAccountTable />
           </div>
         </div>
-        <TableTransaction />
-        <TableDeposits />
-        <div className="mt-10">
-          <TableDeliverymenCashBalances />
-        </div>
-        <div className="mt-10">
-          <TableCustomersWithDebts />
-        </div>
-        <div className="mt-10">
-          <TableSuppliersWithDebts />
-        </div>
-        <div className="mt-10">
-          <TransferAccountTable />
-        </div>
-      </div>
 
-      <AddTransactionDialog open={isOpen} onOpenChange={onOpenChange} />
-      <TransferTransactionDialog open={isOpenTransfer} onOpenChange={onOpenChangeTransfer} />
-      <TransferToAccountDialog open={isOpenTransferAccount} onOpenChange={onOpenChangeTransferAccount} />
-
-    </main>
+        <AddTransactionDialog open={isOpen} onOpenChange={onOpenChange} />
+        <TransferTransactionDialog
+          open={isOpenTransfer}
+          onOpenChange={onOpenChangeTransfer}
+        />
+        <TransferToAccountDialog
+          open={isOpenTransferAccount}
+          onOpenChange={onOpenChangeTransferAccount}
+        />
+      </main>
     </OnlyRolesCanAccess>
   );
 }
