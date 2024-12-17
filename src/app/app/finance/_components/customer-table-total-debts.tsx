@@ -23,6 +23,7 @@ interface CustomerDebt {
   customerName: string;
   totalDebt: number;
   paid: boolean;
+  sales: {id: string, paid: boolean}[]
 }
 
 export function TableCustomersTotalWithDebts() {
@@ -53,6 +54,7 @@ export function TableCustomersTotalWithDebts() {
     }
 
     const data = await response.json();
+
     setCustomers(data);
     setLoading(false);
   }
@@ -106,7 +108,7 @@ export function TableCustomersTotalWithDebts() {
                     {fCurrencyIntlBRL(customer.totalDebt)}
                   </TableCell>
                   <TableCell className="font-medium truncate">
-                    {customer.paid ? (
+                    {customer.sales.filter(sale => !sale.paid).length === 0 ? (
                       <div className="flex gap-2">
                         <p className="text-green-800">PAGO</p>
                         <Checkbox checked disabled />
