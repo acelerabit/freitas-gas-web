@@ -449,7 +449,7 @@ export default function TableSale() {
               popoverDirection="down"
               primaryColor={"blue"}
               showShortcuts={true}
-              placeholder={"DD/MM/YYYY ~ DD/MM/YYYY"}
+              placeholder={"DD/MM/AAAA ~ DD/MM/AAAA"}
               displayFormat={"DD/MM/YYYY"}
               value={dateFilter}
               onChange={handleValueChange}
