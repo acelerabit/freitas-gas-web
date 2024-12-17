@@ -40,6 +40,8 @@ import { format, formatISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/user-context";
+import ProductQuantityInput from "./input-quantity";
+import UpdateQuantityInput from "./update-input-quantity";
 
 interface Customer {
   id: string;
@@ -473,7 +475,7 @@ export function UpdateSaleDialog({
                     render={({ field }) => (
                       <div>
                         <Label>Quantidade</Label>
-                        <Input
+                        {/* <Input
                           placeholder="Quantidade"
                           type="number"
                           {...field}
@@ -485,7 +487,8 @@ export function UpdateSaleDialog({
                             setSaleProducts(updatedProducts);
                             field.onChange(parseInt(e.target.value, 10) || 1);
                           }}
-                        />
+                        /> */}
+                        <UpdateQuantityInput field={field} saleProducts={saleProducts} setSaleProducts={setSaleProducts} index={index} product={product} />
                       </div>
                     )}
                   />

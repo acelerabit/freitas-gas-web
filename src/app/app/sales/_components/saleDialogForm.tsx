@@ -26,6 +26,7 @@ import { CurrencyInput } from "react-currency-mask";
 import { Separator } from "@/components/ui/separator";
 import { Trash } from "lucide-react";
 import { toast } from "sonner";
+import ProductQuantityInput from "./input-quantity";
 
 interface ProductType {
   id: string;
@@ -98,6 +99,7 @@ export function SaleDialogForm({
   });
   const [deliverymanSelected, setDeliverymanSelected] = useState("");
   const [deliverymanOptions, setDeliverymanOptions] = useState<User[]>([]);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -258,6 +260,16 @@ export function SaleDialogForm({
     }));
   }
 
+  function increment() {
+    setCount((oldCount) => oldCount + 1);
+  }
+
+  function decrement() {
+    if (count - 1 > 0) {
+      setCount((oldCount) => oldCount - 1);
+    }
+  }
+
   async function getUsers() {
     const response = await fetchApi(`/users/all`);
 
@@ -276,6 +288,7 @@ export function SaleDialogForm({
 
     setDeliverymanOptions(usersFormatted);
   }
+  
 
   useEffect(() => {
     if (isOpen) {
@@ -471,7 +484,7 @@ export function SaleDialogForm({
                       <>
                         <div>
                           <Label>Quantidade</Label>
-                          <Input
+                          {/* <Input
                             placeholder="Quantidade"
                             type="number"
                             {...field}
@@ -486,7 +499,9 @@ export function SaleDialogForm({
                               }));
                               field.onChange(parseInt(e.target.value, 10) || 1);
                             }}
-                          />
+
+                          /> */}
+                          <ProductQuantityInput field={field} formData={formData} setFormData={setFormData} index={index} product={product} />
                           {fieldState?.error && (
                             <p
                               style={{
