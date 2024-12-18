@@ -560,6 +560,7 @@ export function SaleDialogForm({
             render={({ field, fieldState }) => (
               <div className="z-50">
                 <Select
+      
                   {...field}
                   onValueChange={(value) => {
                     field.onChange(value);
@@ -571,7 +572,7 @@ export function SaleDialogForm({
                   >
                     <SelectValue placeholder="Selecione um método de pagamento" />
                   </SelectTrigger>
-                  <SelectContent className="z-50">
+                  <SelectContent className="z-50 pointer-events-auto">
                     <SelectItem className="z-50" value="DINHEIRO">Dinheiro</SelectItem>
                     <SelectItem className="z-50" value="CARTAO">Cartão de débito</SelectItem>
                     <SelectItem className="z-50" value="CARTAO_CREDITO">
