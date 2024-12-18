@@ -224,13 +224,24 @@ export function UpdateSaleDialog({
 
     const formattedDate = formatISO(selectedDate);
 
+    const formattedSaleProducts = saleProducts.map(product => {
+      const productFound = products.find(p => p.status === product.status && p.type === product.type)
+
+
+      return {
+        ...product,
+        productId: productFound?.id
+      }
+    })
+
     const requestData = {
       customerId: values.customerId,
       deliverymanId: deliverymanSelected ?? null,
       paymentMethod: values.paymentMethod,
-      products: saleProducts,
+      products: formattedSaleProducts,
       createdAt: formattedDate,
     };
+
 
     const response = await fetchApi(`/sales/${saleId}`, {
       method: "PUT",
@@ -251,51 +262,91 @@ export function UpdateSaleDialog({
     window.location.reload();
   };
 
-  const handleProductSelect = (type: ProductType, index: number) => {
-    const selectedProduct = products[index];
+  const handleProductSelect = (id: string, type: ProductType, index: number) => {
+    const indexFound = saleProducts.findIndex(p => p.id === id && p.type === type)
 
-    if (selectedProduct) {
-      const updatedProducts = [...saleProducts];
-      updatedProducts[index] = {
-        ...updatedProducts[index],
-        id: selectedProduct.id,
-        type: type,
-        status: selectedProduct.status,
-        typeSale: selectedProduct.status,
-        price: selectedProduct.price,
-        quantity: updatedProducts[index].quantity,
-      };
+    const selectedProduct = saleProducts[indexFound];
 
-      setSaleProducts(updatedProducts);
 
-      setValue(`products[${index}].productId`, selectedProduct.id);
-      setValue(`products[${index}].type`, type);
-      setValue(`products[${index}].status`, selectedProduct.status);
-      setValue(`products[${index}].price`, selectedProduct.price);
-    }
+    setSaleProducts((prevSaleProducts) => {
+      // Cria uma cópia do array
+      const updatedSaleProducts = [...prevSaleProducts];
+  
+      // Cria uma cópia do item que será atualizado
+      const updatedProduct = { ...updatedSaleProducts[index], type };
+  
+      // Atualiza o item na posição específica
+      updatedSaleProducts[index] = updatedProduct;
+  
+      // Retorna o novo array para atualizar o estado
+      return updatedSaleProducts;
+    });
+
+    // if (selectedProduct) {
+    //   const updatedProducts = [...saleProducts];
+    //   updatedProducts[index] = {
+    //     ...updatedProducts[index],
+    //     id: selectedProduct.id,
+    //     type: selectedProduct.type,
+    //     status: selectedProduct.status,
+    //     typeSale: selectedProduct.status,
+    //     price: selectedProduct.price,
+    //     quantity: updatedProducts[index].quantity,
+    //   };
+
+    //   setSaleProducts(updatedProducts);
+
+    //   setValue(`products[${index}].productId`, selectedProduct.id);
+    //   setValue(`products[${index}].type`, selectedProduct.type);
+    //   setValue(`products[${index}].status`, selectedProduct.status);
+    //   setValue(`products[${index}].price`, selectedProduct.price);
+    // }
   };
 
-  function handleTypeSaleSelect(status: string, index: number) {
-    const selectedProduct = products[index];
+  function handleTypeSaleSelect(status: string, index: number, type: string, id: string) {
+    const indexFound = saleProducts.findIndex(p => p.id === id)
 
-    if (selectedProduct) {
-      const updatedProducts = [...saleProducts];
-      updatedProducts[index] = {
-        ...updatedProducts[index],
-        id: selectedProduct.id,
-        type: selectedProduct.type,
-        status,
-        price: selectedProduct.price,
-        quantity: updatedProducts[index].quantity,
-      };
 
-      setSaleProducts(updatedProducts);
+    const touchedProduct = saleProducts[index];
 
-      setValue(`products[${index}].productId`, selectedProduct.id);
-      setValue(`products[${index}].type`, selectedProduct.type);
-      setValue(`products[${index}].status`, status);
-      setValue(`products[${index}].price`, selectedProduct.price);
-    }
+    const selectedProduct = products.find(p => p.type === type && p.status === status)
+
+    // console.log(selectedProduct)
+
+    setSaleProducts((prevSaleProducts) => {
+      // Cria uma cópia do array
+      const updatedSaleProducts = [...prevSaleProducts];
+  
+      // Cria uma cópia do item que será atualizado
+      const updatedProduct = { ...updatedSaleProducts[index], status };
+  
+      // Atualiza o item na posição específica
+      updatedSaleProducts[index] = updatedProduct;
+  
+      // Retorna o novo array para atualizar o estado
+      return updatedSaleProducts;
+    });
+
+    // console.log(type, id, saleProducts[])
+
+    // if (selectedProduct) {
+    //   const updatedProducts = [...saleProducts];
+    //   updatedProducts[index] = {
+    //     ...updatedProducts[index],
+    //     id: selectedProduct.id,
+    //     type: selectedProduct.type,
+    //     status,
+    //     price: selectedProduct.price,
+    //     quantity: updatedProducts[index].quantity,
+    //   };
+
+    //   setSaleProducts(updatedProducts);
+
+    //   setValue(`products[${index}].productId`, selectedProduct.id);
+    //   setValue(`products[${index}].type`, selectedProduct.type);
+    //   setValue(`products[${index}].status`, status);
+    //   setValue(`products[${index}].price`, selectedProduct.price);
+    // }
   }
 
   useEffect(() => {
@@ -383,7 +434,7 @@ export function UpdateSaleDialog({
                         {...field}
                         defaultValue={product.type}
                         onValueChange={(value) =>
-                          handleProductSelect(value as ProductType, index)
+                          handleProductSelect(product.id, value as ProductType, index)
                         }
                       >
                         <SelectTrigger>
@@ -407,7 +458,7 @@ export function UpdateSaleDialog({
                         {...field}
                         defaultValue={product.typeSale}
                         onValueChange={(value) =>
-                          handleTypeSaleSelect(value, index)
+                          handleTypeSaleSelect(value, index, product.type, product.id)
                         }
                       >
                         <SelectTrigger>
