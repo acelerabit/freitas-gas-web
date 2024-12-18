@@ -571,7 +571,7 @@ export function SaleDialogForm({
                   >
                     <SelectValue placeholder="Selecione um método de pagamento" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-50">
                     <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
                     <SelectItem value="CARTAO">Cartão de débito</SelectItem>
                     <SelectItem value="CARTAO_CREDITO">
