@@ -82,6 +82,8 @@ interface User {
   name: string;
 }
 
+const generateId = () => Math.random().toString(36).substr(2, 9);
+
 export function SaleDialogForm({
   isOpen,
   onClose,
@@ -94,7 +96,15 @@ export function SaleDialogForm({
   const [formData, setFormData] = useState({
     customerId: "",
     deliverymanId: user?.id || "",
-    products: [{ type: "", status: "EMPTY", price: 0, quantity: 1 }],
+    products: [
+      {
+        orderId: generateId(),
+        type: "",
+        status: "EMPTY",
+        price: 0,
+        quantity: 1,
+      },
+    ],
     paymentMethod: "",
   });
   const [deliverymanSelected, setDeliverymanSelected] = useState("");
@@ -148,6 +158,7 @@ export function SaleDialogForm({
     if (selectedProduct) {
       const updatedProducts = [...formData.products];
       updatedProducts[index] = {
+        orderId: currentProduct.orderId,
         type: type,
         status: currentProduct.status,
         price: selectedProduct.price,
@@ -170,6 +181,7 @@ export function SaleDialogForm({
     if (selectedProduct && findProduct) {
       const updatedProducts = [...formData.products];
       updatedProducts[index] = {
+        orderId: selectedProduct.orderId,
         type: selectedProduct.type,
         status: value,
         price: findProduct.price,
@@ -186,7 +198,13 @@ export function SaleDialogForm({
       ...prevData,
       products: [
         ...prevData.products,
-        { type: "", status: "EMPTY", price: 0, quantity: 1 },
+        {
+          orderId: generateId(),
+          type: "",
+          status: "EMPTY",
+          price: 0,
+          quantity: 1,
+        },
       ],
     }));
   };
@@ -253,21 +271,16 @@ export function SaleDialogForm({
     onSubmit(saleData);
   };
 
-  function removeProduct(index: number) {
-    setFormData((prev) => ({
-      ...prev,
-      products: prev.products.filter((_, i) => i !== index),
-    }));
-  }
+  function removeProduct(index: number, orderId?: string) {
+    const clonedProducts = [...formData.products]
+    const result = clonedProducts.filter((p) => p.orderId !== orderId);
 
-  function increment() {
-    setCount((oldCount) => oldCount + 1);
-  }
-
-  function decrement() {
-    if (count - 1 > 0) {
-      setCount((oldCount) => oldCount - 1);
+    const newFormData = {
+      ...formData,
+      products: [...result]
     }
+
+    setFormData(newFormData);
   }
 
   async function getUsers() {
@@ -288,13 +301,13 @@ export function SaleDialogForm({
 
     setDeliverymanOptions(usersFormatted);
   }
-  
 
   useEffect(() => {
     if (isOpen) {
       getUsers();
     }
   }, [isOpen]);
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -342,7 +355,7 @@ export function SaleDialogForm({
             )}
           />
           {formData.products.map((product, index) => (
-            <div key={index} className="space-y-4">
+            <div key={product.orderId} className="space-y-4">
               <div className="flex gap-2  items-start">
                 <div className="flex-1 space-y-4">
                   <Controller
@@ -501,7 +514,13 @@ export function SaleDialogForm({
                             }}
 
                           /> */}
-                          <ProductQuantityInput field={field} formData={formData} setFormData={setFormData} index={index} product={product} />
+                          <ProductQuantityInput
+                            field={field}
+                            formData={formData}
+                            setFormData={setFormData}
+                            index={index}
+                            product={product}
+                          />
                           {fieldState?.error && (
                             <p
                               style={{
@@ -519,7 +538,11 @@ export function SaleDialogForm({
                   />
                 </div>
 
-                <Button variant="ghost" onClick={() => removeProduct(index)}>
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => removeProduct(index, product.orderId)}
+                >
                   <Trash />
                 </Button>
               </div>
@@ -535,7 +558,7 @@ export function SaleDialogForm({
             control={control}
             rules={{ required: "Selecione um método de pagamento" }}
             render={({ field, fieldState }) => (
-              <>
+              <div className="z-50">
                 <Select
                   {...field}
                   onValueChange={(value) => {
@@ -566,7 +589,7 @@ export function SaleDialogForm({
                     {fieldState?.error?.message}
                   </p>
                 )}
-              </>
+              </div>
             )}
           />
           {user?.role === "ADMIN" && (
