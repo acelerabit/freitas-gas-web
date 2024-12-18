@@ -572,14 +572,14 @@ export function SaleDialogForm({
                     <SelectValue placeholder="Selecione um método de pagamento" />
                   </SelectTrigger>
                   <SelectContent className="z-50">
-                    <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
-                    <SelectItem value="CARTAO">Cartão de débito</SelectItem>
-                    <SelectItem value="CARTAO_CREDITO">
+                    <SelectItem className="z-50" value="DINHEIRO">Dinheiro</SelectItem>
+                    <SelectItem className="z-50" value="CARTAO">Cartão de débito</SelectItem>
+                    <SelectItem className="z-50" value="CARTAO_CREDITO">
                       Cartão de crédito
                     </SelectItem>
-                    <SelectItem value="PIX">Pix</SelectItem>
-                    <SelectItem value="FIADO">Venda a receber</SelectItem>
-                    <SelectItem value="TRANSFERENCIA">Transferência</SelectItem>
+                    <SelectItem className="z-50" value="PIX">Pix</SelectItem>
+                    <SelectItem className="z-50" value="FIADO">Venda a receber</SelectItem>
+                    <SelectItem className="z-50" value="TRANSFERENCIA">Transferência</SelectItem>
                   </SelectContent>
                 </Select>
                 {fieldState?.error && (
