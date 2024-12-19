@@ -25,7 +25,7 @@ export default function Finance() {
       <Breadcrumb className="my-4">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/app">Home</BreadcrumbLink>
+            <BreadcrumbLink href="/app/dashboard">Home</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

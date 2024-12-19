@@ -545,7 +545,9 @@ export function SaleDialogForm({
                   <Trash />
                 </Button>
               </div>
-              <Separator className="last:hidden" />
+              {index < formData.products.length - 1 && (
+                <Separator className="border-t-2 border-gray-400 w-full" />
+              )}
             </div>
           ))}
           <Button type="button" onClick={addProductField}>

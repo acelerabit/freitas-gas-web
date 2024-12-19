@@ -78,7 +78,7 @@ export function TransferTransactionDialog({
 
   const [deliverymans, setDeliverymans] = useState<User[]>([]);
   const [expenseTypeOptions, setExpenseTypeOptions] = useState([
-    { key: "outros", value: "outros" },
+    { key: "outros", value: "Outros" },
   ]);
   const [selected, setSelected] = useState("");
   const [accountOptions, setAccountOptions] = useState<
@@ -285,11 +285,8 @@ export function TransferTransactionDialog({
                     </FormControl>
                     <SelectContent>
                       {expenseTypeOptions.map((expenseType) => (
-                        <SelectItem
-                          key={expenseType.key}
-                          value={expenseType.key}
-                        >
-                          {expenseType.value}
+                        <SelectItem key={expenseType.key} value={expenseType.key}>
+                          {expenseType.value.charAt(0).toUpperCase() + expenseType.value.slice(1)}
                         </SelectItem>
                       ))}
                     </SelectContent>

@@ -46,15 +46,15 @@ const BottleStatusSchema = z.enum(["FULL", "EMPTY", "COMODATO"]);
 const bottleStatusOptions = [
   {
     key: "FULL",
-    value: "cheio",
+    value: "Cheio",
   },
-  { key: "EMPTY", value: "vazio" },
-  { key: "COMODATO", value: "comodato" },
+  { key: "EMPTY", value: "Vazio" },
+  { key: "COMODATO", value: "Comodato" },
 ];
 
 const formSchema = z.object({
   status: BottleStatusSchema,
-  quantity: z.coerce.number().min(0, "insira um numero maior ou igual a 0"),
+  quantity: z.coerce.number().min(0, "Insira um numero maior ou igual a 0"),
 });
 
 export function IncreaseProductQuantityDialog({

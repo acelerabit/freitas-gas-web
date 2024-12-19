@@ -10,10 +10,8 @@ export function formatDate(date: string) {
 }
 
 export function formatSignedDate(dateInput: Date | string): string {
-  // Converte a data de entrada para um objeto dayjs
   const date = dayjs(dateInput);
 
-  // Formata a data conforme necessário
   const formattedDate = `Assinado em ${date.format('D [de] MMMM, YYYY')}`;
 
   return formattedDate;

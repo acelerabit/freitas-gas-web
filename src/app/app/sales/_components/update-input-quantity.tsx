@@ -19,9 +19,8 @@ const UpdateQuantityInput = ({
 }: UpdateQuantityInputProps) => {
   const handleQuantityChange = (newQuantity: number) => {
     const updatedProducts = [...saleProducts];
-    updatedProducts[index].quantity = newQuantity >= 0 ? newQuantity : 0; // Garante que a quantidade não seja menor que 0
-    setSaleProducts(updatedProducts);
-    field.onChange(newQuantity >= 0 ? newQuantity : 0); // Garante consistência com React Hook Form
+    updatedProducts[index].quantity = newQuantity >= 0 ? newQuantity : 0;
+    field.onChange(newQuantity >= 0 ? newQuantity : 0);
   };
 
   return (
@@ -30,7 +29,7 @@ const UpdateQuantityInput = ({
       <Button
         type="button"
         onClick={() => handleQuantityChange(product.quantity - 1)}
-        disabled={product.quantity <= 0} // Desabilita o botão se quantidade for 0
+        disabled={product.quantity <= 0}
       >
         -
       </Button>
@@ -46,7 +45,7 @@ const UpdateQuantityInput = ({
           handleQuantityChange(isNaN(newQuantity) ? 0 : newQuantity);
         }}
         className="text-center"
-        min={0} // Evita entrada de valores negativos
+        min={0}
       />
 
       {/* Botão Incrementar */}

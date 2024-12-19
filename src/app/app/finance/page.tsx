@@ -41,7 +41,7 @@ export default function Finance() {
         <Breadcrumb className="my-4">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/app">Home</BreadcrumbLink>
+              <BreadcrumbLink href="/app/dashboard">Home</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -66,10 +66,10 @@ export default function Finance() {
             <div className="space-x-4">
               <Button onClick={onOpenChange}>Adicionar movimentação</Button>
               <Button onClick={onOpenChangeTransfer}>
-                Fazer transferência
+                Transferência para entregador
               </Button>
               <Button onClick={onOpenChangeTransferAccount}>
-                Fazer transferência entre contas
+                Transferência entre contas
               </Button>
             </div>
           </div>
