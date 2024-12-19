@@ -546,7 +546,7 @@ export function SaleDialogForm({
                 </Button>
               </div>
               {index < formData.products.length - 1 && (
-                <Separator className="border-t-2 border-gray-400 w-full" />
+                <Separator className="border-t border-[#c3c3c3] w-full my-[35px]" />
               )}
             </div>
           ))}
