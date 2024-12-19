@@ -646,6 +646,8 @@ export function SaleDialogForm({
                   >
                     <select
                       {...field}
+                      defaultValue=""
+                      value={field.value}
                       onChange={(e) => {
                         let value = e.target.value;
 
