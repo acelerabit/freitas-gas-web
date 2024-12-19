@@ -272,13 +272,13 @@ export function SaleDialogForm({
   };
 
   function removeProduct(index: number, orderId?: string) {
-    const clonedProducts = [...formData.products]
+    const clonedProducts = [...formData.products];
     const result = clonedProducts.filter((p) => p.orderId !== orderId);
 
     const newFormData = {
       ...formData,
-      products: [...result]
-    }
+      products: [...result],
+    };
 
     setFormData(newFormData);
   }
@@ -307,7 +307,6 @@ export function SaleDialogForm({
       getUsers();
     }
   }, [isOpen]);
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -553,46 +552,136 @@ export function SaleDialogForm({
             Adicionar Produto
           </Button>
 
-          <Controller
-            name="paymentMethod"
-            control={control}
-            rules={{ required: "Selecione um método de pagamento" }}
-            render={({ field, fieldState }) => (
-              <div className="z-50">
-                <Select
-      
-                  {...field}
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    setFormData((prev) => ({ ...prev, paymentMethod: value }));
-                  }}
-                >
-                  <SelectTrigger
-                    className={fieldState?.error ? "border-red-500" : ""}
+          {user?.role === "ADMIN" && (
+            <Controller
+              name="paymentMethod"
+              control={control}
+              rules={{ required: "Selecione um método de pagamento" }}
+              render={({ field, fieldState }) => (
+                <div className="z-50 ">
+                  <Select
+                    {...field}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setFormData((prev) => ({
+                        ...prev,
+                        paymentMethod: value,
+                      }));
+                    }}
                   >
-                    <SelectValue placeholder="Selecione um método de pagamento" />
-                  </SelectTrigger>
-                  <SelectContent className="z-50 pointer-events-auto">
-                    <SelectItem className="z-50" value="DINHEIRO">Dinheiro</SelectItem>
-                    <SelectItem className="z-50" value="CARTAO">Cartão de débito</SelectItem>
-                    <SelectItem className="z-50" value="CARTAO_CREDITO">
-                      Cartão de crédito
-                    </SelectItem>
-                    <SelectItem className="z-50" value="PIX">Pix</SelectItem>
-                    <SelectItem className="z-50" value="FIADO">Venda a receber</SelectItem>
-                    <SelectItem className="z-50" value="TRANSFERENCIA">Transferência</SelectItem>
-                  </SelectContent>
-                </Select>
-                {fieldState?.error && (
-                  <p
-                    style={{ color: "red", fontSize: "12px", marginTop: "4px" }}
+                    <SelectTrigger
+                      className={fieldState?.error ? "border-red-500" : ""}
+                    >
+                      <SelectValue placeholder="Selecione um método de pagamento" />
+                    </SelectTrigger>
+                    <SelectContent
+                      side="bottom"
+                      aria-modal
+                      collisionPadding={10}
+                      style={{
+                        pointerEvents: "auto",
+                      }}
+                    >
+                      <SelectItem
+                        style={{
+                          zIndex: 9999,
+                        }}
+                        value="DINHEIRO"
+                      >
+                        Dinheiro
+                      </SelectItem>
+                      <SelectItem
+                        style={{
+                          zIndex: 9999,
+                        }}
+                        value="CARTAO"
+                      >
+                        Cartão de débito
+                      </SelectItem>
+                      <SelectItem
+                        style={{
+                          zIndex: 9999,
+                        }}
+                        value="CARTAO_CREDITO"
+                      >
+                        Cartão de crédito
+                      </SelectItem>
+                      <SelectItem value="PIX">Pix</SelectItem>
+                      <SelectItem value="FIADO">Venda a receber</SelectItem>
+                      <SelectItem value="TRANSFERENCIA">
+                        Transferência
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {fieldState?.error && (
+                    <p
+                      style={{
+                        color: "red",
+                        fontSize: "12px",
+                        marginTop: "4px",
+                      }}
+                    >
+                      {fieldState?.error?.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            />
+          )}
+
+          {user?.role !== "ADMIN" && (
+            <Controller
+              name="paymentMethod"
+              control={control}
+              rules={{ required: "Selecione um método de pagamento" }}
+              render={({ field, fieldState }) => (
+                <div className="w-full">
+                  <label htmlFor="payment-method" className="sr-only">
+                    Método de Pagamento
+                  </label>
+                  <div
+                    className={`relative flex h-10 w-full items-center justify-between rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
+                      fieldState?.error ? "border-red-500" : "border-input"
+                    }`}
                   >
-                    {fieldState?.error?.message}
-                  </p>
-                )}
-              </div>
-            )}
-          />
+                    <select
+                      {...field}
+                      onChange={(e) => {
+                        let value = e.target.value;
+
+                        field.onChange(value);
+                        setFormData((prev) => ({
+                          ...prev,
+                          paymentMethod: value,
+                        }));
+                      }}
+                      id="payment-method"
+                      className={`w-full bg-transparent text-sm outline-none cursor-pointer disabled:cursor-not-allowed ${
+                        field.value
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      <option className="text-sm" value="" disabled>
+                        Selecione um método de pagamento
+                      </option>
+                      <option value="DINHEIRO">Dinheiro</option>
+                      <option value="CARTAO">Cartão de débito</option>
+                      <option value="CARTAO_CREDITO">Cartão de crédito</option>
+                      <option value="PIX">Pix</option>
+                      <option value="FIADO">Venda a receber</option>
+                      <option value="TRANSFERENCIA">Transferência</option>
+                    </select>
+                  </div>
+                  {fieldState?.error && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {fieldState?.error?.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            />
+          )}
           {user?.role === "ADMIN" && (
             <Select
               value={deliverymanSelected}
