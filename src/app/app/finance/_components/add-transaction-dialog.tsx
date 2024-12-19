@@ -428,7 +428,7 @@ export function AddTransactionDialog({
                   <FormLabel>Descrição da movimentação</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="descrição"
+                      placeholder="Descrição"
                       {...field}
                       value={field.value ?? ""}
                     />

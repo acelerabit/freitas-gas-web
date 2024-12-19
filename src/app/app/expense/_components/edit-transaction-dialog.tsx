@@ -307,7 +307,7 @@ export function UpdateTransactionDialog({
                     <FormLabel>Nome da nova categoria</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="nome da categoria"
+                        placeholder="Nome da categoria"
                         {...field}
                         value={field.value ?? ""}
                       />
@@ -354,7 +354,7 @@ export function UpdateTransactionDialog({
                   <FormLabel>Descrição da movimentação</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="descrição"
+                      placeholder="Descrição"
                       {...field}
                       value={field.value ?? ""}
                     />
