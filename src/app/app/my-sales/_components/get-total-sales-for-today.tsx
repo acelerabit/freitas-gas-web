@@ -41,6 +41,8 @@ const GetTotalSalesForToday: React.FC = () => {
         return 'bg-green-500';
       case 'CARTAO_CREDITO':
         return 'bg-indigo-500';
+      case 'TRANSFERENCIA':
+        return 'bg-cyan-500';
       default:
         return 'bg-gray-500';
     }
@@ -58,8 +60,10 @@ const GetTotalSalesForToday: React.FC = () => {
         return 'Pix';
       case 'CARTAO_CREDITO':
         return 'Cartão de crédito';
+      case 'TRANSFERENCIA':
+          return 'Transferência';
       default:
-        return 'Outro';
+        return 'Outros';
     }
   };
 

@@ -38,7 +38,7 @@ export default function Login() {
     if (result?.error) {
       toast.error("E-mail ou senha inválidas!",{
         action: {
-          label: "Undo",
+          label: "Ok",
           onClick: () => console.log("Undo"),
         },
       });
@@ -49,7 +49,7 @@ export default function Login() {
 
     toast.success("Login realizado com sucesso",{
       action: {
-        label: "Undo",
+        label: "Ok",
         onClick: () => console.log("Undo"),
       },
     });
@@ -69,9 +69,9 @@ export default function Login() {
       <div className="flex items-center justify-center h-full">
         <Card className="mx-auto grid gap-6 p-8">
           <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Login</h1>
+            <h1 className="text-3xl font-bold">Bem vindo(a) ao Freitas Gás</h1>
             <p className="text-balance text-muted-foreground">
-              Enter your email below to login to your account
+              Digite seu e-mail e senha abaixo para fazer login em sua conta
             </p>
           </div>
           <div className="grid gap-4">
@@ -99,7 +99,7 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>Senha</FormLabel>
                       <FormControl>
                         <Input placeholder="password" {...field} />
                       </FormControl>
@@ -108,7 +108,7 @@ export default function Login() {
                         href="/recovery-password"
                         className="ml-auto inline-block text-sm underline"
                       >
-                        Forgot your password?
+                        Esqueci minha senha
                       </Link>
                     </FormItem>
                   )}
@@ -116,26 +116,26 @@ export default function Login() {
 
                 <div className="flex flex-col gap-4 mt-4">
                   <Button type="submit" className="w-full">
-                    Login
+                    Entrar
                   </Button>
-                  <Button
+                  {/* <Button
                     type="button"
                     onClick={loginWithGoogle}
                     variant="outline"
                     className="w-full"
                   >
                     Login with Google
-                  </Button>
+                  </Button> */}
                 </div>
               </form>
             </Form>
           </div>
-          <div className="mt-4 text-center text-sm">
+          {/* <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link href="/sign-up" className="underline">
               Sign up
             </Link>
-          </div>
+          </div> */}
         </Card>
       </div>
     </div>

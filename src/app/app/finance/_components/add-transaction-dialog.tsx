@@ -58,9 +58,9 @@ const TransactionCategorySchema = z.enum([
 const transactionCategoryOptions = [
   {
     key: "INCOME",
-    value: "entrada",
+    value: "Entrada",
   },
-  { key: "WITHDRAW", value: "saida" },
+  { key: "WITHDRAW", value: "Saída" },
 ];
 
 const formSchema = z
@@ -70,12 +70,12 @@ const formSchema = z
     description: z.string().optional().nullable(),
     type: z.string().optional().nullable(),
     custom: z.string().optional().nullable(),
-    customCategory: z.string().optional().nullable(), // Campo opcional
+    customCategory: z.string().optional().nullable(),
     amount: z.coerce
       .number()
-      .min(0, "insira um numero maior ou igual a 0")
+      .min(0, "Insira um numero maior ou igual a 0")
       .positive("O valor deve ser um inteiro positivo.")
-      .refine((val) => !isNaN(val), "insira um numero"),
+      .refine((val) => !isNaN(val), "Insira um numero"),
   })
   .refine(
     (data) => {
@@ -97,10 +97,10 @@ export function AddTransactionDialog({
   const { user, loadingUser } = useUser();
 
   const [expenseTypeOptions, setExpenseTypeOptions] = useState([
-    { key: "outros", value: "outros" },
+    { key: "outros", value: "Outros" },
   ]);
   const [incomeTypeOptions, setIncomeTypeOptions] = useState([
-    { key: "outros", value: "outros" },
+    { key: "outros", value: "Outros" },
   ]);
   const [selected, setSelected] = useState("");
   const [accountOptions, setAccountOptions] = useState<
@@ -428,7 +428,7 @@ export function AddTransactionDialog({
                   <FormLabel>Descrição da movimentação</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="descrição"
+                      placeholder="Descrição"
                       {...field}
                       value={field.value ?? ""}
                     />

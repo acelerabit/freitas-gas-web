@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -19,11 +20,12 @@ import { Input } from "@/components/ui/input";
 import { useUser } from "@/contexts/user-context";
 import { fetchApi } from "@/services/fetchApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X } from "lucide-react";
+import { Info, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface UpdateBankAccountDialogProps {
   open: boolean;
@@ -55,7 +57,6 @@ export function UpdateBankAccountDialog({
     "CARTAO",
     "CARTAO_CREDITO",
     "DINHEIRO",
-    "FIADO",
     "PIX",
     "TRANSFERENCIA",
   ]);
@@ -135,7 +136,6 @@ export function UpdateBankAccountDialog({
       "CARTAO",
       "CARTAO_CREDITO",
       "DINHEIRO",
-      "FIADO",
       "PIX",
       "TRANSFERENCIA",
     ]);
@@ -157,6 +157,17 @@ export function UpdateBankAccountDialog({
         <DialogHeader>
           <DialogTitle>Atualizar conta</DialogTitle>
         </DialogHeader>
+
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertTitle>Atenção!</AlertTitle>
+          <AlertDescription>
+            A forma de pagamento "Dinheiro" só resultará em atualização do saldo
+            da conta nos casos de vendas em que a própria empresa seja
+            selecionada como entregador. Nas vendas em dinheiro feitas por
+            entregadores, o valor será atualizado no saldo do entregador.
+          </AlertDescription>
+        </Alert>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">

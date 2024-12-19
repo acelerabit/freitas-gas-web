@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { fetchApi } from "@/services/fetchApi";
+import useModal from "@/hooks/use-modal";
+import { toast } from "sonner";
 
 interface NewCustomer {
   name: string;
@@ -38,6 +40,8 @@ const CreateCustomerDialog: React.FC<CreateCustomerDialogProps> = ({ onCreate })
     email: false,
     phone: false,
   });
+
+  const {isOpen, onOpenChange} = useModal()
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^\(\d{2}\) \d{5}-\d{4}$|^\(\d{2}\) \d{4}-\d{4}$/;
@@ -88,8 +92,11 @@ const CreateCustomerDialog: React.FC<CreateCustomerDialogProps> = ({ onCreate })
       if (!response.ok) {
         throw new Error("Erro ao criar cliente");
       }
+
+      toast.success("Cliente cadastrado com sucesso")
   
       onCreate();
+      onOpenChange()
 
       setNewCustomer({
         name: "",
@@ -108,10 +115,10 @@ const CreateCustomerDialog: React.FC<CreateCustomerDialogProps> = ({ onCreate })
   }  
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button className="w-21 sm:w-auto p-2 text-center">Cadastrar Cliente</Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      {/* <DialogTrigger asChild> */}
+        <Button className="w-21 sm:w-auto p-2 text-center" onClick={onOpenChange}>Cadastrar Cliente</Button>
+      {/* </DialogTrigger> */}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Cadastrar Novo Cliente</DialogTitle>

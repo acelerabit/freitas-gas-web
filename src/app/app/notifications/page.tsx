@@ -75,7 +75,7 @@ export default function Notifications() {
         <Breadcrumb className="my-4">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/app">Home</BreadcrumbLink>
+              <BreadcrumbLink href="/app/dashboard">Home</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -87,7 +87,7 @@ export default function Notifications() {
         <div className="space-y-2">
           <Card>
             <CardContent className="flex items-center justify-end pt-4">
-              <Button onClick={markAllAsRead}>marcar todas como lida</Button>
+              <Button onClick={markAllAsRead}>Marcar todas como lida</Button>
             </CardContent>
           </Card>
 

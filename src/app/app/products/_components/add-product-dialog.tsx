@@ -51,21 +51,21 @@ const ProductTypeOptions = [
 const bottleStatusOptions = [
   {
     key: "FULL",
-    value: "cheio",
+    value: "Cheio",
   },
-  { key: "EMPTY", value: "vazio" },
-  { key: "COMODATO", value: "comodato" },
+  { key: "EMPTY", value: "Vazio" },
+  { key: "COMODATO", value: "Comodato" },
 ];
 
 const formSchema = z.object({
   type: ProductTypeSchema,
   status: BottleStatusSchema,
-  quantity: z.coerce.number().min(0, "insira um numero maior ou igual a 0"),
+  quantity: z.coerce.number().min(0, "Insira um numero maior ou igual a 0"),
   price: z.coerce
     .number()
-    .min(0, "insira um numero maior ou igual a 0")
+    .min(0, "Insira um numero maior ou igual a 0")
     .positive("O valor deve ser um inteiro positivo.")
-    .refine((val) => !isNaN(val), "insira um numero"),
+    .refine((val) => !isNaN(val), "Insira um numero"),
 });
 
 export function AddProductDialog({

@@ -88,7 +88,6 @@ export default function CardsStats() {
     }
     const response = await fetchApi(`${fetchUrl.pathname}${fetchUrl.search}`);
     if (!response.ok) {
-      console.log(response);
       setSalesIndicators({ totalSales: 0, totalPerDay: [], totalPerMonth: [] });
       setLoadingSalesIndicators(false);
       return;

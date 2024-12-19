@@ -15,6 +15,5 @@ export async function fetchApi(path: string, init?: RequestInit, noContentType?:
     headers['Content-type'] = 'application/json'
   } 
 
-
-  return fetch(url, { ...init, headers }).catch(err => err)
+  return fetch(url, { ...init, headers, }).catch(err => err)
 }

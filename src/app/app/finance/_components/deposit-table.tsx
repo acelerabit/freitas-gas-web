@@ -119,7 +119,6 @@ export function TableDeposits() {
   useEffect(() => {
     fetchDeposits();
   }, [page, dateFilter]);
-  console.log(dateFilter);
 
   if (loadingUser) {
     return <LoadingAnimation />;
@@ -132,16 +131,31 @@ export function TableDeposits() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="w-full flex items-center gap-2">
-          <div className="w-full md:max-w-xs my-4">
+          <div onKeyDown={(e) => e.preventDefault()} className="w-full md:max-w-xs my-4">
             <Datepicker
               containerClassName="relative border rounded-md border-zinc-300"
               popoverDirection="down"
               primaryColor="blue"
               showShortcuts={true}
-              placeholder="DD/MM/YYYY ~ DD/MM/YYYY"
+              placeholder="DD/MM/AAAA ~ DD/MM/AAAA"
               displayFormat="DD/MM/YYYY"
               value={dateFilter}
               onChange={handleValueChange}
+              configs={{
+                shortcuts: {
+                  today: "Hoje",
+                  yesterday: "Ontem",
+                  past: (period) => `Últimos ${period} dias`,
+                  currentMonth: "Mês atual",
+                  pastMonth: "Último mês",
+                },
+                footer: {
+                  cancel: "Cancelar",
+                  apply: "Aplicar",
+                },
+              }}
+              i18n="pt-br"
+              readOnly
             />
           </div>
         </div>

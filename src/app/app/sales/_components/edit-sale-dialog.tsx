@@ -39,6 +39,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { format, formatISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/contexts/user-context";
+import ProductQuantityInput from "./input-quantity";
+import UpdateQuantityInput from "./update-input-quantity";
 
 interface Customer {
   id: string;
@@ -113,6 +116,12 @@ interface UpdateSaleDialogProps {
 //   }),
 // });
 
+interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
 export function UpdateSaleDialog({
   open,
   onOpenChange,
@@ -122,8 +131,12 @@ export function UpdateSaleDialog({
   const [products, setProducts] = useState<Product[]>([]);
   const [saleProducts, setSaleProducts] = useState<SaleProduct[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [deliverymanSelected, setDeliverymanSelected] = useState("");
+  const [deliverymanOptions, setDeliverymanOptions] = useState<User[]>([]);
 
   const { control, handleSubmit, setValue } = useForm();
+
+  const { user, loadingUser } = useUser();
 
   async function getSale() {
     const response = await fetchApi(`/sales/${saleId}`);
@@ -141,6 +154,8 @@ export function UpdateSaleDialog({
     setValue("customerId", data?.customer?.id);
     setValue("deliverymanId", data?.deliveryman?.id);
     setValue("paymentMethod", data.paymentMethod);
+
+    setDeliverymanSelected(data?.deliveryman?.id);
 
     if (data.products) {
       const saleProductsUpdated = data?.products.map((product: any) => {
@@ -209,15 +224,25 @@ export function UpdateSaleDialog({
 
     const formattedDate = formatISO(selectedDate);
 
+    const formattedSaleProducts = saleProducts.map(product => {
+      const productFound = products.find(p => p.status === product.status && p.type === product.type)
+
+
+      return {
+        ...product,
+        productId: productFound?.id
+      }
+    })
+
     const requestData = {
       customerId: values.customerId,
-      // deliverymanId: values.deliverymanId,
+      deliverymanId: deliverymanSelected ?? null,
       paymentMethod: values.paymentMethod,
-      products: saleProducts,
-      createdAt: formattedDate
+      products: formattedSaleProducts,
+      createdAt: formattedDate,
     };
 
-    // console.log(saleProducts)
+
     const response = await fetchApi(`/sales/${saleId}`, {
       method: "PUT",
       body: JSON.stringify(requestData),
@@ -237,51 +262,91 @@ export function UpdateSaleDialog({
     window.location.reload();
   };
 
-  const handleProductSelect = (type: ProductType, index: number) => {
-    const selectedProduct = products[index];
+  const handleProductSelect = (id: string, type: ProductType, index: number) => {
+    const indexFound = saleProducts.findIndex(p => p.id === id && p.type === type)
 
-    if (selectedProduct) {
-      const updatedProducts = [...saleProducts];
-      updatedProducts[index] = {
-        ...updatedProducts[index],
-        id: selectedProduct.id,
-        type: type,
-        status: selectedProduct.status,
-        typeSale: selectedProduct.status,
-        price: selectedProduct.price,
-        quantity: updatedProducts[index].quantity,
-      };
+    const selectedProduct = saleProducts[indexFound];
 
-      setSaleProducts(updatedProducts);
 
-      setValue(`products[${index}].productId`, selectedProduct.id);
-      setValue(`products[${index}].type`, type);
-      setValue(`products[${index}].status`, selectedProduct.status);
-      setValue(`products[${index}].price`, selectedProduct.price);
-    }
+    setSaleProducts((prevSaleProducts) => {
+      // Cria uma cópia do array
+      const updatedSaleProducts = [...prevSaleProducts];
+  
+      // Cria uma cópia do item que será atualizado
+      const updatedProduct = { ...updatedSaleProducts[index], type };
+  
+      // Atualiza o item na posição específica
+      updatedSaleProducts[index] = updatedProduct;
+  
+      // Retorna o novo array para atualizar o estado
+      return updatedSaleProducts;
+    });
+
+    // if (selectedProduct) {
+    //   const updatedProducts = [...saleProducts];
+    //   updatedProducts[index] = {
+    //     ...updatedProducts[index],
+    //     id: selectedProduct.id,
+    //     type: selectedProduct.type,
+    //     status: selectedProduct.status,
+    //     typeSale: selectedProduct.status,
+    //     price: selectedProduct.price,
+    //     quantity: updatedProducts[index].quantity,
+    //   };
+
+    //   setSaleProducts(updatedProducts);
+
+    //   setValue(`products[${index}].productId`, selectedProduct.id);
+    //   setValue(`products[${index}].type`, selectedProduct.type);
+    //   setValue(`products[${index}].status`, selectedProduct.status);
+    //   setValue(`products[${index}].price`, selectedProduct.price);
+    // }
   };
 
-  function handleTypeSaleSelect(status: string, index: number) {
-    const selectedProduct = products[index];
+  function handleTypeSaleSelect(status: string, index: number, type: string, id: string) {
+    const indexFound = saleProducts.findIndex(p => p.id === id)
 
-    if (selectedProduct) {
-      const updatedProducts = [...saleProducts];
-      updatedProducts[index] = {
-        ...updatedProducts[index],
-        id: selectedProduct.id,
-        type: selectedProduct.type,
-        status,
-        price: selectedProduct.price,
-        quantity: updatedProducts[index].quantity,
-      };
 
-      setSaleProducts(updatedProducts);
+    const touchedProduct = saleProducts[index];
 
-      setValue(`products[${index}].productId`, selectedProduct.id);
-      setValue(`products[${index}].type`, selectedProduct.type);
-      setValue(`products[${index}].status`, status);
-      setValue(`products[${index}].price`, selectedProduct.price);
-    }
+    const selectedProduct = products.find(p => p.type === type && p.status === status)
+
+    // console.log(selectedProduct)
+
+    setSaleProducts((prevSaleProducts) => {
+      // Cria uma cópia do array
+      const updatedSaleProducts = [...prevSaleProducts];
+  
+      // Cria uma cópia do item que será atualizado
+      const updatedProduct = { ...updatedSaleProducts[index], status };
+  
+      // Atualiza o item na posição específica
+      updatedSaleProducts[index] = updatedProduct;
+  
+      // Retorna o novo array para atualizar o estado
+      return updatedSaleProducts;
+    });
+
+    // console.log(type, id, saleProducts[])
+
+    // if (selectedProduct) {
+    //   const updatedProducts = [...saleProducts];
+    //   updatedProducts[index] = {
+    //     ...updatedProducts[index],
+    //     id: selectedProduct.id,
+    //     type: selectedProduct.type,
+    //     status,
+    //     price: selectedProduct.price,
+    //     quantity: updatedProducts[index].quantity,
+    //   };
+
+    //   setSaleProducts(updatedProducts);
+
+    //   setValue(`products[${index}].productId`, selectedProduct.id);
+    //   setValue(`products[${index}].type`, selectedProduct.type);
+    //   setValue(`products[${index}].status`, status);
+    //   setValue(`products[${index}].price`, selectedProduct.price);
+    // }
   }
 
   useEffect(() => {
@@ -290,8 +355,39 @@ export function UpdateSaleDialog({
   }, []);
 
   useEffect(() => {
-    getSale();
-  }, [saleId]);
+    if (open) {
+      getSale();
+    }
+  }, [saleId, open, deliverymanOptions]);
+
+  async function getUsers() {
+    const response = await fetchApi(`/users/all`);
+
+    if (!response.ok) {
+      const respError = await response.json();
+      return;
+    }
+
+    const data = await response.json();
+
+    const usersFormatted = data.map((user: any) => ({
+      id: user._id,
+      name: user.props.name,
+      email: user.props.email,
+    }));
+
+    setDeliverymanOptions(usersFormatted);
+  }
+
+  useEffect(() => {
+    if (open) {
+      getUsers();
+    }
+  }, [open]);
+
+  if (loadingUser) {
+    return;
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -338,7 +434,7 @@ export function UpdateSaleDialog({
                         {...field}
                         defaultValue={product.type}
                         onValueChange={(value) =>
-                          handleProductSelect(value as ProductType, index)
+                          handleProductSelect(product.id, value as ProductType, index)
                         }
                       >
                         <SelectTrigger>
@@ -362,7 +458,7 @@ export function UpdateSaleDialog({
                         {...field}
                         defaultValue={product.typeSale}
                         onValueChange={(value) =>
-                          handleTypeSaleSelect(value, index)
+                          handleTypeSaleSelect(value, index, product.type, product.id)
                         }
                       >
                         <SelectTrigger>
@@ -430,7 +526,7 @@ export function UpdateSaleDialog({
                     render={({ field }) => (
                       <div>
                         <Label>Quantidade</Label>
-                        <Input
+                        {/* <Input
                           placeholder="Quantidade"
                           type="number"
                           {...field}
@@ -442,7 +538,8 @@ export function UpdateSaleDialog({
                             setSaleProducts(updatedProducts);
                             field.onChange(parseInt(e.target.value, 10) || 1);
                           }}
-                        />
+                        /> */}
+                        <UpdateQuantityInput field={field} saleProducts={saleProducts} setSaleProducts={setSaleProducts} index={index} product={product} />
                       </div>
                     )}
                   />
@@ -480,6 +577,27 @@ export function UpdateSaleDialog({
               </Select>
             )}
           />
+          {user?.role === "ADMIN" && (
+            <Select
+              value={deliverymanSelected}
+              onValueChange={(value) => {
+                setDeliverymanSelected(value);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um entregador" />
+              </SelectTrigger>
+              <SelectContent>
+                {deliverymanOptions.map((deliveryman) => {
+                  return (
+                    <SelectItem key={deliveryman.id} value={deliveryman.id}>
+                      {deliveryman.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          )}
           <div>
             <Popover>
               <PopoverTrigger asChild>

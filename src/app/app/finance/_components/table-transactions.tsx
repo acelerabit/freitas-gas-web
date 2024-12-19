@@ -27,6 +27,7 @@ import { SearchTransactions } from "./search-transaction";
 import { DataTable } from "./data-table-transactions";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConfirmDelete } from "./confirm-delete";
+import { UpdateDateDialog } from "./update-date-dialog";
 
 const transactionTypeLabels: { [key: string]: string } = {
   ENTRY: "Entrada",
@@ -132,6 +133,8 @@ export default function TableTransaction() {
   const { user, loadingUser } = useUser();
 
   const {isOpen: confirmDeleteOpen, onOpenChange: confirmDeleteOnOpenChange} = useModal()
+  const {isOpen: updateDateOpen, onOpenChange: updateDateOnOpenChange} = useModal()
+
 
   const handleSort = (sortField: SortType, direction: "desc" | "asc") => {
     setOrderByField(sortField);
@@ -314,6 +317,20 @@ export default function TableTransaction() {
                 </Button>
               </DropdownMenuItem> */}
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Button
+                  className="w-full cursor-pointer"
+                  onClick={() => {
+                    setTransactionId(row.original.id);
+                    updateDateOnOpenChange()
+                  }}
+                >
+                  Atualizar data
+                </Button>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
 
               <DropdownMenuItem asChild>
                 <Button
@@ -328,6 +345,7 @@ export default function TableTransaction() {
                 </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
+            
           </DropdownMenu>
         );
       },
@@ -435,10 +453,25 @@ export default function TableTransaction() {
               popoverDirection="down"
               primaryColor={"blue"}
               showShortcuts={true}
-              placeholder={"DD/MM/YYYY ~ DD/MM/YYYY"}
+              placeholder={"DD/MM/AAAA ~ DD/MM/AAAA"}
               displayFormat={"DD/MM/YYYY"}
               value={dateFilter}
               onChange={handleValueChange}
+              configs={{
+                shortcuts: {
+                  today: "Hoje",
+                  yesterday: "Ontem",
+                  past: (period) => `Últimos ${period} dias`,
+                  currentMonth: "Mês atual",
+                  pastMonth: "Último mês",
+                },
+                footer: {
+                  cancel: "Cancelar",
+                  apply: "Aplicar",
+                },
+              }}
+              i18n="pt-br"
+              readOnly
             />
           </div>
           <Select value={category} onValueChange={(value) => setCategory(value)}>
@@ -474,6 +507,8 @@ export default function TableTransaction() {
       </div>
 
       <ConfirmDelete transactionId={transactionId} open={confirmDeleteOpen} onOpenChange={confirmDeleteOnOpenChange} />
+      <UpdateDateDialog transactionId={transactionId} open={updateDateOpen} onOpenChange={updateDateOnOpenChange} transaction={transactions.find(transaction => transaction.id === transactionId)} />
+
     </div>
   );
 }

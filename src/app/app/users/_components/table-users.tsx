@@ -29,13 +29,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Importação do Select
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"; // Importação do Select
 import { useState, useEffect } from "react";
 import { EllipsisVertical } from "lucide-react";
 import { fetchApi } from "@/services/fetchApi";
 import Link from "next/link";
+import useModal from "@/hooks/use-modal";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -50,7 +65,14 @@ export function TableUsers() {
   const [page, setPage] = useState(1);
   const itemsPerPage = 5;
   const [loadingUsers, setSetLoadingUsers] = useState(true);
-  const [newUser, setNewUser] = useState({ name: "", email: "", role: "", password: "" });
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    role: "",
+    password: "",
+  });
+
+  const { isOpen, onOpenChange } = useModal();
 
   async function getUsers() {
     setSetLoadingUsers(true);
@@ -73,6 +95,7 @@ export function TableUsers() {
     const data = await response.json();
 
     setUsers(data);
+
     setSetLoadingUsers(false);
   }
 
@@ -93,6 +116,9 @@ export function TableUsers() {
       await getUsers();
       setNewUser({ name: "", email: "", role: "", password: "" });
     }
+
+    toast.success("Usuário cadastrado com sucesso");
+    onOpenChange();
   }
 
   function nextPage() {
@@ -116,10 +142,8 @@ export function TableUsers() {
     <Card className="col-span-2">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg font-semibold">Usuários</CardTitle>
-        <Dialog>
-          <DialogTrigger>
-            <Button>Cadastrar Usuário</Button>
-          </DialogTrigger>
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+          <Button onClick={onOpenChange}>Cadastrar Usuário</Button>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Cadastrar Novo Usuário</DialogTitle>
@@ -128,21 +152,29 @@ export function TableUsers() {
               <Input
                 placeholder="Nome"
                 value={newUser.name}
-                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, name: e.target.value })
+                }
               />
               <Input
                 placeholder="Email"
                 value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, email: e.target.value })
+                }
               />
               <Input
                 placeholder="Senha"
                 type="password"
                 value={newUser.password}
-                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, password: e.target.value })
+                }
               />
               <Select
-                onValueChange={(value) => setNewUser({ ...newUser, role: value })}
+                onValueChange={(value) =>
+                  setNewUser({ ...newUser, role: value })
+                }
                 value={newUser.role}
               >
                 <SelectTrigger>
@@ -209,7 +241,9 @@ export function TableUsers() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <DropdownMenuItem className="cursor-pointer" asChild>
-                          <Link href={`/app/users/${user.id}`}>Ver usuário</Link>
+                          <Link href={`/app/users/${user.id}`}>
+                            Ver usuário
+                          </Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -13,17 +14,18 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/contexts/user-context";
 import { fetchApi } from "@/services/fetchApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X } from "lucide-react";
+import { Info, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface CreateBankAccountDialogProps {
   open: boolean;
@@ -40,7 +42,12 @@ const paymentsMapper = {
 };
 
 const formSchema = z.object({
-  bank: z.string().min(1, {message: 'O nome do banco é obrigatório'}).refine(val => val.trim().length > 0, { message: 'O nome do banco é obrigatório' }),
+  bank: z
+    .string()
+    .min(1, { message: "O nome do banco é obrigatório" })
+    .refine((val) => val.trim().length > 0, {
+      message: "O nome do banco é obrigatório",
+    }),
 });
 
 export function CreateBankAccountDialog({
@@ -52,6 +59,7 @@ export function CreateBankAccountDialog({
   const [paymentsAssociated, setPaymentsAssociated] = useState<string[]>([
     "CARTAO",
     "CARTAO_CREDITO",
+    "DINHEIRO",
     "PIX",
     "TRANSFERENCIA",
   ]);
@@ -59,8 +67,8 @@ export function CreateBankAccountDialog({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      bank: ""
-    }
+      bank: "",
+    },
   });
 
   const { control } = form;
@@ -112,7 +120,6 @@ export function CreateBankAccountDialog({
       "CARTAO",
       "CARTAO_CREDITO",
       "DINHEIRO",
-      "FIADO",
       "PIX",
       "TRANSFERENCIA",
     ]);
@@ -128,6 +135,17 @@ export function CreateBankAccountDialog({
         <DialogHeader>
           <DialogTitle>Criar conta</DialogTitle>
         </DialogHeader>
+
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertTitle>Atenção!</AlertTitle>
+          <AlertDescription>
+            A forma de pagamento "Dinheiro" só resultará em atualização do saldo
+            da conta nos casos de vendas em que a própria empresa seja
+            selecionada como entregador. Nas vendas em dinheiro feitas por
+            entregadores, o valor será atualizado no saldo do entregador.
+          </AlertDescription>
+        </Alert>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
@@ -166,7 +184,14 @@ export function CreateBankAccountDialog({
                 ))}
               </div>
 
-              <Button variant="ghost" onClick={redefine} type="button" className="mt-4">Redefinir</Button>
+              <Button
+                variant="ghost"
+                onClick={redefine}
+                type="button"
+                className="mt-4"
+              >
+                Redefinir
+              </Button>
             </div>
 
             <div className="w-full flex justify-end">

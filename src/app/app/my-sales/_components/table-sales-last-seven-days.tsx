@@ -131,10 +131,25 @@ export function TableSalesLastSevenDays() {
               popoverDirection="down"
               primaryColor={"blue"}
               showShortcuts={true}
-              placeholder={"DD/MM/YYYY ~ DD/MM/YYYY"}
+              placeholder={"DD/MM/AAAA ~ DD/MM/AAAA"}
               displayFormat={"DD/MM/YYYY"}
               value={dateFilter}
               onChange={handleValueChange}
+              configs={{
+                shortcuts: {
+                  today: "Hoje",
+                  yesterday: "Ontem",
+                  past: (period) => `Últimos ${period} dias`,
+                  currentMonth: "Mês atual",
+                  pastMonth: "Último mês",
+                },
+                footer: {
+                  cancel: "Cancelar",
+                  apply: "Aplicar",
+                },
+              }}
+              i18n="pt-br"
+              readOnly
             />
           </div>
         </div>

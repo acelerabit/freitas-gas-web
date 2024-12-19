@@ -194,13 +194,18 @@ export default function TableSale() {
         );
       },
       cell: ({ row }) => {
-        const paymentMethod = row.original.paymentMethod === "FIADO" 
-          ? "VENDA A RECEBER" 
-          : row.original.paymentMethod;
-        
+        const paymentMethod = {
+          CARTAO: "Cartão",
+          CARTAO_CREDITO: "Cartão de crédito",
+          DINHEIRO: "Dinheiro",
+          FIADO: "Venda a receber",
+          PIX: "Pix",
+          TRANSFERENCIA: "Transferência"
+        }[row.original.paymentMethod] || row.original.paymentMethod;
+    
         return <p>{paymentMethod}</p>;
       },
-    },    
+    },       
     {
       accessorKey: "customer",
       header: ({ column }) => {
@@ -444,10 +449,25 @@ export default function TableSale() {
               popoverDirection="down"
               primaryColor={"blue"}
               showShortcuts={true}
-              placeholder={"DD/MM/YYYY ~ DD/MM/YYYY"}
+              placeholder={"DD/MM/AAAA ~ DD/MM/AAAA"}
               displayFormat={"DD/MM/YYYY"}
               value={dateFilter}
               onChange={handleValueChange}
+              configs={{
+                shortcuts: {
+                  today: "Hoje",
+                  yesterday: "Ontem",
+                  past: (period) => `Últimos ${period} dias`,
+                  currentMonth: "Mês atual",
+                  pastMonth: "Último mês",
+                },
+                footer: {
+                  cancel: "Cancelar",
+                  apply: "Aplicar",
+                },
+              }}
+              i18n="pt-br"
+              readOnly
             />
           </div>
         </div>

@@ -66,20 +66,20 @@ const TransactionTypeSchema = z.enum(["ENTRY", "EXIT", "TRANSFER"]);
 const transactionTypeOptions = [
   {
     key: "ENTRY",
-    value: "entrada",
+    value: "Entrada",
   },
-  { key: "EXIT", value: "saida" },
-  { key: "TRANSFER", value: "transferência" },
+  { key: "EXIT", value: "Saida" },
+  { key: "TRANSFER", value: "Transferência" },
 ];
 
 const transactionCategoryOptions = [
   {
     key: "DEPOSIT",
-    value: "depósito",
+    value: "Depósito",
   },
-  { key: "SALE", value: "venda" },
-  { key: "EXPENSE", value: "despesa" },
-  { key: "CUSTOM", value: "outro" },
+  { key: "SALE", value: "Venda" },
+  { key: "EXPENSE", value: "Despesa" },
+  { key: "CUSTOM", value: "Outro" },
 ];
 
 const formSchema = z
@@ -89,12 +89,12 @@ const formSchema = z
     description: z.string().optional().nullable(),
     type: z.string().optional().nullable(),
     custom: z.string().optional().nullable(),
-    customCategory: z.string().optional().nullable(), // Campo opcional
+    customCategory: z.string().optional().nullable(),
     amount: z.coerce
       .number()
-      .min(0, "insira um numero maior ou igual a 0")
+      .min(0, "Insira um numero maior ou igual a 0")
       .positive("O valor deve ser um inteiro positivo.")
-      .refine((val) => !isNaN(val), "insira um numero"),
+      .refine((val) => !isNaN(val), "Insira um numero"),
   })
   .refine(
     (data) => {
@@ -119,10 +119,10 @@ export function UpdateTransactionDialog({
   const [expenseTypeOptions, setExpenseTypeOptions] = useState([
     {
       key: "combustível",
-      value: "combustível",
+      value: "Combustível",
     },
-    { key: "oficina mecânica", value: "oficina mecânica" },
-    { key: "outros", value: "outros" },
+    { key: "oficina mecânica", value: "Oficina mecânica" },
+    { key: "outros", value: "Outros" },
   ]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -307,7 +307,7 @@ export function UpdateTransactionDialog({
                     <FormLabel>Nome da nova categoria</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="nome da categoria"
+                        placeholder="Nome da categoria"
                         {...field}
                         value={field.value ?? ""}
                       />
@@ -354,7 +354,7 @@ export function UpdateTransactionDialog({
                   <FormLabel>Descrição da movimentação</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="descrição"
+                      placeholder="Descrição"
                       {...field}
                       value={field.value ?? ""}
                     />
