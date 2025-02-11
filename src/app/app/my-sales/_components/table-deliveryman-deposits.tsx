@@ -31,13 +31,14 @@ interface User {
 }
 
 interface Deposit {
-  id: string,
-      transactionType: string,
-      category: string,
-      customCategory: string,
-      amount: number,
-      description: string,
-      createdAt: string,
+  id: string;
+  transactionType: string;
+  category: string;
+  customCategory: string;
+  amount: number;
+  description: string;
+  depositDate: string;
+  createdAt: string;
 }
 
 export function TableDeliverymanDeposits() {
@@ -45,7 +46,7 @@ export function TableDeliverymanDeposits() {
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
 
-  const {user, loadingUser} = useUser()
+  const { user, loadingUser } = useUser();
 
   async function fetchDepositsDeliveryman() {
     const fetchUsersUrl = new URL(
@@ -68,8 +69,6 @@ export function TableDeliverymanDeposits() {
     setDeposits(data);
   }
 
-  
-
   function nextPage() {
     setPage((currentPage) => currentPage + 1);
   }
@@ -82,9 +81,8 @@ export function TableDeliverymanDeposits() {
     fetchDepositsDeliveryman();
   }, [page]);
 
-
-  if(loadingUser) {
-    return <LoadingAnimation />
+  if (loadingUser) {
+    return <LoadingAnimation />;
   }
 
   return (
@@ -98,21 +96,18 @@ export function TableDeliverymanDeposits() {
             <TableRow>
               <TableHead>Valor</TableHead>
               <TableHead>Data</TableHead>
-
             </TableRow>
           </TableHeader>
           <TableBody>
             {deposits &&
               deposits.map((deposit) => (
                 <TableRow key={deposit.id}>
-                  
                   <TableCell className="font-medium truncate">
                     {fCurrencyIntlBRL(deposit.amount / 100)}
                   </TableCell>
                   <TableCell className="font-medium truncate">
-                    {formatDateWithHours(deposit.createdAt)}
+                    {formatDateWithHours(deposit.depositDate)}
                   </TableCell>
-                  
                 </TableRow>
               ))}
           </TableBody>

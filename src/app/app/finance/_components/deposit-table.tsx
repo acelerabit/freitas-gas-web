@@ -39,6 +39,7 @@ interface Deposit {
   amount: number;
   description: string;
   createdAt: string;
+  depositDate: string;
   user?: {
     id: string;
     name: string;
@@ -180,7 +181,7 @@ export function TableDeposits() {
                     {fCurrencyIntlBRL(deposit.amount / 100)}
                   </TableCell>
                   <TableCell className="font-medium truncate">
-                    {formatDateWithHours(deposit.createdAt)}
+                    {formatDateWithHours(deposit.depositDate)}
                   </TableCell>
                   <TableCell className="font-medium truncate">
                     {deposit?.user?.name}

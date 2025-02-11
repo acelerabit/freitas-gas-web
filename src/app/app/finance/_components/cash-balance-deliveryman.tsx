@@ -98,6 +98,8 @@ export function TableDeliverymenCashBalances() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const date = handleDateAndTimeFormat(values.date, values.time);
 
+    console.log(date)
+
     if (!date) {
       toast.error("Selecione uma data e horário válidos", {
         action: {
